@@ -2,10 +2,11 @@
 FROM node:14
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json 
-COPY package*.json ./
+COPY package.json package.json
+COPY package-lock.json package-lock.json
 
 # Install dependencies
 RUN npm install
@@ -17,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # Define the command to run the app
-CMD [ "node", "app.js" ]
+CMD [ "npm", "start" ]
