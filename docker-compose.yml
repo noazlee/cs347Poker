@@ -5,3 +5,9 @@ services:
     ports:
       - '3000:3000'
     command: node app.js
+  client:
+    build: ./client
+    ports:
+      - '3001:3001'
+    depends_on:
+      - server
