@@ -7,6 +7,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const pokerLogic = require('./routes/poker-logic.js');
+const game = require('./routes/game.js');
 
 // io.on('connection', (socket) => {
 //   console.log('New client connected:', socket.id);
@@ -15,6 +16,7 @@ const pokerLogic = require('./routes/poker-logic.js');
 // });
 
 app.use(pokerLogic);
+app.use(game);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
