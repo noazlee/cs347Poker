@@ -9,11 +9,17 @@ const io = socketIo(server);
 const pokerLogic = require('./routes/poker-logic.js');
 const game = require('./routes/game.js');
 
-// io.on('connection', (socket) => {
-//   console.log('New client connected:', socket.id);
-//   // Implement poker game logic here
-//   socket.on('disconnect', () => console.log('Client disconnected'));
-// });
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+  // Implement poker game logic here
+  socket.on('join-game', (data) => {
+    // Add user to a game room, for example
+    socket.join(data.gameId);
+    // Notify others in the room
+    socket.to(data.gameId).emit('player-joined', { playerId: socket.id, gameId: data.gameId });
+  });
+  socket.on('disconnect', () => console.log('Client disconnected'));
+});
 
 app.use(pokerLogic);
 app.use(game);
