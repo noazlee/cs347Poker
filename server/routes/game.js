@@ -43,7 +43,7 @@ app.post('/api/table/init', (req, res) => {
 
 class deck{
     //dictionary
-    {1; ace_of_spades,  2: "ace of hears", }
+    {1; ace_of_spades,  2; two_of_hearts, 3; three_of_hearts}
     [1,52]
 
 
@@ -57,6 +57,7 @@ class deck{
     //remember which card have been chosen, remove from array
 
     //loop until each player has two cards(working wiht between 2-8 players)
+    return 0;
 
     
 }
