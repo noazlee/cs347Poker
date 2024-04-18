@@ -13,7 +13,6 @@ router.post('/product',(req,res,next)=>{
 }); 
 
 //tests
-
 router.get('/',(req,res,next)=>{
     res.write('<h1>Hello world</h1>');
 }); 
