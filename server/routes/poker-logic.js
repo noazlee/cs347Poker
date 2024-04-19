@@ -36,6 +36,10 @@ router.post('/api/table/init', (req, res) => {
 });
 
 let tables = {};
+class card{
+    suite = // hearts, spade, cloves, diamond
+    value = // ace - king
+}
 
 /*
 class deck{
