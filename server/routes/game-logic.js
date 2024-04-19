@@ -100,6 +100,7 @@ module.exports = (io) => {
         }
     });
 
+    // HELPFUL ROUTES FOR TESTING - CHECK ALL GAMES AND INDIVIDUAL GAME DATA
     router.get('/game-info',(req, res) => {
         res.status(200).json({games})
     });
