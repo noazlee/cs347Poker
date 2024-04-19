@@ -1,157 +1,39 @@
-// Start game stuff
+const router = require('express').Router();
 
-//Express is used to create the API endpoints
-const express = require('express');
-const router = express.Router();
+// Now the router takes io as a parameter
+module.exports = (io) => {
 
-
-//extracts the entire body portion of an incoming request stream and exposes it on req.body as an object. 
-//This makes it easier to work with the request body, especially when dealing with POST requests 
-//where you are sending data to the server.
-const bodyParser = require('body-parser'); 
-
-//create an instance of the Express application and specify the port number
-//on which the server will listen for incoming requests.
-const app = express();
-const PORT = 3000;
-
-//define a JavaScript object (tables) to store the game tables. 
-//This object will hold the state of each table, including players and the pot.
-let tables = {};
-
-app.use(bodyParser.json());
-
-app.post('/api/table/init', (req, res) => {
-    const { num_players, starting_chips } = req.body;
-
-    // Create a new table ID
-    const table_id = Object.keys(tables).length + 1;
-
-    // Initialize the table with the specified number of players and starting chips
-    tables[table_id] = {
-        players: Array.from({ length: num_players }, (_, i) => ({
-            id: i + 1,
-            chips: starting_chips
-        })),
-        pot: 0
-    };
-
-    res.json({ success: true, message: 'Table initialized successfully', table_id });
-});
-
-
-
-class deck{
-    constructor(card){
-        this.card = card
+    const createNewGame = () =>{
+        return 5;
     }
 
-    //dictionary holding numbers 1-52 and their corresponding card
-    deck = {
-        //heart
-        1: "ace_of_hearts", 
-        2: "two_of_hearts", 
-        3: "three_of_hearts",
-        4: "four_of_hearts",
-        5: "five_of_hearts",
-        6: "six_of_hearts",
-        7: "seven_of_hearts",
-        8: "eight_of_hearts",
-        9: "nine_of_hearts",
-        10: "ten_of_hearts",
-        11: "jack_of_hearts",
-        12: "queen_of_hearts",
-        13: "king_of_hearts",
-        //diamond
-        14: "ace_of_diamonds", 
-        15: "two_of_diamonds", 
-        16: "three_of_diamonds",
-        17: "four_of_diamonds",
-        18: "five_of_diamonds",
-        19: "six_of_diamonds",
-        20: "seven_of_diamonds",
-        21: "eight_of_diamonds",
-        22: "nine_of_diamonds",
-        23: "ten_of_diamonds",
-        24: "jack_of_diamonds",
-        25: "queen_of_diamonds",
-        26: "king_of_diamonds",
-        //clubs
-        27: "ace_of_clubs", 
-        28: "two_of_clubs", 
-        29: "three_of_clubs",
-        30: "four_of_clubs",
-        31: "five_of_clubs",
-        32: "six_of_clubs",
-        33: "seven_of_clubs",
-        34: "eight_of_clubs",
-        35: "nine_of_clubs",
-        36: "ten_of_clubs",
-        37: "jack_of_clubs",
-        38: "queen_of_clubs",
-        39: "king_of_clubs",
-        //spades
-        40: "ace_of_spades", 
-        41: "two_of_spades", 
-        42: "three_of_spades",
-        43: "four_of_spades",
-        44: "five_of_spades",
-        45: "six_of_spades",
-        46: "seven_of_spades",
-        47: "eight_of_spades",
-        48: "nine_of_spades",
-        49: "ten_of_spades",
-        50: "jack_of_spades",
-        51: "queen_of_spades",
-        52: "king_of_spades"
-    };
-    
+    router.post('/create-game',(req, res) => {
+        // Create a new game with a unique identifier
+        const gameId = createNewGame(); // Logic to create a game -> NEEDS TO BE ADDED
 
+        // Emit an event to all connected clients
+        io.emit('game-created', { gameId: gameId });
 
-    //creating the array with 52 cards
-    let card = []
-    for(let i = 1; i<= 52; i++){
-        card.push(i);
-    }
+        // Respond to the HTTP request
+        res.status(200).json({ message: 'Game created', gameId: gameId });
+    });
 
+    router.post('/join-game',(req, res) => {
+        const { gameId } = req.body; // Assume the gameId is passed in the request body
 
-    //pick a random card from deck
+        // Add the player to the game's room (your logic here)
+        const result = joinGameRoom(gameId, req.user.id); // Example function to handle game joining logic
 
+        if (result.success) {
+            // Emit an event to all clients in the room
+            io.to(gameId).emit('player-joined', { playerId: req.user.id, gameId: gameId });
 
-
-
-
-
-    //remember which card have been chosen, remove from array
-
-    //loop until each player has two cards(working wiht between 2-8 players)
-    return 0;
-}
-
-
-
-//pick card function
-fun pick_card{
-    Math.random(card)
-}
-    
-
-
-
-
-//hands
-
-
-
-//gameID
-
-
-
-
-//hand out chips
-
-//role - big blind, small blind
-//reset position when someone raises
-
-
-module.exports = router;
+            // Respond to the HTTP request
+            res.status(200).json({ message: 'Joined game', gameId: gameId });
+        } else {
+            // If the joining failed (game doesn't exist, etc.)
+            res.status(400).json({ message: 'Error joining game' });
+        }
+    });
+    return router;
+};
