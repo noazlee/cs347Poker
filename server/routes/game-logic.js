@@ -71,15 +71,27 @@ module.exports = (io) => {
         const { userId, gameId } = req.params;
     
         if (games[gameId] && games[gameId].players.some(player => player.playerId === userId)) {
+            const isHostLeaving = userId === games[gameId].hostId;
             games[gameId].removePlayer(userId);
     
             // Emit an event to all clients in the room
             io.to(gameId).emit('player-left', { playerId: userId, gameId: gameId });
     
-            // Optionally, you might want to close the game room if no players are left
-            if (games[gameId].players.length === 0) {
-                delete games[gameId];  // Remove the game if empty
-                io.emit('game-closed', { gameId: gameId });
+            if (isHostLeaving) {
+                // Find a new human host (not an AI player)
+                const newHost = games[gameId].players.find(player => !player.isAI);
+    
+                if (newHost) {
+                    // Assign new host
+                    games[gameId].hostId = newHost.playerId;
+                    io.to(gameId).emit('new-host', { newHostId: newHost.playerId, gameId: gameId });
+                } else {
+                    // No human players left, delete the game
+                    delete games[gameId];
+                    io.emit('game-closed', { gameId: gameId });
+                    res.status(200).json({ message: 'Game closed as the last human player left', gameId: gameId });
+                    return;
+                }
             }
     
             res.status(200).json({ message: 'Left game', gameId: gameId });
@@ -90,6 +102,14 @@ module.exports = (io) => {
 
     router.get('/game-info',(req, res) => {
         res.status(200).json({games})
+    });
+    router.get('/game-info/:gameId',(req, res) => {
+        const {gameId} = req.params;
+        if(games[gameId]){
+            res.status(200).json({game: games[gameId]});
+        }else{
+            res.status(404).json({message: "Game not found"});
+        }  
     });
     return router;
 };
