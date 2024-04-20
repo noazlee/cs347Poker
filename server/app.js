@@ -23,8 +23,8 @@ const gameLogic = require('./routes/game-logic.js');
 const registerSocketHandlers = require('./socketHandlers');
 
 registerSocketHandlers(io);
-app.use(gameLogic(io));
-app.use(userLogic);
+app.use('/api',gameLogic(io));
+app.use('/api',userLogic);
 //app.use(pokerLogic); commented out because it is breaking the execution
 
 const port = process.env.PORT || 3000;
