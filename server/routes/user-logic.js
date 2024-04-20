@@ -8,6 +8,13 @@ const { connectDb } = require('../db');
 const saltRounds = 10;
 
 async function createUser(username, password) {
+    const db = await connectDb();
+
+    const existingUser = await db.collection('users').findOne({username:username});
+    if(existingUser){
+        throw new Error('Username already exists.');
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newUser = {
         userId: Math.random().toString(36).substring(2, 15),
@@ -17,8 +24,7 @@ async function createUser(username, password) {
         gamesPlayed: 0,
         gamesWon: 0
     };
-
-    const db = await connectDb();
+    
     await db.collection('users').insertOne(newUser);
     return newUser;
 }
@@ -33,10 +39,13 @@ router.post('/create-user', async (req, res) => {
 
     try {
         const newUser = await createUser(username, password);
-        res.status(201).json({ message: 'User created', userId: newUser.userId });
+        return res.status(201).json({ message: 'User created', userId: newUser.userId });
     } catch (error) {
+        if(error.message==="Username already exists."){
+            return res.status(409).json({ message: 'Username already exists.', error: error.message });
+        }
         console.error('Failed to create user:', error);
-        res.status(500).json({ message: 'Failed to create user', error: error.message });
+        return res.status(500).json({ message: 'Failed to create user', error: error.message });
     }
 });
 
@@ -45,10 +54,10 @@ router.get('/users', async (req, res) => {
     try {
         const db = await connectDb();
         const users = await db.collection('users').find({}).toArray(); // Retrieve all users
-        res.status(200).json(users);
+        return res.status(200).json(users);
     } catch (error) {
         console.error('Failed to retrieve users:', error);
-        res.status(500).json({ message: 'Failed to retrieve users' });
+        return res.status(500).json({ message: 'Failed to retrieve users' });
     }
 });
 
@@ -63,11 +72,11 @@ router.get('/users/:userId', async (req, res) => {
         if (user) {
             res.status(200).json(user);
         } else {
-            res.status(404).json({ message: 'User not found' }); // No user found with the given userId
+            return res.status(404).json({ message: 'User not found' }); // No user found with the given userId
         }
     } catch (error) {
         console.error('Failed to retrieve user:', error);
-        res.status(500).json({ message: 'Failed to retrieve user' });
+        return res.status(500).json({ message: 'Failed to retrieve user' });
     }
 });
 
