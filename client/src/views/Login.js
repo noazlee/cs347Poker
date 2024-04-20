@@ -7,16 +7,19 @@ import '../App.css';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError(''); //clears previous errors
         try {
             const response = await axios.post('/login', { username, password });
             const userId = response.data.userId;
             navigate(`/home/${userId}`);
         } catch (error) {
             console.error(error.response.data.message); 
+            setError(error.response.data.message);
         }
     };
 
@@ -43,6 +46,7 @@ const Login = () => {
                 <p>
                     Don't have an account? <Link to="/register">Register here</Link>
                 </p>
+                {error && <div className="error-box">{error}</div>}
             </div>
             
         </div>

@@ -7,16 +7,18 @@ import '../App.css';
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setError('');
         try {
             const response = await axios.post('/create-user', { username, password });
             const userId = response.data.userId;
             navigate(`/home/${userId}`);
         } catch (error) {
-            console.error(error.response.data.message); // handle registration errors
+            setError(error.response.data.message);
         }
     };
 
@@ -43,6 +45,7 @@ const Register = () => {
                 <p>
                     Already have an account? <Link to="/login">Login here</Link>
                 </p>
+                {error && <div className="error-box">{error}</div>}
             </div>
         </div>
     );
