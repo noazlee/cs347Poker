@@ -3,6 +3,7 @@ BASE NODE FILE THAT IS EXECUTED BY THE BACKEND
 */
 
 const express = require('express');
+const bodyParser = require('body-parser');
 const http = require('http');
 const socketIo = require('socket.io');
 
@@ -11,11 +12,13 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // const pokerLogic = require('./routes/poker-logic.js');
+const userLogic = require('./routes/user-logic.js');
 const gameLogic = require('./routes/game-logic.js');
 const registerSocketHandlers = require('./socketHandlers');
 
 registerSocketHandlers(io);
 app.use(gameLogic(io));
+app.use(userLogic);
 //app.use(pokerLogic); commented out because it is breaking the execution
 
 

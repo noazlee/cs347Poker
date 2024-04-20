@@ -6,6 +6,7 @@ WHERE TEMPORARY GAME DATA CAN EXIST BEFORE BEING UPLOADED TO THE DB AFTER COMPLE
 const MAXNUMPLAYERS = 2;
 const POTAMOUNT = 10000;
 const BIGBLINDAMOUNT = 200; 
+const GAMEMODE = 'default'; 
 
 class Game {
     constructor(hostId, maxNumPlayers, potAmount) {
@@ -14,7 +15,7 @@ class Game {
         this.maxPlayers = MAXNUMPLAYERS;
         this.hostId = hostId;
         this.potAmount = POTAMOUNT;
-        this.gameMode = 'default';
+        this.gameMode = GAMEMODE;
         this.bigBlindAmount = BIGBLINDAMOUNT;
         this.rounds = [];
         this.status = 'waiting';

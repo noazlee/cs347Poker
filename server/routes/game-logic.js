@@ -4,7 +4,7 @@ PLAYERS JOINING, ETC. UP IN THE LOBBY UNTIL THE GAME STARTS.
 */
 
 const router = require('express').Router();
-const Game = require('../models/game-model');
+const Game = require('../classes/game-model');
 const games = {}; //stores all games
 
 module.exports = (io) => {
