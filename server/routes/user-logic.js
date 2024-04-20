@@ -2,10 +2,7 @@ const express = require('express');
 const router = express.Router();
 const MongoClient = require('mongodb').MongoClient;
 const bcrypt = require('bcryptjs');
-const { connectDb } = require('../utils/db');
-
-// MongoDB URL
-const url = 'mongodb+srv://noahzlee7:BuA8hAJGSAm8mbsv@cluster0.jxe1laa.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0';
+const { connectDb } = require('../db');
 
 // Hashing strength factor
 const saltRounds = 10;
@@ -14,7 +11,7 @@ async function createUser(username, password) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newUser = {
         userId: Math.random().toString(36).substring(2, 15),
-        username,
+        username: username,
         passHash: hashedPassword,
         totalChips: 0,
         gamesPlayed: 0,
@@ -39,7 +36,7 @@ router.post('/create-user', async (req, res) => {
         res.status(201).json({ message: 'User created', userId: newUser.userId });
     } catch (error) {
         console.error('Failed to create user:', error);
-        res.status(500).json({ message: 'Failed to create user' });
+        res.status(500).json({ message: 'Failed to create user', error: error.message });
     }
 });
 
