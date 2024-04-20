@@ -77,6 +77,19 @@ router.get('/users', async (req, res) => {
     }
 });
 
+// Get a user's username from their id
+router.get('/users/:userId', async (req, res) => {
+    const { userId } = req.params;
+    const db = await connectDb();
+    const user = await db.collection('users').findOne({ userId: userId });
+
+    if (user) {
+        res.status(200).json({ username: user.username });
+    } else {
+        res.status(404).send('User not found');
+    }
+});
+
 // Get a single user by userId
 router.get('/users/:userId', async (req, res) => {
     const { userId } = req.params;
