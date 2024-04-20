@@ -29,7 +29,6 @@ async function createUser(username, password) {
     return newUser;
 }
 
-// Now use createUser in the route handler
 router.post('/create-user', async (req, res) => {
     const { username, password } = req.body;
 
@@ -46,6 +45,23 @@ router.post('/create-user', async (req, res) => {
         }
         console.error('Failed to create user:', error);
         return res.status(500).json({ message: 'Failed to create user', error: error.message });
+    }
+});
+
+//LOGIN LOGIC
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    const db = await connectDb();
+    try {
+        const user = await db.collection('users').findOne({ username });
+        if (user && await bcrypt.compare(password, user.passHash)) {
+            return res.status(200).json({ message: 'Login successful', userId: user.userId });
+        } else {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ message: 'Login failed', error: error.message });
     }
 });
 
