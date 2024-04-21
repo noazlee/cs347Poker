@@ -17,7 +17,7 @@ router.get('/',(req,res,next)=>{
     res.write('<h1>Hello world2</h1>');
 }); 
 
-router.post('/api/table/init', (req, res) => {
+router.post('/table/init', (req, res) => {
     const { num_players, starting_chips } = req.body;
 
     // Create a new table ID
@@ -40,7 +40,7 @@ class card{
     suite = // hearts, spade, cloves, diamond
     value = // ace - king
 }
-
+//array stack 
 /*
 class deck{
     constructor(card){

@@ -100,6 +100,12 @@ module.exports = (io) => {
         }
     });
 
+    router.post('/start-game/:gameId', (req, res) => {
+        const { gameId } = req.params;
+        // table = New Table();
+        // res.json({table});
+    });
+
     // HELPFUL ROUTES FOR TESTING - CHECK ALL GAMES AND INDIVIDUAL GAME DATA
     router.get('/game-info',(req, res) => {
         res.status(200).json({games})
