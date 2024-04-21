@@ -4,7 +4,8 @@ class Round {
         this.table = table;
         this.currentBet = table.smallBlindAmount * 2;
         this.pot = 0;
-        this.hands=[]
+        this.hands=[];
+        this.stage = 0; // 0: preflop, 1:postflop, 2:postturn, 3:postriver
     }
 
     start() {
