@@ -3,6 +3,8 @@ THIS FILE WAS CREATED BY NOAH AND ITS PURPOSE IS TO CREATE A GAME CLASS THAT CAN
 WHERE TEMPORARY GAME DATA CAN EXIST BEFORE BEING UPLOADED TO THE DB AFTER COMPLETION.
 */
 
+const Player = require('./player');
+
 const MAXNUMPLAYERS = 2;
 const POTAMOUNT = 10000;
 const SMALLBLINDAMOUNT = 100; 
@@ -11,7 +13,7 @@ const GAMEMODE = 'default';
 class Game {
     constructor(hostId, maxNumPlayers, potAmount) {
         this.gameId = Math.random().toString(36).substring(2, 15);
-        this.players = [{playerId:hostId,isAI:false}];
+        this.players = [new Player(hostId, 0, false)];
         this.maxPlayers = MAXNUMPLAYERS;
         this.hostId = hostId;
         this.potAmount = POTAMOUNT;
@@ -25,7 +27,7 @@ class Game {
 
     initializeAIPlayers(){
         while(this.players.length<this.maxPlayers){
-            this.players.push({playerId:`AI-${Math.random().toString(36).substring(2, 9)}`,isAI:true});
+            this.players.push(new Player(`AI-${Math.random().toString(36).substring(2, 9)}`, 0, true));
         }
     }
 
