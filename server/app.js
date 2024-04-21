@@ -2,6 +2,8 @@
 BASE NODE FILE THAT IS EXECUTED BY THE BACKEND
 */
 
+//comment for testing
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
