@@ -5,6 +5,7 @@ class Round {
         this.currentBet = table.smallBlindAmount * 2;
         this.pot = 0;
         this.hands=[];
+        this.stage=0;
     }
 
     start() {
