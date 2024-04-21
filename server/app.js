@@ -9,9 +9,7 @@ const socketIo = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server,{
-
-});
+const io = socketIo(server);
 
 
 app.use(bodyParser.json());
@@ -25,18 +23,6 @@ const gameLogic = require('./routes/game-logic.js');
 const registerSocketHandlers = require('./socketHandlers');
 
 registerSocketHandlers(io);
-
-
-io.on('connection', (socket) => {
-    console.info('New client connected:', socket.id);
-
-    socket.on('disconnect', () => {
-        console.info('Client disconnected');
-    });
-
-});
-
-
 app.use('/api',gameLogic(io));
 app.use('/api',userLogic);
 //app.use(pokerLogic); commented out because it is breaking the execution
