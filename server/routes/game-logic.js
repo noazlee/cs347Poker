@@ -116,3 +116,5 @@ module.exports = (io) => {
     });
     return router;
 };
+
+module.exports=games;
