@@ -21,17 +21,6 @@ module.exports = (io) => {
         // Create a new game with a unique identifier
         const gameId = createNewGame(userId); // Logic to create a game -> NEEDS TO BE ADDED
 
-        // Emit an event to all connected clients
-        io.on("connection", async (socket) => {
-            const userId = await computeUserIdFromHeaders(socket);
-          
-            socket.join(userId);
-            console.info("connection achieved");
-          
-            // and then later
-            io.to(userId).emit("hi");
-          });
-
         // Respond to the HTTP request
         res.status(200).json({ message: 'Game created', gameId: gameId, hostId:userId });
     });
