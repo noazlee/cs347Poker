@@ -69,7 +69,7 @@ router.post('/login', async (req, res) => {
 router.get('/users', async (req, res) => {
     try {
         const db = await connectDb();
-        const users = await db.collection('users').find({}).toArray(); // Retrieve all users
+        const users = await db.collection('users').find({}).toArray();
         return res.status(200).json(users);
     } catch (error) {
         console.error('Failed to retrieve users:', error);
@@ -96,12 +96,12 @@ router.get('/users/:userId', async (req, res) => {
 
     try {
         const db = await connectDb();
-        const user = await db.collection('users').findOne({ userId: userId }); // Find user by userId
+        const user = await db.collection('users').findOne({ userId: userId }); 
 
         if (user) {
             res.status(200).json(user);
         } else {
-            return res.status(404).json({ message: 'User not found' }); // No user found with the given userId
+            return res.status(404).json({ message: 'User not found' }); 
         }
     } catch (error) {
         console.error('Failed to retrieve user:', error);

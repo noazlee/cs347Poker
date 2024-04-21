@@ -1,20 +1,63 @@
-class Players{
-    constructor(userId,position, chips){
+class Player{
+    constructor(userId, position, chips, isAi){
         this.userId = userId;
         this.position = position;
         this.chips = chips;
-        this.cards = [];
+        this.hand = [];
         this.isPlaying = true;
-        this.isAi = false;
+        this.isInRound = true;
+        this.currentBet = 0;
+        this.isAi = isAi;
     }
 
-    dealCards(card1,card2){
-        this.cards.push(card1,card2);
+    getCardToHand(card) {
+        this.hand.push(card);
     }
 
-    // revealCards(){
+    fold(){
+        this.isInRound = false;
+    }
 
-    // }
+    raise(amount) {
+        if (amount > this.chips) {
+            throw new Error('Insufficient chips to raise');
+        }
+        this.chips -= amount;
+        this.currentBet = amount;
+    }
+
+    check() {
+        //ADD LATER
+    }
+
+    call(amount){
+        const amountToCall = amount - this.currentBet;
+        if(amountToCall <= 0){
+            throw new Error('Player calls')
+        }
+        if(amountToCall > this.chips){
+            throw new Error('Insufficient amount of chips');
+        }
+        this.chips -= amountToCall
+        this.currentBet += amountToCall;
+    }
+
+    allIn() {
+        this.currentBet += this.chips;
+        this.chips = 0;
+        return this.currentBet; // ADD LIMIT TO HIGHEST OTHER BET LATER
+    }
+
+    resetForNewRound() {
+        this.hand = [];
+        this.currentBet = 0;
+        this.isInRound = this.isPlaying; // Only reset for the round if still playing in the game
+    }
+
+    leaveGame(){
+        this.isPlaying = false;
+        this.isInRound = false;
+    }
 
     getChips(){
         return this.chips;
@@ -24,46 +67,10 @@ class Players{
         return this.position;
     }
 
-    isAi(){
-        this.isAi = false;
-    }
-
-    fold(){
-        this.isPlaying = false;
-    }
-
-    raise(amount){
-        if(amount > this.chips){
-            console.log('Insufficient amount of chips');
-            return;
-        }
-        this.chips -= amount;
-    }
-
-    check(){
-        
-    }
-
-    call(currentBet){
-        const amountToCall = currentbet - this.chips;
-        if(amountToCall <= 0){
-            console.log('Player calls')
-            return;
-        }
-        if(amountToCall > this.chips){
-            console.log('Insufficient amount of chips');
-            return;
-        }
-        this.chips -= amountToCall
-    }
-
-
-    leaveGame(){
-        isPlaying = false;
-    }
-
 
 }
+
+module.exports = Player;
 
 //players two cards
 //position
@@ -74,3 +81,4 @@ class Players{
 
 //methods:
 // fold, raise, check, call, leave game, all in?
+
