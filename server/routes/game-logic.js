@@ -22,7 +22,15 @@ module.exports = (io) => {
         const gameId = createNewGame(userId); // Logic to create a game -> NEEDS TO BE ADDED
 
         // Emit an event to all connected clients
-        io.emit('game-created', { gameId: gameId });
+        io.on("connection", async (socket) => {
+            const userId = await computeUserIdFromHeaders(socket);
+          
+            socket.join(userId);
+            console.info("connection achieved");
+          
+            // and then later
+            io.to(userId).emit("hi");
+          });
 
         // Respond to the HTTP request
         res.status(200).json({ message: 'Game created', gameId: gameId, hostId:userId });
@@ -98,6 +106,11 @@ module.exports = (io) => {
         } else {
             res.status(404).json({ message: 'Game not found or player not in game' });
         }
+    });
+
+    router.post('/start-game/:gameId', (req, res) => {
+        const { gameId } = req.params;
+        
     });
 
     // HELPFUL ROUTES FOR TESTING - CHECK ALL GAMES AND INDIVIDUAL GAME DATA

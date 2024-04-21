@@ -14,7 +14,7 @@ const Login = () => {
         e.preventDefault();
         setError(''); //clears previous errors
         try {
-            const response = await axios.post('/login', { username, password });
+            const response = await axios.post('/api/login', { username, password });
             const userId = response.data.userId;
             navigate(`/home/${userId}`);
         } catch (error) {

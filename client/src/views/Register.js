@@ -14,7 +14,7 @@ const Register = () => {
         e.preventDefault();
         setError('');
         try {
-            const response = await axios.post('/create-user', { username, password });
+            const response = await axios.post('/api/create-user', { username, password });
             const userId = response.data.userId;
             navigate(`/home/${userId}`);
         } catch (error) {
