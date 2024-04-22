@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Register from './views/Register';
 import Login from './views/Login';
 import Home from './views/Home';
+import GameRoom from './views/GameRoom';
 
 const App = () => {
     return (
@@ -11,6 +12,7 @@ const App = () => {
                 <Route path="/register" element={<Register/>} />
                 <Route path="/" element={<Login/>} />
                 <Route path="/home/:userId" element={<Home/>} />
+                <Route path="/game/:gameId" element={<GameRoom/>} />
                 {/* put all routes here */}
             </Routes>
         </Router>

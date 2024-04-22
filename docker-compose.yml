@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   server:
     build: ./server
@@ -11,12 +11,13 @@ services:
     build: ./client
     ports:
       - "3001:3001"
-    networks:
-      - app-network
     environment:
       - REACT_APP_API_URL=http://server:3000
     depends_on:
       - server
+    networks:
+      - app-network
 
 networks:
   app-network:
+    driver: bridge
