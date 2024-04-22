@@ -17,15 +17,12 @@ module.exports = function(io){
     
         // Player joining a game
         socket.on('join-game', (data) => {
-            // Logic for joining the game, similar to joinGameRoom function
-            const result = joinGameRoom(data.gameId, data.playerId);
-            // Handle the result accordingly and emit events
+            
         });
     
         // Player leaving a game
         socket.on('leave-game', (data) => {
-            // Similar logic as in the /leave-game/:userId/:gameId route
-            // Emit events for leaving the game
+            
         });
     
         // Start the game
@@ -33,12 +30,11 @@ module.exports = function(io){
             // Logic for starting the game
             // Emit events for game start
         });
-    
-        // Additional game logic...
+
     
         // Disconnecting
         socket.on('disconnect', () => {
-            // Handle player disconnection, if necessary
+            // Handle player disconnection
         });
         return router;
     });
