@@ -1,6 +1,7 @@
 class Player{
-    constructor(userId, chips, isAi){
+    constructor(userId, socketId, chips, isAi){
         this.userId = userId;
+        this.socketId = socketId;
         this.chips = chips;
         this.hand = [];
         this.isPlaying = true;

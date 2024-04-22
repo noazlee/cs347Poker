@@ -11,45 +11,60 @@ const SMALLBLINDAMOUNT = 100;
 const GAMEMODE = 'default'; 
 
 class Game {
-    constructor(hostId, maxNumPlayers, potAmount) {
+    constructor(hostId, hostSocketId) {
         this.gameId = Math.random().toString(36).substring(2, 15);
-        this.players = [new Player(hostId, 0, false)];
+        this.players = [];
         this.maxPlayers = MAXNUMPLAYERS;
         this.hostId = hostId;
+        this.hostSocketId = hostSocketId;
         this.potAmount = POTAMOUNT;
         this.gameMode = GAMEMODE;
         this.smallBlindAmount = SMALLBLINDAMOUNT;
         this.rounds = [];
         this.status = 'waiting';
 
+        this.addPlayer(hostId, hostSocketId, false);
         this.initializeAIPlayers();
     }
 
-    initializeAIPlayers(){
-        while(this.players.length<this.maxPlayers){
-            this.players.push(new Player(`AI-${Math.random().toString(36).substring(2, 9)}`, 0, true));
+    initializeAIPlayers() {
+        while (this.players.length < this.maxPlayers) {
+            const aiId = `AI-${Math.random().toString(36).substring(2, 9)}`;
+            const aiSocketId = `AI-Socket-${Math.random().toString(36).substring(2, 9)}`;
+            this.addPlayer(aiId, aiSocketId, true);
         }
     }
 
-    addPlayer(playerId) {
-        const aiIndex = this.players.findIndex(player => player.isAI);
-        if (aiIndex !== -1) {
-            this.players[aiIndex] = { playerId: playerId, isAI: false };
-        } else {
-            // Only add a new player if there's still room
-            if (this.players.length < this.maxPlayers) {
-                this.players.push({ playerId: playerId, isAI: false });
-            }
+    addPlayer(playerId, socketId, isAI) {
+        if (this.players.find(p => p.playerId === playerId)) {
+            return false; // if player already exists
         }
+        if (this.players.length >= this.maxPlayers) {
+            return false; // no room for more players
+        }
+        const newPlayer = new Player(playerId, socketId, POTAMOUNT, isAI); 
+        this.players.push(newPlayer);
+        return true;
     }
 
-    removePlayer(playerId){
-        this.players = this.players.filter(player => player.playerId !== playerId);
-        // Fill the rest of the game with AI players
+    removePlayer(socketId) {
+        this.players = this.players.filter(player => player.socketId !== socketId);
+        // Optionally, re-fill with AI players if below max capacity
         if (this.players.length < this.maxPlayers) {
             this.initializeAIPlayers();
         }
+    }
 
+    getPlayerBySocket(socketId) {
+        return this.players.find(player => player.socketId === socketId);
+    }
+
+    getPlayerById(playerId) {
+        return this.players.find(player => player.playerId === playerId);
+    }
+
+    startGame() {
+        // NEEDS TO BE IMPLEMENTED
     }
 }
 
