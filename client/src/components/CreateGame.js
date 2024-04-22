@@ -29,7 +29,7 @@ const CreateGame = () => {
 
         socket.on('game-created', (data) => {
             console.log('Game Created: ', data);
-            navigate(`/game/${data.gameId}`); // Redirecting to a game page, ensure you have a route setup for this
+            navigate(`/game/${data.gameId}/${data.hostId}`); // Redirecting to a game page, ensure you have a route setup for this
         });
     };
 
