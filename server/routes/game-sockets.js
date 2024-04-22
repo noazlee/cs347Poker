@@ -30,6 +30,12 @@ module.exports = function(io){
                 socket.emit('join-failed', { message: 'Game not found or not joinable' });
             }
         });
+
+        // Player move during round of betting
+        socket.on('player-action', (data) => {
+            const game = games[data.gameId];
+            // Needs to be programmed
+        });
     
         // Player leaving a game
         socket.on('leave-game', (data) => {

@@ -34,9 +34,14 @@ class Game {
             this.addPlayer(aiId, aiSocketId, true);
         }
     }
-
+    
+    // move to the next player in the queue unless there is no players left
     nextPlayer(){
-        // move to the next player in the queue unless there is no players left
+        
+    }
+
+    // method to get all the relevant game information that would be known by everyone at the table
+    getPublicGameState() {
     }
 
     addPlayer(playerId, socketId, isAI) {
