@@ -35,6 +35,10 @@ class Game {
         }
     }
 
+    nextPlayer(){
+        // move to the next player in the queue unless there is no players left
+    }
+
     addPlayer(playerId, socketId, isAI) {
         if (this.players.find(p => p.playerId === playerId)) {
             return false; // if player already exists
