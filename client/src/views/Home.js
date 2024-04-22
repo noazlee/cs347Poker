@@ -42,9 +42,9 @@ const Home = () => {
     };
 
     return (
-        <div className="container">
-            <h1>Welcome, {username || 'Loading...'}</h1>
-            <button onClick={handleCreateGame}>Create New Game</button>
+        <div className="home-container">
+            <h1 className="home-title">Welcome, {username || 'Loading...'}</h1>
+            <button className="home-button" onClick={handleCreateGame}>Create New Game</button>
         </div>
     );
 };
