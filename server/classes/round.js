@@ -5,7 +5,7 @@ class Round {
         this.currentBet = table.smallBlindAmount * 2;
         this.pot = 0;
         this.hands=[];
-        this.stage=0;
+        this.stage=0;//0 is preflop, 1 is postflop, 2 is postturn, 3 is postriver
     }
 
     start() {

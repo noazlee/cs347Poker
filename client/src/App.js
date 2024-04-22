@@ -4,6 +4,7 @@ import Register from './views/Register';
 import Login from './views/Login';
 import Home from './views/Home';
 import Table from './views/Table';
+import GameRoom from './views/GameRoom';
 
 const App = () => {
     return (
@@ -13,6 +14,7 @@ const App = () => {
                 <Route path="/" element={<Login/>} />
                 <Route path="/home/:userId" element={<Home/>} />
                 <Route path="/table" element={<Table/>} />
+                <Route path="/game/:gameId" element={<GameRoom/>} />
                 {/* put all routes here */}
             </Routes>
         </Router>
