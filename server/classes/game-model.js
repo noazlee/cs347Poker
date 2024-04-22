@@ -11,7 +11,8 @@ const SMALLBLINDAMOUNT = 100;
 const GAMEMODE = 'default'; 
 
 class Game {
-    constructor(hostId, hostSocketId) {
+    constructor(ioInstance, hostId, hostSocketId) {
+        this.io = ioInstance;
         this.gameId = Math.random().toString(36).substring(2, 15);
         this.players = [];
         this.maxPlayers = MAXNUMPLAYERS;
@@ -42,6 +43,12 @@ class Game {
 
     // method to get all the relevant game information that would be known by everyone at the table
     getPublicGameState() {
+    }
+
+    notifyPlayerToAct(playerId) {
+        this.io.to(playerId).emit('your-turn', {
+            //what actions the player can take
+        });
     }
 
     addPlayer(playerId, socketId, isAI) {
