@@ -90,24 +90,5 @@ router.get('/users/:userId', async (req, res) => {
     }
 });
 
-// Get a single user by userId
-router.get('/users/:userId', async (req, res) => {
-    const { userId } = req.params;
-
-    try {
-        const db = await connectDb();
-        const user = await db.collection('users').findOne({ userId: userId }); 
-
-        if (user) {
-            res.status(200).json(user);
-        } else {
-            return res.status(404).json({ message: 'User not found' }); 
-        }
-    } catch (error) {
-        console.error('Failed to retrieve user:', error);
-        return res.status(500).json({ message: 'Failed to retrieve user' });
-    }
-});
-
 
 module.exports = router;
