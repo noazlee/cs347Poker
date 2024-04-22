@@ -27,7 +27,7 @@ const Home = () => {
     useEffect(() => {
         const handleGameCreated = (data) => {
             console.log('Game Created:', data);
-            navigate(`/game/${data.gameId}/${data.hostId}`); // Navigate to the game page
+            navigate(`/game/${data.gameId}/${data.hostId}`); 
         };
 
         socket.on('game-created', handleGameCreated);
