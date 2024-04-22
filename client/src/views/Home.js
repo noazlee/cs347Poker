@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import '../App.css';
 
-const socket = io('http://localhost:3000', { withCredentials: true, transports: ['websocket', 'polling'] });
+const acceptedURL  = ['http://10.133.26.36:3001', 'http://localhost:3001']
+const socket = io(acceptedURL, { withCredentials: true, transports: ['websocket', 'polling'] });
 
 const Home = () => {
     const { userId } = useParams();
