@@ -5,7 +5,6 @@ export default function Table() {
     return (
         <>
             <Card />
-            <Card isVisible={true} />
         </>
     );
 }
