@@ -1,0 +1,54 @@
+.table {
+    width: 100%;
+    height: 100vh;
+    background-color: darkgreen;
+    display: grid;
+    grid-template-columns: 3 1fr 1fr 1fr;
+    grid-template-rows: 3 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+#firstBox {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#secondBox {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#thirdBox {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#fourthBox {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#deck {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#fifthBox {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#sixthBox {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+#seventhBox {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+#eighthBox {
+    grid-column: 3;
+    grid-row: 3;
+}

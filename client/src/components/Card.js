@@ -9,16 +9,16 @@ export default function Card ({ isVisible=false, card_data}) {
             {!isVisible ? (
                 <img
                     src={buildImgUrl('cardback.png')}
-                    width={25}
-                    height={35}
+                    width={50}
+                    height={70}
                     alt='Facedown playing card'>
                 </img>
             ) : (
                 <img
-                    src={buildImgUrl('ace1.png')}
+                    src={buildImgUrl('card_pics/ace1.png')}
                     alt={'Ace of Clubs'}
-                    width={25}
-                    height={35}
+                    width={50}
+                    height={70}
                 />
             )}
         </div>
