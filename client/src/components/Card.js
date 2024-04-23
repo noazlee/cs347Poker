@@ -1,8 +1,10 @@
 import React from 'react';
 import { buildImgUrl } from '../utils/utils';
+import '../css/Card.css';
 
 export default function Card ({ isVisible=false, card_data}) {
     return (
+
         <div className='card'>
             {!isVisible ? (
                 <img
@@ -12,8 +14,12 @@ export default function Card ({ isVisible=false, card_data}) {
                     alt='Facedown playing card'>
                 </img>
             ) : (
-                // To Do: Add visible card front depending on the card. Null placeholder for now
-                null
+                <img
+                    src={buildImgUrl('ace1.png')}
+                    alt={'Ace of Clubs'}
+                    width={25}
+                    height={35}
+                />
             )}
         </div>
     );

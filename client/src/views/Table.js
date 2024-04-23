@@ -1,10 +1,11 @@
 import React from 'react';
-import Card from '../components/Card'
+import PlayerBox from '../components/PlayerBox'
 
 export default function Table() {
     return (
         <>
-            <Card />
+            <PlayerBox isPlayerOne={true}/>
+            <PlayerBox isPlayerOne={false}/>
         </>
     );
 }
