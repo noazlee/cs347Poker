@@ -7,10 +7,10 @@ export default function Table({ props }) {
     return (
         <div className='table'>
             <section id='firstBox'>
-                <PlayerBox isPlayerOne={false} />
+                <PlayerBox isPlayerOne={false} blind={1} />
             </section>
             <section id='secondBox'>
-                <PlayerBox isPlayerOne={false} />
+                <PlayerBox isPlayerOne={false} blind={2} />
             </section>
             <section id='thirdBox'>
                 <PlayerBox isPlayerOne={false} />
