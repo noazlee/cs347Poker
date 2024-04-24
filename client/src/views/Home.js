@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
-import '../App.css';
 
-const acceptedURL  = ['http://10.133.26.36:3001', 'http://localhost:3001']
-const socket = io(acceptedURL, { withCredentials: true, transports: ['websocket', 'polling'] });
+import '../App.css';
+import { socket } from '../socket';
 
 const Home = () => {
     const { userId } = useParams();
