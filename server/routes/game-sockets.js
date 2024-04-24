@@ -20,14 +20,11 @@ module.exports = function(io){
         socket.on('join-game', (data) => {
             const game = games[data.gameId];
             if (game && game.status === 'waiting') {
-                const newPlayer = new Player(data.playerId, socket.id, 1000, false); // Example starting chips
-                game.addPlayer(newPlayer);
+                game.addPlayer(data.playerId, socket.id, false);
                 socket.join(data.gameId);
-
-                console.info(`${data.playerId} joined game ${data.gameId}`);
-                io.to(data.gameId).emit('player-joined', { playerId: data.playerId, gameId: data.gameId });
+                io.to(data.gameId).emit('player-joined', { player_names: game.players.map(p => p.userId)});
             } else {
-                socket.emit('join-failed', { message: 'Game not found or not joinable' });
+                console.log('Game not found or not joinable')
             }
         });
 

@@ -5,7 +5,7 @@ WHERE TEMPORARY GAME DATA CAN EXIST BEFORE BEING UPLOADED TO THE DB AFTER COMPLE
 
 const Player = require('./player');
 
-const MAXNUMPLAYERS = 2;
+const MAXNUMPLAYERS = 4;
 const POTAMOUNT = 10000;
 const SMALLBLINDAMOUNT = 100; 
 const GAMEMODE = 'default'; 
@@ -25,7 +25,7 @@ class Game {
         this.status = 'waiting';
 
         this.addPlayer(hostId, hostSocketId, false);
-        this.initializeAIPlayers();
+        // this.initializeAIPlayers();
     }
 
     initializeAIPlayers() {
