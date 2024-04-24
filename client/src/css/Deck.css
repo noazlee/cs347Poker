@@ -1,6 +1,4 @@
 .deck {
-    background-color: lightgrey;
-    border: 2px solid black;
     padding: 5px;
     display: flex;
     flex-direction: row;

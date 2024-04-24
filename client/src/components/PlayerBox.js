@@ -12,6 +12,7 @@ export default function PlayerBox({ player, isPlayerOne, blind}) {
         if (blind === 2) {
                 return (
                     <img 
+                        id="blindImage"
                         src={buildImgUrl('bigblind.png')}
                         alt="Big blind"
                         width={40}
@@ -21,6 +22,7 @@ export default function PlayerBox({ player, isPlayerOne, blind}) {
         } else if (blind === 1) {
                 return (
                     <img
+                        id="blindImage"
                         src={buildImgUrl('smallblind.jpg')}
                         alt="Small blind"
                         width={40}
