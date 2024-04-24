@@ -42,10 +42,16 @@ const Home = () => {
         socket.emit('create-game', { hostId: userId });
     };
 
+    const handleJoinGame = () => {
+        navigate(`/join/${userId}`); 
+
+    }
+
     return (
         <div className="home-container">
             <h1 className="home-title">Welcome, {username || 'Loading...'}</h1>
             <button className="home-button" onClick={handleCreateGame}>Create New Game</button>
+            <button className="home-button" onClick={handleJoinGame}>Join New Game</button>
         </div>
     );
 };
