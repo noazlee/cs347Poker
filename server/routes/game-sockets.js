@@ -13,7 +13,7 @@ module.exports = function(io){
             games[newGame.gameId] = newGame;
             socket.join(newGame.gameId);
             console.info("Game created:", newGame.gameId);
-            socket.emit('game-created', { gameId: newGame.gameId, hostId: data.hostId, players: newGame.players });
+            socket.emit('game-created', { gameId: newGame.gameId, hostId: data.hostId,  players: newGame.players.map(p => p.userId)  });
         });
     
         // Player joining a game
@@ -22,7 +22,8 @@ module.exports = function(io){
             if (game && game.status === 'waiting') {
                 game.addPlayer(data.playerId, socket.id, false);
                 socket.join(data.gameId);
-                io.to(data.gameId).emit('player-joined', { player_names: game.players.map(p => p.userId)});
+                io.to(data.gameId).emit('update-players', { players: game.players.map(player => player.userId) });
+                io.to(data.gameId).emit('player-joined', { player_names: game.players.map(p => p.userId) });
             } else {
                 console.log('Game not found or not joinable')
             }
