@@ -1,10 +1,7 @@
     import React, { useState, useEffect } from 'react';
     import { useParams, useNavigate } from 'react-router-dom';
-    import io from 'socket.io-client';
     import '../App.css';
-
-    const acceptedURL = ['http://10.133.26.36:3001', 'http://localhost:3001'];
-    const socket = io(acceptedURL, { withCredentials: true, transports: ['websocket', 'polling'] });
+    import { socket } from '../socket';
 
     const JoinRoom = () => {
         const { userId } = useParams();
