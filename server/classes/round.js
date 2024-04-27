@@ -1,3 +1,5 @@
+const Deck = require('./deck');
+
 // round.js
 class Round {
     constructor() {
@@ -11,6 +13,9 @@ class Round {
         this.stage = 0; 
         this.startingPlayer = 0;
         this.currentPlayer = 0;
+        this.currentSmallBlind = 0;  // Index of the small blind in the players array
+
+
     }
 
     start() {
@@ -28,11 +33,19 @@ class Round {
 
         this.pot = 0;
         this.setBettingOrder();
-        this.advanceToNextPlayer(); 
+        this.startBettingRound(); 
     }
 
     dealFlop(){
-
+        card1 = this.deck.dealOneCard();
+        card2 = this.deck.dealOneCard();
+        card3 = this.deck.dealOneCard();
+        cardsL = [card1,card2,card3]
+        io.to(this.gameId).emit('shown-cards',{
+            type: "Flop",
+            cards: cardsL
+        })
+        this.startBettingRound();
     }
 
     dealTurn(){
@@ -43,7 +56,71 @@ class Round {
 
     }
 
-  
+    startBettingRound(){
+        offset = startingPlayer;
+        for(let i=0;i<this.players.length;i++){
+            playerIndex = (i + offset) % this.players.length;
+            player = players[playerIndex];
+
+            acceptableMovesList = ['Check','Raise','Fold'];
+            if(player.isAi==false){
+                socket.to(player.socketId).emit('your-turn',{
+                    acceptableMoves: acceptableMovesList
+                });
+            }else{
+                // call function from AIplayer
+            }
+            
+            socket.on('player-action',(data)=>{
+                move = data.action;
+                switch(move){
+                    case 'Check':
+                        break;
+                    case 'Raise':
+                        break
+                    case 'Fold':
+                        break
+                    case 'Call':
+                        break;
+                    default:
+                        break;
+                }
+            })
+        };
+        showCards();
+    }
+
+    showCards(){
+        switch(this.stage){
+            case 0:
+                stage++;
+                this.dealFlop();
+            case 1:
+                stage++
+                this.dealTurn();
+            case 2:
+                stage++
+                this.dealRiver();
+            case 3:
+                this.endRound();
+            default:
+                //error
+                break
+        }
+    }
+
+    dealFlop(){
+        
+    }
+
+    dealTurn(){
+
+    }
+
+    dealRiver(){
+
+    }
+
     advanceToNextPlayer() {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.activePlayers.length;
         if (this.currentPlayerIndex === 0) { //full rotation
@@ -56,10 +133,10 @@ class Round {
 
     setBettingOrder(){
         if (this.stage==0) { //if first stage
-            this.startingPlayer = (this.game.currentDealer + 3) % this.players.length; 
+            this.startingPlayer = (this.game.currentSmallBlind + 2) % this.players.length; 
             this.currentPlayer = this.startingPlayer;
         } else {
-            this.startingPlayer = (this.game.currentDealer + 1) % this.players.length;  
+            this.startingPlayer = (this.game.currentSmallBlind + 1) % this.players.length;  
             this.currentPlayer = this.startingPlayer;
         }
     }
