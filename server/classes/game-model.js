@@ -1,4 +1,10 @@
-const Round = require('./rounds');
+const Round = require('./round');
+const Player = require('./player');
+
+const MAXNUMPLAYERS = 2;
+const POTAMOUNT = 10000;
+const GAMEMODE = 'regular';
+const SMALLBLINDAMOUNT = 200;
 
 class Game {
     constructor(ioInstance, hostId, hostSocketId) {
@@ -8,14 +14,24 @@ class Game {
         this.maxPlayers = MAXNUMPLAYERS;
         this.hostId = hostId;
         this.hostSocketId = hostSocketId;
-        this.potAmount = POTAMOUNT;
+        this.startingChips = POTAMOUNT;
         this.gameMode = GAMEMODE;
         this.smallBlindAmount = SMALLBLINDAMOUNT;
         this.rounds = [];
         this.status = 'waiting';
-        this.currentSmallBlind = 0;  // Index of the small blind in the players array
+        
 
-        this.addPlayer(hostId, hostSocketId, false);
+        this.addPlayer(hostId, socketId, POTAMOUNT,isAi=false);
+        this.addAiPlayers();
+    }
+
+    addPlayer(userId, socketId, Chips, isAI){
+        newPlayer = new Player(userId, socketId, Chips,isAI);
+        this.players.push(newPlayer);
+    }
+
+    addAiPlayers(){
+        // to be implemented
     }
 
     startGame() {
@@ -39,4 +55,6 @@ class Game {
         //TBI
     }
 }
+
+module.exports = Game;
 

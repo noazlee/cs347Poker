@@ -9,7 +9,7 @@ module.exports = function(io){
     
         // Create a new game
         socket.on('create-game', (data) => {
-            const newGame = new Game(io, data.hostId, socket.id);
+            const newGame = new Game(socket, data.hostId, socket.id);
             games[newGame.gameId] = newGame;
             socket.join(newGame.gameId);
             console.info("Game created:", newGame.gameId);
