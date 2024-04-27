@@ -55,7 +55,7 @@ class Round {
     }
 
     setBettingOrder(){
-        if (this.game.rounds.length === 0) { //if first round
+        if (this.stage==0) { //if first stage
             this.startingPlayer = (this.game.currentDealer + 3) % this.players.length; 
             this.currentPlayer = this.startingPlayer;
         } else {
