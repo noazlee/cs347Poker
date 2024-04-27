@@ -16,6 +16,7 @@ class Player{
 
     fold(){
         this.isInRound = false;
+        io.to(gameId).emit('player-action', { userId: this.userId, action: 'fold' });
     }
 
     raise(amount) {
