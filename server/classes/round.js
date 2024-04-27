@@ -31,30 +31,49 @@ class Round {
         this.advanceToNextPlayer(); 
     }
 
-    setBettingOrder() {
-        if (this.game.rounds.length === 0) {  // If it's the first round
-            // start with the player after the big blind
-            this.startingPlayer = (this.game.currentSmallBlind + 2) % this.players.length; 
-            this.currentPlayer = this.startingPlayer;
-        } else {
-            // normally, start with the small blind
-            this.startingPlayer = (this.game.currentSmallBlind + 1) % this.players.length; 
-            this.currentPlayer = this.startingPlayer;
-        }
+    dealFlop(){
+
     }
 
-    advanceToNextPlayer() {
-        do {
-            this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
-        } while (!this.players[this.currentPlayer].isInRound);  
+    dealTurn(){
 
-        this.game.notifyPlayerToAct(this.players[this.currentPlayer].userId);
+    }
+
+    dealRiver(){
+
+    }
+
+  
+    advanceToNextPlayer() {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.activePlayers.length;
+        if (this.currentPlayerIndex === 0) { //full rotation
+            this.advanceStage();
+        } else {
+            this.handleBetting();
+        }
+
+    }
+
+    setBettingOrder(){
+        if (this.game.rounds.length === 0) { //if first round
+            this.startingPlayer = (this.game.currentDealer + 3) % this.players.length; 
+            this.currentPlayer = this.startingPlayer;
+        } else {
+            this.startingPlayer = (this.game.currentDealer + 1) % this.players.length;  
+            this.currentPlayer = this.startingPlayer;
+        }
     }
 
     notifyPlayerToAct(playerId) {
         this.game.io.to(playerId).emit('your-turn', {
             playerId: playerId,
         });
+    }
+
+    endRound() {
+        const winner = this.determineWinner();
+        this.game.io.to(this.game.gameId).emit('round-ended', { winner: winner.userId });
+        this.game.startNewRound(); 
     }
     
 

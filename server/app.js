@@ -14,7 +14,7 @@ const acceptedURL  = ['http://10.133.26.36:3001', 'http://localhost:3001']
 const io = socketIo(server,{
     cors: {
         origin: acceptedURL,
-        methods: ["GET, POST"]
+        methods: ["GET", "POST"]
     }
 });
 

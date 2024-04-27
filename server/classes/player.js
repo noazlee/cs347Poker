@@ -16,7 +16,7 @@ class Player{
 
     fold(){
         this.isInRound = false;
-        io.to(gameId).emit('player-action', { userId: this.userId, action: 'fold' });
+        // io.to(gameId).emit('player-action', { userId: this.userId, action: 'fold' });
     }
 
     raise(amount) {
@@ -25,7 +25,7 @@ class Player{
         }
         this.chips -= amount;
         this.currentBet = amount;
-    }
+    }   
 
     check() {
         //ADD LATER
