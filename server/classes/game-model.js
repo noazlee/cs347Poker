@@ -1,3 +1,5 @@
+const Round = require('./rounds');
+
 class Game {
     constructor(ioInstance, hostId, hostSocketId) {
         this.io = ioInstance;
