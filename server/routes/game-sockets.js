@@ -9,25 +9,23 @@ module.exports = function(io){
     
         // Create a new game
         socket.on('create-game', (data) => {
-            const newGame = new Game(io, data.hostId, socket.id);
+            const newGame = new Game(socket, data.hostId, socket.id);
             games[newGame.gameId] = newGame;
             socket.join(newGame.gameId);
             console.info("Game created:", newGame.gameId);
-            socket.emit('game-created', { gameId: newGame.gameId, hostId: data.hostId, players: newGame.players });
+            socket.emit('game-created', { gameId: newGame.gameId, hostId: data.hostId,  players: newGame.players.map(p => p.userId)  });
         });
     
         // Player joining a game
         socket.on('join-game', (data) => {
             const game = games[data.gameId];
             if (game && game.status === 'waiting') {
-                const newPlayer = new Player(data.playerId, socket.id, 1000, false); // Example starting chips
-                game.addPlayer(newPlayer);
+                game.addPlayer(data.playerId, socket.id, false);
                 socket.join(data.gameId);
-
-                console.info(`${data.playerId} joined game ${data.gameId}`);
-                io.to(data.gameId).emit('player-joined', { playerId: data.playerId, gameId: data.gameId });
+                io.to(data.gameId).emit('update-players', { players: game.players.map(player => player.userId) });
+                io.to(data.gameId).emit('player-joined', { player_names: game.players.map(p => p.userId) });
             } else {
-                socket.emit('join-failed', { message: 'Game not found or not joinable' });
+                console.log('Game not found or not joinable')
             }
         });
 
