@@ -21,12 +21,12 @@ class Game {
         this.status = 'waiting';
         
 
-        this.addPlayer(hostId, socketId, POTAMOUNT,isAi=false);
+        this.addPlayer(hostId, hostSocketId, POTAMOUNT, false);
         this.addAiPlayers();
     }
 
     addPlayer(userId, socketId, Chips, isAI){
-        newPlayer = new Player(userId, socketId, Chips,isAI);
+        let newPlayer = new Player(userId, socketId, Chips,isAI);
         this.players.push(newPlayer);
     }
 
