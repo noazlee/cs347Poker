@@ -1,0 +1,9 @@
+.popup {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    padding: 5px;
+    background-color: lightgrey;
+    border: 1px solid black;
+    z-index: 2;
+}
