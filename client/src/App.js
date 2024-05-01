@@ -16,6 +16,7 @@ const App = () => {
                 <Route path="/home/:userId" element={<Home/>} />
                 <Route path="/game/:gameId/:userId" element={<GameRoom/>} />
                 <Route path="/table" element={<Table/>} />
+                <Route path="/table/:gameId/:userId" element={<Table/>} />
                 <Route path="/game/:gameId" element={<GameRoom/>} />
                 <Route path="/join/:userId" element={<JoinRoom/>} />
                 {/* put all routes here */}

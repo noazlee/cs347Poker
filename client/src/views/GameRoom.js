@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 import '../App.css';
@@ -11,6 +11,7 @@ const GameRoom = () => {
     const { gameId, userId } = useParams();
     const [username, setUsername] = useState('');
     const [players, setPlayers] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Fetch user details
@@ -28,10 +29,18 @@ const GameRoom = () => {
             setPlayers(data.players);  // Update player list when new players join or leave
         });
 
+        socket.on('game-started', (data) => {
+            navigate(`/table/${gameId}/${userId}`);
+        });
+
         return () => {
             socket.off('update-players');
         };
     }, [gameId, userId]);
+
+    const startGame = () => {
+        socket.emit('start-game', { gameId });
+    };
 
     return (
         <div className="game-room">
@@ -43,6 +52,7 @@ const GameRoom = () => {
                     <li key={index}>{player}</li>
                 ))}
             </ul>
+            <button className="home-button" onClick={startGame}>Start Game</button>
         </div>
     );
 };
