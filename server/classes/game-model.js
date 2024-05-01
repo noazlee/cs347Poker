@@ -26,6 +26,10 @@ class Game {
     }
 
     addPlayer(userId, socketId, Chips, isAI){
+        if (this.players.some(p => p.userId === userId)) {
+            console.log("Player already exists:", userId);
+            return false; 
+        }
         let newPlayer = new Player(userId, socketId, Chips,isAI);
         this.players.push(newPlayer);
     }
