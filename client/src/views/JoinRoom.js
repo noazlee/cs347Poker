@@ -10,12 +10,16 @@
         const [players, setPlayers] = useState([]);
 
         useEffect(() => {
-            socket.on('player-joined', (data) => {
+            const handlePlayerJoined = (data) => {
+                console.log("Received player-joined data:", data);
                 setPlayers(data.player_names);
-                if (data.playerId === userId) {
-                    navigate(`/game/${gameId}`); 
+                if (data.playerId === userId && data.gameId === gameId) {
+                    console.log("Navigating to game room...");
+                    navigate(`/game/${gameId}/${userId}`);
                 }
-            });
+            };
+
+            socket.on('player-joined',handlePlayerJoined)
 
             return () => {
                 socket.off('player-joined');
