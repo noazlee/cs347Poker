@@ -14,8 +14,6 @@ class Round {
         this.startingPlayer = 0;
         this.currentPlayer = 0;
         this.currentSmallBlind = 0;  // Index of the small blind in the players array
-
-
     }
 
     start() {
@@ -49,11 +47,21 @@ class Round {
     }
 
     dealTurn(){
-
+        const card = this.deck.dealOneCard();
+        io.to(this.gameId).emit('shown-cards',{
+            type: "Turn",
+            cards: [card]
+        })
+        this.startBettingRound();
     }
 
     dealRiver(){
-
+        const card = this.deck.dealOneCard();
+        io.to(this.gameId).emit('shown-cards',{
+            type: "River",
+            cards: [card]
+        })
+        this.startBettingRound();
     }
 
     startBettingRound(){
@@ -107,18 +115,6 @@ class Round {
                 //error
                 break
         }
-    }
-
-    dealFlop(){
-        
-    }
-
-    dealTurn(){
-
-    }
-
-    dealRiver(){
-
     }
 
     advanceToNextPlayer() {

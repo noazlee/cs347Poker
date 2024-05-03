@@ -57,7 +57,7 @@ module.exports = function(io){
             const game = games[data.gameId];
             if (game) {
                 game.startGame();  // NOT WORKING YET
-                io.to(data.gameId).emit('game-started', { gameId: data.gameId });
+                io.to(data.gameId).emit('game-started', { game: game});
             }
         });
     
