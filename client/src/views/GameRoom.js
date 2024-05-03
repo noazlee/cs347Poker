@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 import '../App.css';
@@ -11,27 +11,47 @@ const GameRoom = () => {
     const { gameId, userId } = useParams();
     const [username, setUsername] = useState('');
     const [players, setPlayers] = useState([]);
+    const navigate = useNavigate();
+
+    // Fetching the current user's username
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get(`/api/users/${userId}`);
+                setUsername(response.data.username);
+            } catch (error) {
+                console.error('Failed to fetch user', error);
+            }
+        };
+        fetchUser();
+    }, [userId]);
 
     useEffect(() => {
-        // Fetch user details
-        const fetchUser = async () => {
-            const response = await axios.get(`/api/users/${userId}`);
-            setUsername(response.data.username);
-        };
-
-        fetchUser();
-
         // Setup socket listeners
         socket.emit('join-game', { playerId: userId, gameId });  // Join the game room on component mount
 
         socket.on('update-players', (data) => {
-            setPlayers(data.players);  // Update player list when new players join or leave
+            const fetchAllUsernames = async () => {
+                const playerDetails = await Promise.all(data.players.map(id => 
+                    axios.get(`/api/users/${id}`).then(res => ({ userId: id, username: res.data.username }))
+                ));
+                setPlayers(playerDetails);
+            };
+            fetchAllUsernames();
+        });
+
+        socket.on('game-started', (data) => {
+            navigate(`/table/${gameId}/${userId}`);
         });
 
         return () => {
             socket.off('update-players');
         };
-    }, [gameId, userId]);
+    }, [gameId, userId, navigate]);
+
+    const startGame = () => {
+        socket.emit('start-game', { gameId });
+    };
 
     return (
         <div className="game-room">
@@ -40,9 +60,10 @@ const GameRoom = () => {
             <h3>Players in the room:</h3>
             <ul>
                 {players.map((player, index) => (
-                    <li key={index}>{player}</li>
+                    <li key={index}>{player.username}</li>
                 ))}
             </ul>
+            <button className="home-button" onClick={startGame}>Start Game</button>
         </div>
     );
 };

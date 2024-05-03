@@ -1,0 +1,17 @@
+.playerBox {
+    background-color: lightgrey;
+    border: 2px solid black;
+    height: auto;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+#blindImage {
+    margin: 0 auto;
+}
+
+.playerCards {
+    margin: auto 0;
+}

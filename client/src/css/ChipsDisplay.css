@@ -1,0 +1,10 @@
+.chipsDisplay {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.chipsDisplay img {
+    margin: 5px;
+}

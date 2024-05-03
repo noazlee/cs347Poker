@@ -23,7 +23,11 @@ module.exports = function(io){
                 game.addPlayer(data.playerId, socket.id, false);
                 socket.join(data.gameId);
                 io.to(data.gameId).emit('update-players', { players: game.players.map(player => player.userId) });
-                io.to(data.gameId).emit('player-joined', { player_names: game.players.map(p => p.userId) });
+                io.to(data.gameId).emit('player-joined', { 
+                    player_names: game.players.map(p => p.userId),
+                    playerId: data.playerId,
+                    gameId: data.gameId
+                });
             } else {
                 console.log('Game not found or not joinable')
             }
@@ -57,7 +61,8 @@ module.exports = function(io){
             const game = games[data.gameId];
             if (game) {
                 game.startGame();  // NOT WORKING YET
-                io.to(data.gameId).emit('game-started', { game: game});
+                console.info(`Game has started ${game.gameId}`);
+                io.to(data.gameId).emit('game-started', { gameId: data.gameId });
             }
         });
     

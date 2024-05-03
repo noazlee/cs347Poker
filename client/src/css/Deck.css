@@ -1,0 +1,37 @@
+.deck {
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+#revealedCards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 1 1fr;
+}
+
+#firstSlot {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#secondSlot {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#thirdSlot {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#fourthSlot {
+    grid-column: 4;
+    grid-row: 1;
+}
+
+#fifthSlot {
+    grid-column: 5;
+    grid-row: 1;
+}
