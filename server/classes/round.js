@@ -79,7 +79,7 @@ class Round {
                 // call function from AIplayer
             }
             
-            socket.on('player-action',(data)=>{
+            socket.on('player-action',(data)=>{ //Not finished
                 move = data.action;
                 switch(move){
                     case 'Check':
@@ -151,3 +151,5 @@ class Round {
     
 
 }
+
+module.exports = Round;
