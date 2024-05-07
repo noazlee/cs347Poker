@@ -62,7 +62,7 @@ module.exports = function(io){
             if (game) {
                 game.startGame();  // NOT WORKING YET
                 console.info(`Game has started ${game.gameId}`);
-                io.to(data.gameId).emit('game-started', { game: game });
+                io.to(data.gameId).emit('game-started', {});
             }
         });
     
