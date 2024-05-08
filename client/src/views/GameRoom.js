@@ -41,7 +41,7 @@ const GameRoom = () => {
         });
 
         socket.on('game-started', (data) => {
-            navigate(`/table/${gameId}/${userId}`);
+            navigate(`/table/${gameId}/${userId}`, {state: {gameId, players: data.players}});
         });
 
         return () => {

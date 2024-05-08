@@ -1,15 +1,22 @@
 import React from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
+import { useLocation } from 'react-router-dom';
 import '../css/Table.css'
 
 export default function Table({ props }) {
-    const players = [1, 2, 3, 4, 5, 6, 7, 8]
+    const { state } = useLocation();
+
+    const ind = [1, 2, 3, 4, 5, 6, 7, 8]
+    const players = state.players;
+
     return (
         <div className='table'>
-            {players.map((index) => (
+            {ind.map((index) => (
                 <section id={`Box-${index}`}>
-                        <PlayerBox isPlayerOne={index === 1}/>
+                    {index <= players.length &&
+                        <PlayerBox isPlayerOne={index === 1} player={players[index - 1].userId} chips={players[index - 1].chips}/>
+                    }
                 </section>
             ))}
             <section id='deck'>
