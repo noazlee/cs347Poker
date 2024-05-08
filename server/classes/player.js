@@ -10,7 +10,7 @@ class Player{
         this.isAi = isAi;
     }
 
-    getCardToHand(card) {
+    addCardToHand(card) {
         this.hand.push(card);
     }
 

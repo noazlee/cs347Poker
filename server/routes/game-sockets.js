@@ -36,7 +36,12 @@ module.exports = function(io){
         // Player move during round of betting
         socket.on('player-action', (data) => {
             const game = games[data.gameId];
-            // Needs to be programmed
+            if (game) {
+                const round = game.currentRound;
+                if (round) {
+                    round.handlePlayerAction(socket, data);
+                }
+            }
         });
     
         // Player leaving a game
