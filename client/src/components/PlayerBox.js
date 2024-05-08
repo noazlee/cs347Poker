@@ -6,7 +6,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, isPlayerOne, blind}) {
+export default function PlayerBox({ player, isPlayerOne, blind, chips}) {
 
     const getBlindIcon = (blind) => {
         if (blind === 2) {
@@ -39,26 +39,26 @@ export default function PlayerBox({ player, isPlayerOne, blind}) {
     return isPlayerOne ? (
             <div className="playerBox">
                 <div>
-                    <h2>Player</h2>
+                    <h2>{player}</h2>
                     {blindIcon}
                 </div>
                 <div className="playerCards">
                     <Card isVisible={true} />
                     <Card isVisible={true} />                
                 </div>
-                <BettingControls props={{initialChips: 60, currentBet: 20}}/>
+                <BettingControls props={{initialChips: chips, currentBet: 0}}/>
             </div>
         ) : (
             <div className="playerBox">
                 <div>
-                    <h2>Player</h2>
+                    <h2>{player}</h2>
                     {blindIcon}
                 </div>
                 <div className="playerCards">
                     <Card />
                     <Card />                    
                 </div>
-                <ChipsDisplay props={{initialChips: 40, currentBet: 10}}/>
+                <ChipsDisplay props={{initialChips: chips, currentBet: 0}}/>
             </div>
         );
 }

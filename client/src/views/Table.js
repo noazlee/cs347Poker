@@ -4,34 +4,16 @@ import Deck from '../components/Deck';
 import '../css/Table.css'
 
 export default function Table({ props }) {
+    const players = [1, 2, 3, 4, 5, 6, 7, 8]
     return (
         <div className='table'>
-            <section id='firstBox'>
-                <PlayerBox isPlayerOne={false} blind={1} />
-            </section>
-            <section id='secondBox'>
-                <PlayerBox isPlayerOne={false} blind={2} />
-            </section>
-            <section id='thirdBox'>
-                <PlayerBox isPlayerOne={false} />
-            </section>
-            <section id='fourthBox'>
-                <PlayerBox isPlayerOne={false} />
-            </section>
+            {players.map((index) => (
+                <section id={`Box-${index}`}>
+                        <PlayerBox isPlayerOne={index === 1}/>
+                </section>
+            ))}
             <section id='deck'>
                 <Deck />
-            </section>
-            <section id='fifthBox'>
-                <PlayerBox isPlayerOne={false} />
-            </section>
-            <section id='sixthBox'>
-                <PlayerBox isPlayerOne={false} />
-            </section>
-            <section id="seventhBox">
-                <PlayerBox isPlayerOne={true} />
-            </section>
-            <section id='eighthBox'>
-                <PlayerBox isPlayerOne={false} />
             </section>
         </div>
     );
