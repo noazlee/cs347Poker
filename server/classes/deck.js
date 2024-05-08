@@ -35,9 +35,11 @@ class Deck{
 
     //shuffle deck
     shuffle(){
+        console.log("Trying to shuffle");
         for(let i = this.cards.length - 1; i>0; i--){
+            console.log("Trying to shuffle");
             const j = Math.floor(Math.random() * (i+1));
-            [this.cards[i], this.cards[j] = this.cards[j], this.cards[i]];
+            [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
         }
     }
 

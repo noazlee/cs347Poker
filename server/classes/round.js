@@ -10,6 +10,7 @@ class Round {
         this.smallBlindAmount = smallBlindAmount;
         this.currentBet = this.smallBlindAmount * 2;
         this.pot = 0;
+        this.communityCards = [];
         this.hands = [];
         this.stage = 0; 
         this.startingPlayer = 0;
@@ -31,6 +32,9 @@ class Round {
         });
 
         this.pot = 0;
+        this.players.forEach(player=>{
+            console.info(player);
+        })
         this.setBettingOrder();
         this.promptPlayerAction();
     }
@@ -39,28 +43,32 @@ class Round {
         let card1 = this.deck.dealOneCard();
         let card2 = this.deck.dealOneCard();
         let card3 = this.deck.dealOneCard();
-        let cardsL = [card1,card2,card3]
+        this.communityCards.push(card1);
+        this.communityCards.push(card2);
+        this.communityCards.push(card3);
         this.io.to(this.gameId).emit('shown-cards',{
             type: "Flop",
-            cards: cardsL
+            cards: this.communityCards
         })
         this.startBettingRound();
     }
 
     dealTurn(){
         const card = this.deck.dealOneCard();
+        this.communityCards.push(card);
         this.io.to(this.gameId).emit('shown-cards',{
             type: "Turn",
-            cards: [card]
+            cards: this.communityCards
         })
         this.startBettingRound();
     }
 
     dealRiver(){
         const card = this.deck.dealOneCard();
+        this.communityCards.push(card);
         this.io.to(this.gameId).emit('shown-cards',{
             type: "River",
-            cards: [card]
+            cards: this.communityCards
         })
         this.startBettingRound();
     }
@@ -159,6 +167,8 @@ class Round {
             this.startingPlayer = (this.currentSmallBlind + 1) % this.players.length;  
             this.currentPlayer = this.startingPlayer;
         }
+        console.info("Starting player:",this.startingPlayer, this.players[this.startingPlayer].userId);
+        console.info("Current player:",this.currentPlayer, this.players[this.startingPlayer].userId);
     }
 
     endRound() {

@@ -21,16 +21,16 @@ class Game {
         this.status = 'waiting';
         
 
-        this.addPlayer(hostId, hostSocketId, POTAMOUNT, false);
+        this.addPlayer(hostId, hostSocketId, false);
         this.addAiPlayers();
     }
 
-    addPlayer(userId, socketId, Chips, isAI){
+    addPlayer(userId, socketId, isAI){
         if (this.players.some(p => p.userId === userId)) {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Player(userId, socketId, Chips,isAI);
+        let newPlayer = new Player(userId, socketId, POTAMOUNT,isAI);
         this.players.push(newPlayer);
     }
 
