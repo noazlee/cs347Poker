@@ -29,6 +29,13 @@ class Round {
         this.players.filter(player => player.isInRound).forEach(player => {
             player.addCardToHand(this.deck.dealOneCard());
             player.addCardToHand(this.deck.dealOneCard());
+            console.log('emitting deal-cards to ', player.socketId);
+            this.io.to(player.socketId).emit('deal-cards', {
+                hand: player.hand.map(card => ({
+                    suite: card.suite,
+                    value: card.value
+                }))
+            });
         });
 
         this.pot = 0;

@@ -44,8 +44,6 @@ class Game {
             return;
         }
         this.status = 'active';
-        this.currentRound = new Round(this.io, this.gameId, this.players, this.smallBlindAmount);
-        this.currentRound.start();
         this.io.in(this.gameId).emit('game-started', {
             gameId: this.gameId,
             players: this.players.map(player => ({
@@ -53,6 +51,8 @@ class Game {
                 chips: player.chips
             })),
         });
+        this.currentRound = new Round(this.io, this.gameId, this.players, this.smallBlindAmount);
+        this.currentRound.start();
     }
 
     startNewRound(){

@@ -1,6 +1,6 @@
-import { io } from 'socket.io-client';
+import io from 'socket.io-client';
 
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const url = isLocal ? 'http://localhost:3000' : 'http://10.133.26.36:3000';
+const acceptedURL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'http://10.133.26.36:3000';
+const socket = io(acceptedURL, { withCredentials: true, transports: ['websocket', 'polling'] });
 
-export const socket = io(url, { withCredentials: true, transports: ['websocket', 'polling'] });
+export default socket;

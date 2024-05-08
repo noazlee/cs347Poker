@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import io from 'socket.io-client';
 import '../App.css';
-
-const acceptedURL = ['http://10.133.26.36:3001', 'http://localhost:3001'];
-const socket = io(acceptedURL, { withCredentials: true, transports: ['websocket', 'polling'] });
+import socket from '../socket';
 
 const GameRoom = () => {
     const { gameId, userId } = useParams();
@@ -39,19 +36,28 @@ const GameRoom = () => {
             };
             fetchAllUsernames();
         });
-
-        socket.on('game-started', (data) => {
-            navigate(`/table/${gameId}/${userId}`, {state: {gameId, players: data.players}});
-        });
-
         return () => {
             socket.off('update-players');
+
         };
     }, [gameId, userId, navigate]);
 
     const startGame = () => {
+        console.info(socket.id, " starting game...");
         socket.emit('start-game', { gameId });
+        navigate(`/table/${gameId}/${userId}`, {state: {gameId: gameId, players: players}});
     };
+
+    useEffect(() => {
+        socket.on('game-started', (data) => {
+            console.info('game started', data, socket.id);
+            navigate(`/table/${data.gameId}/${userId}`, {state: {gameId: data.gameId, players: data.players}});
+        });
+    
+        return () => {
+            socket.off('game-started');
+        };
+    }, [gameId, userId, navigate]);
 
     return (
         <div className="game-room">
