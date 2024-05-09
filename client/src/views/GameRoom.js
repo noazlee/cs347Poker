@@ -28,6 +28,7 @@ const GameRoom = () => {
         socket.emit('join-game', { playerId: userId, gameId });  // Join the game room on component mount
 
         socket.on('update-players', (data) => {
+            console.log("updated players");
             const fetchAllUsernames = async () => {
                 const playerDetails = await Promise.all(data.players.map(id => 
                     axios.get(`/api/users/${id}`).then(res => ({ userId: id, username: res.data.username }))
@@ -45,7 +46,6 @@ const GameRoom = () => {
     const startGame = () => {
         console.info(socket.id, " starting game...");
         socket.emit('start-game', { gameId });
-        navigate(`/table/${gameId}/${userId}`, {state: {gameId: gameId, players: players}});
     };
 
     useEffect(() => {

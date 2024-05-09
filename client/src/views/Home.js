@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import l from 'lodash';
 
 import '../App.css';
 import socket  from '../socket';
@@ -34,13 +35,15 @@ const Home = () => {
         };
     }, [navigate, userId]);
 
-    const handleCreateGame = () => {
-        socket.emit('create-game', { hostId: userId });
-    };
 
-    const handleJoinGame = () => {
+    const handleCreateGame = l.debounce(() => {
+        socket.emit('create-game', { hostId: userId });
+    }, 300);
+
+    const handleJoinGame = l.debounce(() => {
         navigate(`/join/${userId}`);
-    };
+    }, 300);
+
 
     return (
         <div className="home-container">
