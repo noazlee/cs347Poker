@@ -16,9 +16,10 @@ class Round {
         this.startingPlayer = 0;
         this.currentPlayer = 0;
         this.currentSmallBlind = 0;  // Index of the small blind in the players array
+        this.playerResponses = new Map(); 
     }
 
-    start() {
+    async start() {
         this.players.forEach(player => {
             if (player.isPlaying) {
                 player.resetForNewRound();
@@ -29,8 +30,7 @@ class Round {
         this.players.filter(player => player.isInRound).forEach(player => {
             player.addCardToHand(this.deck.dealOneCard());
             player.addCardToHand(this.deck.dealOneCard());
-            console.log('emitting deal-cards to ', player.socketId);
-            this.io.to(player.socketId).emit('deal-cards', {
+            this.io.to(player.socketId).emit('deal-cards', { 
                 hand: player.hand.map(card => ({
                     suite: card.suite,
                     value: card.value
@@ -40,10 +40,10 @@ class Round {
 
         this.pot = 0;
         this.players.forEach(player=>{
-            console.info(player);
+            // console.info(player);
         })
-        this.setBettingOrder();
-        this.promptPlayerAction();
+        await this.setBettingOrder();
+        await this.promptPlayerAction();
     }
 
     dealFlop(){
@@ -80,54 +80,55 @@ class Round {
         this.startBettingRound();
     }
 
-    promptPlayerAction() {
+    async promptPlayerAction() {
         if (this.currentPlayer >= this.players.length) {
             this.currentPlayer = 0;  // Wrap-around
         }
 
         const player = this.players[this.currentPlayer];
+        console.log(player.userId, "turn"); 
         if (player.isInRound) {
             this.io.to(player.socketId).emit('your-turn', {
                 acceptableMoves: ['Check', 'Raise', 'Fold', 'Call']
             });
+            return new Promise((resolve) => {
+                this.playerResponses.set(player.socketId, resolve);
+            });
         } else {
-            this.advanceToNextPlayer();  // Skip if the player is not active
+            await this.advanceToNextPlayer();  // Skip if the player is not active
         }
     }
 
     handlePlayerAction(socket, data) {
-        // Process the action data received
-        console.log(`Action received from ${socket.id}: ${data.action}`);
-
-        // Verify it's the correct player's turn
-        const player = this.players[this.currentPlayer];
-        if (socket.id !== player.socketId) {
-            return;  // It's not this player's turn
+        const resolve = this.playerResponses.get(socket.id);
+        if (resolve) {
+            resolve();
+            this.playerResponses.delete(socket.id);
+            this.processPlayerAction(socket, data);
         }
-        
-        // Example processing
+    }
+
+    processPlayerAction(socket, data) {
+        // Process the action
+        console.log(`Action received from ${socket.id}: ${data.action}`);
+        const player = this.players[this.currentPlayer];
         switch (data.action) {
             case 'Check':
-                // Do nothing, just log it
+                // Handle check
                 break;
             case 'Raise':
-                // Update pot and player's bet
+                // Handle raise
                 break;
             case 'Fold':
-                // Mark player as folded
                 player.isInRound = false;
                 break;
             default:
-                // Unhandled action
                 break;
         }
-
-        // Move to the next player or advance the game state
-        this.advanceToNextPlayer();
     }
 
     // Moves to the next player
-    advanceToNextPlayer() {
+    async advanceToNextPlayer() {
         do {
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
         } while (!this.players[this.currentPlayer].isInRound);
@@ -135,7 +136,7 @@ class Round {
         if (this.allPlayersActed()) {
             this.advanceStage();
         } else {
-            this.promptPlayerAction();
+            await this.promptPlayerAction();
         }
     }
 

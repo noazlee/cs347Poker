@@ -44,13 +44,15 @@ class Game {
             return;
         }
         this.status = 'active';
-        this.io.in(this.gameId).emit('game-started', {
+
+        this.io.to(this.gameId).emit('game-started', {
             gameId: this.gameId,
             players: this.players.map(player => ({
                 userId: player.userId,
                 chips: player.chips
             })),
         });
+        
         this.currentRound = new Round(this.io, this.gameId, this.players, this.smallBlindAmount);
         this.currentRound.start();
     }
