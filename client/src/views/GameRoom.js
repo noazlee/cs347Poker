@@ -3,12 +3,34 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
 import socket from '../socket';
+import { buildImgUrl } from '../utils/utils';
 
 const GameRoom = () => {
     const { gameId, userId } = useParams();
     const [username, setUsername] = useState('');
     const [players, setPlayers] = useState([]);
     const navigate = useNavigate();
+
+    const [backgroundPosition, setBackgroundPosition] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setBackgroundPosition(prevPosition => (prevPosition + 1) % 100); // This will move the background
+        }, 100);
+        return () => clearInterval(interval);
+    }, []);
+
+    const backgroundStyle = {
+        backgroundImage: `url(${buildImgUrl('poker-bg2.jpg')})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: `${backgroundPosition}% 0`,
+        backgroundSize: '150% auto',
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    };
 
     // Fetching the current user's username
     useEffect(() => {
@@ -60,6 +82,7 @@ const GameRoom = () => {
     }, [gameId, userId, navigate]);
 
     return (
+        <div style={backgroundStyle}>
         <div className="game-room">
             <h1>Game ID: {gameId}</h1>
             <h1>Host: {username || 'Loading...'}</h1>
@@ -70,6 +93,7 @@ const GameRoom = () => {
                 ))}
             </ul>
             <button className="home-button" onClick={startGame}>Start Game</button>
+        </div>
         </div>
     );
 };

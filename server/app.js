@@ -10,10 +10,10 @@ const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-// const acceptedURL  = ['http://10.133.26.36:3001', 'http://localhost:3001']
+const acceptedURL  = ['http://10.133.26.36:3001', 'http://localhost:3001']
 const io = socketIo(server,{
     cors: {
-        origin: 'http://localhost:3001', //change to accepted url later
+        origin: acceptedURL, 
         methods: ["GET", "POST"],
         credentials:true
     },
@@ -21,7 +21,7 @@ const io = socketIo(server,{
 });
 
 app.use(cors({
-    origin: 'http://localhost:3001' //change to accepted url later
+    origin: acceptedURL 
   }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

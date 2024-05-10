@@ -3,6 +3,19 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; 
 import '../App.css';
+import { buildImgUrl } from '../utils/utils';
+
+const backgroundStyle = {
+    backgroundImage:  `url(${buildImgUrl('poker-bg.jpg')})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center center',
+    backgroundSize: 'cover',
+    height: '100vh', // Make sure the container fills the screen
+    width: '100vw',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+};
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -23,9 +36,11 @@ const Register = () => {
     };
 
     return (
+        <div style={backgroundStyle}>
         <div className="container">
             
             <div className="form-box">
+            <div className="title">Pocket ACES</div>
                 <h2>Register</h2>
                 <form onSubmit={handleRegister}>
                     <input
@@ -47,6 +62,7 @@ const Register = () => {
                 </p>
                 {error && <div className="error-box">{error}</div>}
             </div>
+        </div>
         </div>
     );
 };

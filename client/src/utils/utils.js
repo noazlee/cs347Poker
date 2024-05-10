@@ -1,3 +1,5 @@
 export function buildImgUrl(imgName) {
-    return process.env.PUBLIC_URL + '/images/' + imgName;
+    const url = process.env.PUBLIC_URL + '/images/' + imgName
+    console.log("Image URL:", url);
+    return url;
 }
