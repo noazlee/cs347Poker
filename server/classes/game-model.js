@@ -53,7 +53,7 @@ class Game {
             })),
         });
         
-        this.currentRound = new Round(this.io, this.gameId, this.players, this.smallBlindAmount);
+        this.currentRound = new Round(this.io, this.gameId, 0, this.players, this.smallBlindAmount);
         this.currentRound.start();
     }
 

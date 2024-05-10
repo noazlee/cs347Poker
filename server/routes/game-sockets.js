@@ -24,15 +24,15 @@ module.exports = function(io){
                 socket.join(data.gameId);
 
                 //checking socket room
-                if (io.sockets.adapter.rooms.has(data.gameId)) {
-                    const room = io.sockets.adapter.rooms.get(data.gameId);
-                    console.log(`Sockets in room ${data.gameId}:`);
-                    room.forEach((value, socketId) => {
-                        console.log(socketId);
-                    });
-                } else {
-                    console.log(`No active room with ID: ${data.gameId}`);
-                }
+                // if (io.sockets.adapter.rooms.has(data.gameId)) {
+                //     const room = io.sockets.adapter.rooms.get(data.gameId);
+                //     console.log(`Sockets in room ${data.gameId}:`);
+                //     room.forEach((value, socketId) => {
+                //         console.log(socketId);
+                //     });
+                // } else {
+                //     console.log(`No active room with ID: ${data.gameId}`);
+                // }
 
                 io.to(data.gameId).emit('update-players', { players: game.players.map(player => player.userId) });
                 io.to(data.gameId).emit('player-joined', { 

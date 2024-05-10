@@ -30,14 +30,14 @@ const { connectDb } = require('./db');
 
 // const pokerLogic = require('./routes/poker-logic.js');
 const userLogic = require('./routes/user-logic.js');
-const gameLogic = require('./routes/game-logic.js');
 const gameSockets = require('./routes/game-sockets.js');
+const gameData = require('./routes/game-data');
 // const registerSocketHandlers = require('./socketHandlers');
 
 // registerSocketHandlers(io);
 gameSockets(io);
 app.use('/api',userLogic);
-app.use('/api',gameLogic);
+app.use('/api',gameData);
 //app.use(pokerLogic); commented out because it is breaking the execution
 
 const port = process.env.PORT || 3000;

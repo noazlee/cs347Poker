@@ -6,6 +6,8 @@ import Home from './views/Home';
 import Table from './views/Table';
 import GameRoom from './views/GameRoom';
 import JoinRoom from './views/JoinRoom';
+import GameHistory from './views/GameHistory';
+import LeaderBoard from './views/LeaderBoard';
 
 const App = () => {
     return (
@@ -19,6 +21,8 @@ const App = () => {
                 <Route path="/table/:gameId/:userId" element={<Table/>} />
                 <Route path="/game/:gameId" element={<GameRoom/>} />
                 <Route path="/join/:userId" element={<JoinRoom/>} />
+                <Route path="/leaderboard/:userId" element={<LeaderBoard/>} />
+                <Route path="/game-history/:userId" element={<GameHistory/>} />
                 {/* put all routes here */}
             </Routes>
         </Router>

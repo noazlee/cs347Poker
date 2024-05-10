@@ -2,9 +2,10 @@ const Deck = require('./deck');
 
 // round.js
 class Round {
-    constructor(io, gameId, players, smallBlindAmount) {
+    constructor(io, gameId, prevIndex, players, smallBlindAmount) {
         this.io = io;
         this.gameId = gameId;
+        this.index = prevIndex+1;
         this.players = players;  
         this.deck = new Deck();
         this.smallBlindAmount = smallBlindAmount;
