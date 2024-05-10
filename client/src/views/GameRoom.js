@@ -70,6 +70,12 @@ const GameRoom = () => {
         socket.emit('start-game', { gameId });
     };
 
+    const leaveGame = () => {
+        console.info(socket.id, " leaving game...");
+        // socket.emit('leave-game', { gameId, userId }); add later
+        navigate(`/home/${userId}`); 
+    };
+
     useEffect(() => {
         socket.on('game-started', (data) => {
             console.info('game started', data, socket.id);
@@ -93,6 +99,7 @@ const GameRoom = () => {
                 ))}
             </ul>
             <button className="home-button" onClick={startGame}>Start Game</button>
+            <button className="home-button" onClick={leaveGame}>Leave Game</button>
         </div>
         </div>
     );

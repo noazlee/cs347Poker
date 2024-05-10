@@ -76,7 +76,7 @@ module.exports = function(io){
         // Start the game
         socket.on('start-game', (data) => {
             const game = games[data.gameId];
-            if (game) {
+            if (game) { //changing this to check host causes the game to BREAK - binary error
                 game.startGame();  // NOT WORKING YET
                 console.info(`Game has started ${game.gameId}`);
                 // io.to(data.gameId).emit('game-started', {});

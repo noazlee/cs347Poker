@@ -73,6 +73,10 @@ const Home = () => {
     return (
         <div style={backgroundStyle}>
         <div className="home-container">
+            <div className="navigation-tab">
+                <button onClick={() => navigate('/leaderboard')}>Leaderboard</button>
+                <button onClick={() => navigate('/game-history')}>Game History</button>
+            </div>
             <h1 className="home-title">Welcome, {username || 'Loading...'}</h1>
             <button className="home-button" onClick={handleCreateGame}>Create New Game</button>
             <button className="home-button" onClick={handleJoinGame}>Join Game</button>
