@@ -20,7 +20,8 @@ class Round {
         this.playerResponses = new Map(); 
     }
 
-    async start() {
+    async start(io) {
+        console.log("Starting Round");
         this.players.forEach(player => {
             if (player.isPlaying) {
                 player.resetForNewRound();
@@ -31,12 +32,25 @@ class Round {
         this.players.filter(player => player.isInRound).forEach(player => {
             player.addCardToHand(this.deck.dealOneCard());
             player.addCardToHand(this.deck.dealOneCard());
-            this.io.to(player.socketId).emit('deal-cards', { 
-                hand: player.hand.map(card => ({
-                    suite: card.suite,
-                    value: card.value
-                }))
-            });
+        });
+        console.log('emitting update-round');
+        this.io.to(this.gameId).emit('update-round-data', {
+            round: {
+                gameId: this.gameId,
+                index: this.index,
+                players: this.players,
+                deck: this.deck,
+                smallBlindAmount: this.smallBlindAmount,
+                currentBet: this.currentBet,
+                pot: this.pot,
+                communityCards: this.communityCards,
+                hands: this.hands,
+                stage: this.stage,
+                startingPlayer: this.startingPlayer,
+                currentPlayer: this.currentPlayer,
+                currentSmallBlind: this.currentSmallBlind,
+                playerResponses: this.playerResponses
+            }
         });
 
         this.pot = 0;
@@ -44,6 +58,7 @@ class Round {
             // console.info(player);
         })
         await this.setBettingOrder();
+        console.log('Prompting player action');
         await this.promptPlayerAction();
     }
 

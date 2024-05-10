@@ -54,7 +54,7 @@ class Game {
         });
         
         this.currentRound = new Round(this.io, this.gameId, 0, this.players, this.smallBlindAmount);
-        this.currentRound.start();
+        this.currentRound.start(this.io);
     }
 
     startNewRound(){
