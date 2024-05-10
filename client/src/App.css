@@ -191,7 +191,7 @@ body, html {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-.join-form button {
+.join-form button:hover {
   background-color: #ae4c4c;
 }
 
