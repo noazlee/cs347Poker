@@ -83,7 +83,7 @@ const GameRoom = () => {
 
     return (
         <div style={backgroundStyle}>
-        <div className="game-room">
+        <div className="home-container">
             <h1>Game ID: {gameId}</h1>
             <h1>Host: {username || 'Loading...'}</h1>
             <h3>Players in the room:</h3>

@@ -18,8 +18,8 @@ const Home = () => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setBackgroundPosition(prevPosition => (prevPosition + 1) % 100); // This will move the background
-        }, 100);
+            setBackgroundPosition(prevPosition => (prevPosition + 1) % 75); // This will move the background
+        }, 75);
         return () => clearInterval(interval);
     }, []);
 

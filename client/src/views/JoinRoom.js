@@ -2,12 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../App.css';
 import socket  from '../socket';
+import { buildImgUrl } from '../utils/utils';
 
 const JoinRoom = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
     const [gameId, setGameId] = useState('');
     const [players, setPlayers] = useState([]);
+
+    const [backgroundPosition, setBackgroundPosition] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setBackgroundPosition(prevPosition => (prevPosition + 1) % 75); // This will move the background
+        }, 75);
+        return () => clearInterval(interval);
+    }, []);
+
+    const backgroundStyle = {
+        backgroundImage: `url(${buildImgUrl('poker-bg2.jpg')})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: `${backgroundPosition}% 0`,
+        backgroundSize: '150% auto',
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    };
 
     useEffect(() => {
         const handlePlayerJoined = (data) => {
@@ -36,6 +58,7 @@ const JoinRoom = () => {
     };
 
     return (
+        <div style={backgroundStyle}>
         <div className="home-container">
             <form onSubmit={handleJoin}>
                 <input
@@ -56,6 +79,7 @@ const JoinRoom = () => {
                     </ul>
                 </div>
             )}
+        </div>
         </div>
     );
 };
