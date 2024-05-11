@@ -1,11 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
-// import { useLocation } from 'react-router-dom';
 import '../css/Table.css'
 import socket from '../socket';
-// import Player from '../../../server/classes/player';
-import axios from 'axios';
 
 export default function Table({ props }) {
     const [roundData, setRoundData] = useState(undefined)

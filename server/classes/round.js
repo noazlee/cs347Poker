@@ -20,8 +20,7 @@ class Round {
         this.playerResponses = new Map(); 
     }
 
-    async start(io) {
-        console.log("Starting Round");
+    async start() {
         this.players.forEach(player => {
             if (player.isPlaying) {
                 player.resetForNewRound();
@@ -33,7 +32,7 @@ class Round {
             player.addCardToHand(this.deck.dealOneCard());
             player.addCardToHand(this.deck.dealOneCard());
         });
-        console.log('emitting update-round');
+
         this.io.to(this.gameId).emit('update-round-data', {
             round: {
                 gameId: this.gameId,
@@ -58,7 +57,6 @@ class Round {
             // console.info(player);
         })
         await this.setBettingOrder();
-        console.log('Prompting player action');
         await this.promptPlayerAction();
     }
 

@@ -42,24 +42,24 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
         getPlayerName(player.userId)
     }, [player.userId]);
 
-    const blindIcon = getBlindIcon(blind);
-
     return (
             <div className="playerBox">
                 <div>
                     <h2>{playerName}</h2>
-                    {blindIcon}
+                    {getBlindIcon(blind)}
                 </div>
                 <div className="playerCards">
-                {player.hand.map((card, index) => (
-                    <Card key={index} isVisible={playerOne && true} card={card} />
-                ))}
+                    {player.hand.map((card, index) => {
+                        const cardSuit = card.suite;
+                        const cardValue = card.value;
+                        return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
+                    })}
+                </div>
+                {playerOne ? (
+                    <BettingControls props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
+                ) : (
+                    <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
+                )}
             </div>
-            {playerOne ? (
-                <BettingControls props={{ initialChips: 0, currentBet: 0 }}/>
-            ) : (
-                <ChipsDisplay props={{ initialChips: 0, currentBet: 0 }}/>
-            )}
-        </div>
         )
 }
