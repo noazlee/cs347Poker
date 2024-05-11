@@ -5,10 +5,10 @@ import ChipsDisplay from "./ChipsDisplay";
 import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
+import axios from 'axios';
 
-export default function PlayerBox({ player, isPlayerOne, blind, chips, socket}) {
-    const [hand, setHand] = useState([]);
-
+export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind }) {
+    const [playerName, setPlayerName] = useState('Loading...');
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -36,37 +36,29 @@ export default function PlayerBox({ player, isPlayerOne, blind, chips, socket}) 
     }
 
     useEffect(() => {
-        const handleDealCards = (data) => {
-            console.log(data);
-            if (data.playerId === player.userId) {
-                setHand(data.hand);
-            }
-        };
-
-        socket.on('deal-cards', handleDealCards);
-
-        return () => {
-            socket.off('deal-cards', handleDealCards);
-        };
-    }, [socket, player.userId]);
+        const getPlayerName = async (playerId) => {
+            await axios.get(`/api/users/${playerId}`).then((res) => {setPlayerName(res.data.username)})
+        }
+        getPlayerName(player.userId)
+    }, [player.userId]);
 
     const blindIcon = getBlindIcon(blind);
 
     return (
             <div className="playerBox">
                 <div>
-                    <h2>{player.userId}</h2>
+                    <h2>{playerName}</h2>
                     {blindIcon}
                 </div>
                 <div className="playerCards">
-                {hand.map((card, index) => (
-                    <Card key={index} isVisible={true} card={card} />
+                {player.hand.map((card, index) => (
+                    <Card key={index} isVisible={playerOne && true} card={card} />
                 ))}
             </div>
-            {isPlayerOne ? (
-                <BettingControls props={{ initialChips: chips, currentBet: 0 }}/>
+            {playerOne ? (
+                <BettingControls props={{ initialChips: 0, currentBet: 0 }}/>
             ) : (
-                <ChipsDisplay props={{ initialChips: chips, currentBet: 0 }}/>
+                <ChipsDisplay props={{ initialChips: 0, currentBet: 0 }}/>
             )}
         </div>
         )
