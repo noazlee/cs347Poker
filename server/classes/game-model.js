@@ -7,7 +7,7 @@ const GAMEMODE = 'regular';
 const SMALLBLINDAMOUNT = 200;
 
 class Game {
-    constructor(ioInstance, hostId, hostSocketId) {
+    constructor(ioInstance, hostId, username, hostSocketId) {
         this.io = ioInstance;
         this.gameId = Math.random().toString(36).substring(2, 15);
         this.players = [];
@@ -21,16 +21,16 @@ class Game {
         this.status = 'waiting';
         
 
-        this.addPlayer(hostId, hostSocketId, false);
+        this.addPlayer(hostId, hostSocketId, username, false);
         this.addAiPlayers();
     }
 
-    addPlayer(userId, socketId, isAI){
+    addPlayer(userId, socketId, username, isAI){
         if (this.players.some(p => p.userId === userId)) {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Player(userId, socketId, POTAMOUNT,isAI);
+        let newPlayer = new Player(userId, socketId, username, POTAMOUNT,isAI);
         this.players.push(newPlayer);
     }
 
@@ -48,6 +48,7 @@ class Game {
         this.io.to(this.gameId).emit('game-started', {
             gameId: this.gameId,
             players: this.players.map(player => ({
+                username: player.username,
                 userId: player.userId,
                 chips: player.chips
             })),

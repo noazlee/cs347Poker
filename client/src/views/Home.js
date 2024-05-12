@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import l from 'lodash';
 
+
 import '../App.css';
 import socket  from '../socket';
 
@@ -62,11 +63,11 @@ const Home = () => {
 
 
     const handleCreateGame = l.debounce(() => {
-        socket.emit('create-game', { hostId: userId });
+        socket.emit('create-game', { hostId: userId, username});
     }, 300);
 
     const handleJoinGame = l.debounce(() => {
-        navigate(`/join/${userId}`);
+        navigate(`/join/${userId}`, {state: {username}});
     }, 300);
 
 

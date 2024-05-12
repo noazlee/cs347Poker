@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import BettingControls from "./BettingControls";
 import Card from "./Card";
 import ChipsDisplay from "./ChipsDisplay";
 import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
-import axios from 'axios';
 
-export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind }) {
-    const [playerName, setPlayerName] = useState('Loading...');
+export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props }) {
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -35,17 +33,10 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
         }
     }
 
-    useEffect(() => {
-        const getPlayerName = async (playerId) => {
-            await axios.get(`/api/users/${playerId}`).then((res) => {setPlayerName(res.data.username)})
-        }
-        getPlayerName(player.userId)
-    }, [player.userId]);
-
     return (
             <div className="playerBox">
                 <div>
-                    <h2>{playerName}</h2>
+                    <h2>{player.username}</h2>
                     {getBlindIcon(blind)}
                 </div>
                 <div className="playerCards">
@@ -56,7 +47,13 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                     })}
                 </div>
                 {playerOne ? (
-                    <BettingControls props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
+                    <BettingControls props={{
+                        initialChips: player.chips,
+                        currentBet: player.currentBet,
+                        moves: moves,
+                        isTurn: isCurrentPlayer,
+                        toggleCurrentPlayer: props.toggleCurrentPlayer
+                    }}/>
                 ) : (
                     <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
                 )}

@@ -5,20 +5,28 @@ import '../css/Table.css'
 import socket from '../socket';
 
 export default function Table({ props }) {
-    const [roundData, setRoundData] = useState(undefined)
+    const [roundData, setRoundData] = useState(undefined);
+    const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
+    const [moves, setMoves] = useState([]);
 
     useEffect(() => {
         socket.on('update-round-data', (data) => {
             setRoundData(data.round);
         });
 
+        socket.on('your-turn', (data) => {
+            console.log("My turn!");
+            setIsCurrentPlayer(true);
+            setMoves(data.acceptableMoves);
+        });
+
         return () => {
             socket.off('update-round-data');
+            socket.off('your-turn');
         };
     }, []);
 
     const generatePlayerBoxes = (data) => {
-        const currPlayerId = data.players[data.currentPlayer].socketId;
         let smallBlindPlayerId;
         let bigBlindPlayerId;
         let box = 1;
@@ -51,8 +59,12 @@ export default function Table({ props }) {
                         <PlayerBox
                             player={player} 
                             playerOne={isPlayerOne}
-                            isCurrentPlayer={currPlayerId === player.socketId && true}
+                            isCurrentPlayer={isCurrentPlayer}
                             blind={blindStatus}
+                            moves={moves}
+                            props={{
+                                toggleCurrentPlayer: setIsCurrentPlayer
+                            }}
                         />
                     </section>
                 )
@@ -60,15 +72,15 @@ export default function Table({ props }) {
     }
 
     return (
-        <div className='table'>
-            {roundData === undefined ? (
-                <p>Loading...</p>
-            ) : (
-                generatePlayerBoxes(roundData)
-            )}
-            <section id='deck'>
-                <Deck />
-            </section>
-        </div>
+        roundData === undefined ? (
+            <p>Loading...</p>
+        ) : (
+            <div className='table'>
+                {generatePlayerBoxes(roundData)}
+                <section id='deck'>
+                    <Deck props={{cards: roundData.communityCards}}/>
+                </section>
+            </div>
+        )
     );
 }

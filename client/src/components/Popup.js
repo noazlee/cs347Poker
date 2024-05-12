@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../css/Popup.css';
+import socket from '../socket';
+
 
 export default function Popup ({ isDisplayed, togglePopup, props }) {
     const [raiseAmount, changeRaiseAmount] = useState(0)
@@ -10,6 +12,9 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
 
     const handleSubmit = () => {
         console.log(document.getElementById('raiseAmount').value);
+        console.log(raiseAmount);
+
+        socket.emit('raise', {amount: raiseAmount});
         togglePopup(false);
         props.toggleButtons(true);
     }

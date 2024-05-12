@@ -1,5 +1,6 @@
 class Player{
-    constructor(userId, socketId, chips, isAi){
+    constructor(userId, socketId, username, chips, isAi){
+        this.username = username;
         this.userId = userId;
         this.socketId = socketId;
         this.chips = chips;

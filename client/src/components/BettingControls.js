@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ChipsDisplay from './ChipsDisplay';
 import Popup from './Popup';
 import '../css/BettingControls.css';
@@ -6,36 +6,41 @@ import socket from '../socket';
 
 export default function BettingControls({ props }) {
     const [popupDisplayed, toggleDisplayPopup] = useState(false);
-    const [moves, setMoves] = useState([]);
-    const [isPlayersTurn, setIsPlayersTurn] = useState(false);
     const [buttonRowOn, toggleButtonRow] = useState(true);
+    const moves = props.moves;
 
     const handleRaise = () => {
-        console.log('raise');
         toggleDisplayPopup(true);
         toggleButtonRow(false);
     }
 
-    useEffect(() => {
-        socket.on('your-turn', (data) => {
-            setMoves(data.acceptableMoves);
-            setIsPlayersTurn(true);
-        });
+    const handleCheck = () => {
+        console.log('check');
+        props.toggleCurrentPlayer(false);
+        socket.emit('check', {});
+    }
 
-        return () => {
-            socket.off('your-turn');
-        }
-    }, []);
+    const handleFold = () => {
+        console.log('fold');
+        props.toggleCurrentPlayer(false);
+        socket.emit('fold', {});
+    }
+
+    const handleCall = () => {
+        console.log('call');
+        props.toggleCurrentPlayer(false);
+        socket.emit('fold', {});
+    }
 
     return (
         <div className='bettingControls'>
             <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow}} />
-            {isPlayersTurn && buttonRowOn ? (
+            {(props.isTurn && buttonRowOn) ? (
                 <div className='buttonRow'>
-                    {moves.includes('check') && <button id='checkButton' onClick={() => console.log('check')}>Check</button>}
-                    {moves.includes('call') && <button id='callButton' onClick={() => console.log('call')}>Call</button>}
-                    {moves.includes('raise') && <button id='raiseButton' onClick={() => handleRaise()}>Raise</button>}
-                    {moves.includes('fold') && <button id='foldButton' onClick={() => console.log('fold')}>Fold</button>}
+                    {moves.includes('Check') && <button id='checkButton' onClick={handleCheck}>Check</button>}
+                    {moves.includes('Call') && <button id='callButton' onClick={handleCall}>Call</button>}
+                    {moves.includes('Raise') && <button id='raiseButton' onClick={handleRaise}>Raise</button>}
+                    {moves.includes('Fold') && <button id='foldButton' onClick={handleFold}>Fold</button>}
                 </div>
             ) : (
                 null
