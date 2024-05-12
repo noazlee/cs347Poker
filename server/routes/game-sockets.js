@@ -9,7 +9,7 @@ module.exports = function(io){
     
         // Create a new game
         socket.on('create-game', (data) => {
-            const newGame = new Game(io, data.hostId, socket.id);
+            const newGame = new Game(io, data.hostId, data.username, socket.id);
             games[newGame.gameId] = newGame;
             socket.join(newGame.gameId);
             console.info("Game created:", newGame.gameId);
@@ -20,7 +20,7 @@ module.exports = function(io){
         socket.on('join-game', (data) => {
             const game = games[data.gameId];
             if (game && game.status === 'waiting') {
-                game.addPlayer(data.playerId, socket.id, false);
+                game.addPlayer(data.playerId, socket.id, data.username, false);
                 socket.join(data.gameId);
 
                 //checking socket room
@@ -34,7 +34,7 @@ module.exports = function(io){
                 //     console.log(`No active room with ID: ${data.gameId}`);
                 // }
 
-                io.to(data.gameId).emit('update-players', { players: game.players.map(player => player.userId) });
+                io.to(data.gameId).emit('update-players', { players: game.players.map(player => ({userId: player.userId, username: player.username})) });
                 io.to(data.gameId).emit('player-joined', { 
                     player_names: game.players.map(p => p.userId),
                     playerId: data.playerId,

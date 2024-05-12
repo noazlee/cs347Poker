@@ -51,11 +51,11 @@ export default function PlayerBox({ player, isPlayerOne, blind, chips, socket}) 
     }, [socket, player.userId]);
 
     const blindIcon = getBlindIcon(blind);
-
+    console.log(player)
     return (
             <div className="playerBox">
                 <div>
-                    <h2>{player.userId}</h2>
+                    <h2>{player.username}</h2>
                     {blindIcon}
                 </div>
                 <div className="playerCards">

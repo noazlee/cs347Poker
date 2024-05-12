@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '../App.css';
 import socket  from '../socket';
 import { buildImgUrl } from '../utils/utils';
@@ -11,6 +11,8 @@ const [gameId, setGameId] = useState('');
 const [players, setPlayers] = useState([]);
 
 const [backgroundPosition, setBackgroundPosition] = useState(0);
+
+const { state } = useLocation();
 
 useEffect(() => {
     const interval = setInterval(() => {
@@ -51,7 +53,7 @@ useEffect(() => {
 const handleJoin = (e) => {
     e.preventDefault();
     if (gameId) {
-        socket.emit('join-game', { playerId: userId, gameId });
+        socket.emit('join-game', { playerId: userId, gameId, username: state.username});
     } else {
         alert('Please enter a valid game ID.');
     }

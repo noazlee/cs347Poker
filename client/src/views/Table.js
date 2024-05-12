@@ -21,7 +21,7 @@ export default function Table({ props }) {
             {ind.map((index) => (
                 <section key={index} id={`Box-${index}`}>
                     {index <= players.length &&
-                        <PlayerBox isPlayerOne={index === 1} player={players[index - 1].userId} chips={players[index - 1].chips} socket={socket}/>
+                        <PlayerBox isPlayerOne={index === 1} player={players[index - 1]} chips={players[index - 1].chips} socket={socket} />
                     }
                 </section>
             ))}
