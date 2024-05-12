@@ -87,5 +87,17 @@ module.exports = function(io){
         socket.on('disconnect', () => {
             console.info('Client disconnected', socket.id);
         });
+
+        socket.on('check', (data) => {
+            console.log('check');
+        });
+
+        socket.on('fold', (data) => {
+            console.log('fold');
+        });
+
+        socket.on('raise', (data) => {
+            console.log('raise', data.amount);
+        });
     });
 }
