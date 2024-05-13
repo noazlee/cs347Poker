@@ -57,7 +57,7 @@ const GameRoom = () => {
             socket.off('update-players');
 
         };
-    }, [gameId, userId, navigate]);
+    }, [gameId, userId,username, navigate]);
 
     const startGame = () => {
         console.info(socket.id, " starting game...");

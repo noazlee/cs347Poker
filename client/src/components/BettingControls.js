@@ -5,6 +5,7 @@ import '../css/BettingControls.css';
 import socket from '../socket';
 
 export default function BettingControls({ props }) {
+    const gameId = props.gameId;
     const [popupDisplayed, toggleDisplayPopup] = useState(false);
     const [buttonRowOn, toggleButtonRow] = useState(true);
     const moves = props.moves;
@@ -12,24 +13,38 @@ export default function BettingControls({ props }) {
     const handleRaise = () => {
         toggleDisplayPopup(true);
         toggleButtonRow(false);
+        socket.emit('player-action', {
+            action: 'raise',
+            gameId:gameId
+            // value: 
+        });
     }
 
     const handleCheck = () => {
         console.log('check');
         props.toggleCurrentPlayer(false);
-        socket.emit('check', {});
+        socket.emit('player-action', {
+            action: 'check',
+            gameId:gameId
+        });
     }
 
     const handleFold = () => {
         console.log('fold');
         props.toggleCurrentPlayer(false);
-        socket.emit('fold', {});
+        socket.emit('player-action', {
+            action: 'fold',
+            gameId:gameId
+        });
     }
 
     const handleCall = () => {
         console.log('call');
         props.toggleCurrentPlayer(false);
-        socket.emit('fold', {});
+        socket.emit('player-action', {
+            action: 'call',
+            gameId:gameId
+        });
     }
 
     return (

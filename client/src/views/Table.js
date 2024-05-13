@@ -2,12 +2,14 @@ import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
 import '../css/Table.css'
+import { useParams } from 'react-router-dom';
 import socket from '../socket';
 
 export default function Table({ props }) {
     const [roundData, setRoundData] = useState(undefined);
     const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
     const [moves, setMoves] = useState([]);
+    const {gameId, userId} = useParams();
 
     useEffect(() => {
         socket.on('update-round-data', (data) => {
@@ -65,6 +67,8 @@ export default function Table({ props }) {
                             props={{
                                 toggleCurrentPlayer: setIsCurrentPlayer
                             }}
+                            gameId={gameId}
+                            userId={userId}
                         />
                     </section>
                 )

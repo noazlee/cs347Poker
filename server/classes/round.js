@@ -2,6 +2,7 @@ const Deck = require('./deck');
 
 // round.js
 class Round {
+
     constructor(io, gameId, prevIndex, players, smallBlindAmount) {
         this.io = io;
         this.gameId = gameId;
@@ -15,6 +16,7 @@ class Round {
         this.hands = [];
         this.stage = 0; 
         this.startingPlayer = 0;
+        this.anchor = null; // used when someone raises
         this.currentPlayer = 0;
         this.currentSmallBlind = 0;  // Index of the small blind in the players array
         this.playerResponses = new Map(); 
@@ -71,7 +73,8 @@ class Round {
             type: "Flop",
             cards: this.communityCards
         })
-        this.startBettingRound();
+        console.log(this.communityCards);
+        this.promptPlayerAction();
     }
 
     dealTurn(){
@@ -81,7 +84,7 @@ class Round {
             type: "Turn",
             cards: this.communityCards
         })
-        this.startBettingRound();
+        this.promptPlayerAction();
     }
 
     dealRiver(){
@@ -91,7 +94,7 @@ class Round {
             type: "River",
             cards: this.communityCards
         })
-        this.startBettingRound();
+        this.promptPlayerAction();
     }
 
     async promptPlayerAction() {
@@ -115,6 +118,7 @@ class Round {
 
     handlePlayerAction(socket, data) {
         const resolve = this.playerResponses.get(socket.id);
+        console.log('in player action', data.action);
         if (resolve) {
             resolve();
             this.playerResponses.delete(socket.id);
@@ -127,14 +131,22 @@ class Round {
         console.log(`Action received from ${socket.id}: ${data.action}`);
         const player = this.players[this.currentPlayer];
         switch (data.action) {
-            case 'Check':
-                // Handle check
+            case 'check':
+                this.advanceToNextPlayer();
                 break;
-            case 'Raise':
-                // Handle raise
+            case 'call':
+                player.call(data.value);
+                this.advanceToNextPlayer();
                 break;
-            case 'Fold':
+            case 'raise':
+                this.currentBet += data.value;
+                this.anchor = this.positionInQueue(player);
+                player.raise(data.value);
+                this.advanceToNextPlayer();
+                break;
+            case 'fold':
                 player.isInRound = false;
+                this.advanceToNextPlayer();
                 break;
             default:
                 break;
@@ -144,7 +156,20 @@ class Round {
     // Moves to the next player
     async advanceToNextPlayer() {
         do {
+            console.log(this.currentPlayer);
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+            console.log(this.currentPlayer);
+            if(this.anchor){
+                if(this.currentPlayer==this.anchor){
+                    console.log('betting round done, advancing stage');
+                    this.advanceStage();
+                }
+            }else{
+                if(this.currentPlayer==this.startingPlayer){
+                    console.log('betting round done, advancing stage');
+                    this.advanceStage();
+                }
+            }
         } while (!this.players[this.currentPlayer].isInRound);
 
         if (this.allPlayersActed()) {
@@ -199,6 +224,16 @@ class Round {
         // this.game.startNewRound(); 
     }
     
+    positionInQueue(playerToFind){
+        let counter = 0;
+        for(player in players){
+            if(player.userId===playerToFind.userId){
+                return counter;
+            }else{
+                counter++;
+            }
+        }
+    }
 
 }
 
