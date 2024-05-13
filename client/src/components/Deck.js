@@ -6,21 +6,9 @@ export default function Deck({ props }) {
     return (
         <div className='deck'>
             <section id='revealedCards'>
-                <section id='firstSlot'>
-                    <Card isVisible={true} />
-                </section>
-                <section id='secondSlot'>
-                    <Card isVisible={true} />
-                </section>
-                <section id='thirdSlot'>
-                    <Card isVisible={true} />
-                </section>
-                <section id='fourthSlot'>
-                    <Card isVisible={true} />
-                </section>
-                <section id='fifthSlot'>
-                    <Card isVisible={true} />
-                </section>
+                {props.communityCards && props.communityCards.map((card, index) => {
+                    return <Card key={index} isVisible={true} suit={card.suite} value={card.value} />
+                })}
             </section>
             <Card isVisible={false} />
         </div>

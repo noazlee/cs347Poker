@@ -16,6 +16,7 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
 
         socket.emit('raise', {amount: raiseAmount});
         togglePopup(false);
+        props.toggleButtons(true);
     }
 
     return isDisplayed === true ? (
@@ -24,7 +25,10 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
                 <h2>Select Amount to Raise</h2>
                 <input type='number' name='raiseAmount' id='raiseAmount' value={raiseAmount} onChange={(e) => changeRaiseAmount(e.target.value)}/>
                 <button onClick={goAllIn}>Go All In!</button>
-                <button onClick={() => togglePopup(false)}>Cancel</button>
+                <button onClick={() => {
+                    togglePopup(false);
+                    props.toggleButtons(true);
+                }}>Cancel</button>
                 <button onClick={handleSubmit}>Confirm</button>
             </div>
         </div>

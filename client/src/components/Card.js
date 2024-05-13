@@ -1,10 +1,9 @@
 import React from 'react';
-import { buildImgUrl } from '../utils/utils';
+import { cardMap, buildImgUrl } from '../utils/utils';
 import '../css/Card.css';
 
-export default function Card ({ isVisible=false, card_data}) {
+export default function Card({isVisible=false, suit, value}) {
     return (
-
         <div className='card'>
             {!isVisible ? (
                 <img
@@ -15,8 +14,8 @@ export default function Card ({ isVisible=false, card_data}) {
                 </img>
             ) : (
                 <img
-                    src={buildImgUrl('card_pics/ace1.png')}
-                    alt={'Ace of Clubs'}
+                    src={buildImgUrl(`card_pics/${cardMap[`${value}-${suit}`]}`)}
+                    alt={`${value} of ${suit}`}
                     width={50}
                     height={70}
                 />
