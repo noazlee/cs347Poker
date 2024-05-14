@@ -46,7 +46,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                         return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
                     })}
                 </div>
-                <div className="bettingHistory">
+                <div className="bettingTab">
                     {playerOne ? (
                         <BettingControls props={{
                             initialChips: player.chips,

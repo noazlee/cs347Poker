@@ -15,22 +15,21 @@ export default function Table({ props }) {
     useEffect(() => {
         socket.on('update-round-data', (data) => {
             setRoundData(data.round);
-            console.log(data.round.currentPlayer);
         });
 
         socket.on('your-turn', (data) => {
-            console.log("My turn!");
             setPlayerOneCurrent(true);
             setMoves(data.acceptableMoves);
         });
 
         socket.on('shown-cards', (data) => {
-            setCommunityCards(data.cards)
+            setCommunityCards(data.cards);
         })
 
         return () => {
             socket.off('update-round-data');
             socket.off('your-turn');
+            socket.off('shown-cards');
         };
     }, []);
 
