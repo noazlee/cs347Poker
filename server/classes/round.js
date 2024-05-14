@@ -149,25 +149,30 @@ class Round {
         const player = this.players[this.currentPlayer];
         switch (data.action) {
             case 'check':
+                player.latestMove = "Check";
                 this.advanceToNextPlayer();
+                this.updatePlayer();
                 break;
             case 'call':
+                player.latestMove = "Call";
                 player.call(this.highestBet);
-                this.updatePlayer();
                 console.log(this.getRoundState());
                 this.advanceToNextPlayer();
+                this.updatePlayer();
                 break;
             case 'raise':
+                player.latestMove = "Raise";
                 this.currentBet += data.value;
                 this.anchor = this.positionInQueue(player);
                 player.raise(data.value);
-                this.updatePlayer();
                 this.advanceToNextPlayer();
+                this.updatePlayer();
                 break;
             case 'fold':
+                player.latestMove = "Fold";
                 player.isInRound = false;
-                this.updatePlayer();
                 this.advanceToNextPlayer();
+                this.updatePlayer();
                 break;
             default:
                 break;

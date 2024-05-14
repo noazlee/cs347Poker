@@ -6,7 +6,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId , userId}) {
+export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId , userId, active}) {
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -34,7 +34,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
     }
 
     return (
-            <div className="playerBox">
+            <div className={"playerBox " + (active === true ? "active" : "inactive")}>
                 <div>
                     <h2>{player.username}</h2>
                     {getBlindIcon(blind)}
@@ -46,18 +46,21 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                         return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
                     })}
                 </div>
-                {playerOne ? (
-                    <BettingControls props={{
-                        initialChips: player.chips,
-                        currentBet: player.currentBet,
-                        moves: moves,
-                        isTurn: isCurrentPlayer,
-                        toggleCurrentPlayer: props.toggleCurrentPlayer,
-                        gameId:gameId
-                    }}/>
-                ) : (
-                    <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
-                )}
+                <div className="bettingHistory">
+                    {playerOne ? (
+                        <BettingControls props={{
+                            initialChips: player.chips,
+                            currentBet: player.currentBet,
+                            moves: moves,
+                            isTurn: isCurrentPlayer,
+                            toggleCurrentPlayer: props.toggleCurrentPlayer,
+                            gameId:gameId
+                        }}/>
+                    ) : (
+                        <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
+                    )}
+                    <p>Latest Move: {player.latestMove}</p>
+                </div>
             </div>
         )
 }

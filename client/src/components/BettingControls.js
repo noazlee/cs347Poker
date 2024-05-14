@@ -13,11 +13,6 @@ export default function BettingControls({ props }) {
     const handleRaise = () => {
         toggleDisplayPopup(true);
         toggleButtonRow(false);
-        socket.emit('player-action', {
-            action: 'raise',
-            gameId:gameId
-            // value: 
-        });
     }
 
     const handleCheck = () => {
@@ -49,7 +44,7 @@ export default function BettingControls({ props }) {
 
     return (
         <div className='bettingControls'>
-            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow}} />
+            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow, gameId: gameId}} />
             {(props.isTurn && buttonRowOn) ? (
                 <div className='buttonRow'>
                     {moves.includes('Check') && <button id='checkButton' onClick={handleCheck}>Check</button>}

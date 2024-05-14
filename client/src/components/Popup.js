@@ -11,10 +11,13 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
     }
 
     const handleSubmit = () => {
-        console.log(document.getElementById('raiseAmount').value);
-        console.log(raiseAmount);
+        console.log('raise');
 
-        socket.emit('raise', {amount: raiseAmount});
+        socket.emit('player-action', {
+            action: 'raise',
+            gameId: props.gameId,
+            value: Number(document.getElementById('raiseAmount').value)
+        });
         togglePopup(false);
         props.toggleButtons(true);
     }

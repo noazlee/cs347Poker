@@ -9,6 +9,7 @@ class Player{
         this.isInRound = true;
         this.currentBet = 0;
         this.isAi = isAi;
+        this.latestMove = "";
     }
 
     addCardToHand(card) {
