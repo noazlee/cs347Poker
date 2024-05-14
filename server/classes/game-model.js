@@ -55,11 +55,13 @@ class Game {
         });
         
         this.currentRound = new Round(this.io, this.gameId, 0, this.players, this.smallBlindAmount);
+        this.rounds.push(this.currentRound);
         this.currentRound.start();
     }
 
     startNewRound(){
-        //TBI
+        this.currentRound = new Round(this.io, this.gameId, 0, this.players, this.smallBlindAmount);
+        this.currentRound.start();
     }
 }
 

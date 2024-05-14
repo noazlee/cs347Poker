@@ -22,10 +22,11 @@ class Player{
     }
 
     raise(amount) {
-        if (amount > this.chips) {
+        const amountToRaise = amount - this.currentBet;
+        if (amountToRaise > this.chips) {
             throw new Error('Insufficient chips to raise');
         }
-        this.chips -= amount;
+        this.chips -= amountToRaise;
         this.currentBet = amount;
     }   
 

@@ -26,9 +26,17 @@ export default function Table({ props }) {
             setCommunityCards(data.cards);
         })
 
+        socket.on('round-ended', (data)=>{
+            console.log('game ended on client');
+            if(socket.id===data.winner.socketId){ //ensures this is not sent twice
+                socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner});
+            }
+        })
+
         return () => {
             socket.off('update-round-data');
             socket.off('your-turn');
+            socket.off('round-ended');
             socket.off('shown-cards');
         };
     }, []);

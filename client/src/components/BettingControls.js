@@ -44,7 +44,7 @@ export default function BettingControls({ props }) {
 
     return (
         <div className='bettingControls'>
-            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow, gameId: gameId, maxChips: props.initialChips}} />
+            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow, gameId: gameId, maxChips: props.initialChips, toggleCurrentPlayer: props.toggleCurrentPlayer}} />
             {(props.isTurn && buttonRowOn) ? (
                 <div className='buttonRow'>
                     {moves.includes('Check') && <button id='checkButton' onClick={handleCheck}>Check</button>}

@@ -46,7 +46,7 @@ module.exports = function(io){
         });
 
         // Player move during round of betting
-        socket.on('player-action', (data) => {
+        socket.once('player-action', (data) => {
             const game = games[data.gameId];
             console.log('Action received', data.action, data.gameId);
             if (game) {
@@ -56,9 +56,18 @@ module.exports = function(io){
                 }
             }
         });
+
+        socket.once('round-end-client', (data) => {
+            const game = games[data.gameId];
+            console.log('Round ended');
+            if (game) {
+                console.log('starting new round');
+                game.startNewRound();
+            }
+        });
     
         // Player leaving a game
-        socket.on('leave-game', (data) => {
+        socket.once('leave-game', (data) => {
             const game = games[data.gameId];
             if (game) {
                 game.removePlayer(data.playerId);

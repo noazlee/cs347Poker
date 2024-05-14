@@ -1,4 +1,5 @@
 const Deck = require('./deck');
+const pokerHandEvaluator = require('./poker-hand-evaluator');
 
 // round.js
 class Round {
@@ -15,7 +16,7 @@ class Round {
         this.communityCards = [];
         this.hands = [];
         this.stage = 0; 
-        this.startingPlayer = 0;
+        this.startingPlayer = (prevIndex+1)%this.players.length;
         this.anchor = null; // used when someone raises
         this.currentPlayer = 0;
         this.currentSmallBlind = 0;  // Index of the small blind in the players array
@@ -40,8 +41,10 @@ class Round {
         await this.setBettingOrder();
 
         this.players[this.currentSmallBlind].currentBet = this.smallBlindAmount;
+        this.pot+=this.players[this.currentSmallBlind].currentBet;
         this.players[this.currentSmallBlind].chips -= this.smallBlindAmount;
         this.players[(this.currentSmallBlind+1)%this.players.length].currentBet = this.smallBlindAmount * 2; //big blind
+        this.pot+= this.players[(this.currentSmallBlind+1)%this.players.length].currentBet 
         this.players[(this.currentSmallBlind+1)%this.players.length].chips -= this.smallBlindAmount * 2;
 
         this.players.forEach(player=>{
@@ -162,8 +165,9 @@ class Round {
                 break;
             case 'raise':
                 player.latestMove = "Raise";
-                this.currentBet += data.value;
+                this.highestBet = data.value;
                 this.anchor = this.positionInQueue(player);
+                console.log('raise anchor: ',this.anchor);
                 player.raise(data.value);
                 this.advanceToNextPlayer();
                 this.updatePlayer();
@@ -171,7 +175,12 @@ class Round {
             case 'fold':
                 player.latestMove = "Fold";
                 player.isInRound = false;
-                this.advanceToNextPlayer();
+                const numPlayers = this.numPlayersInRound();
+                if(numPlayers>1){
+                    this.advanceToNextPlayer();
+                }else{
+                    this.endRound();
+                }
                 this.updatePlayer();
                 break;
             default:
@@ -185,6 +194,7 @@ class Round {
             console.log(this.currentPlayer);
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
             console.log(this.currentPlayer);
+            console.log(this.anchor);
             if(this.anchor){
                 if(this.currentPlayer==this.anchor){
                     console.log('betting round done, advancing stage');
@@ -212,6 +222,9 @@ class Round {
 
     advanceStage() {
         // Logic to move to the next stage of the game (flop, turn, river)
+        this.moveBetstoPot();
+        this.updatePlayer();
+        this.highestBet = 0;
         this.stage++;
         switch (this.stage) {
             case 1:
@@ -232,7 +245,7 @@ class Round {
         }
     }
 
-    setBettingOrder(){
+    setBettingOrder(){    
         if (this.stage==0) { //if first stage
             this.startingPlayer = (this.currentSmallBlind + 2) % this.players.length; 
             this.currentPlayer = this.startingPlayer;
@@ -245,9 +258,61 @@ class Round {
     }
 
     endRound() {
-        const winner = this.determineWinner();
-        this.io.to(this.game.gameId).emit('round-ended', { winner: winner.userId });
-        // this.game.startNewRound(); 
+        let winner;
+        if(this.numPlayersInRound()>1){
+            winner = this.determineWinner();
+        }else{
+            winner = this.lastPlayerInRound();
+        }
+        winner.chips += this.pot;
+        console.log('winner:',winner);
+
+        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner });
+    }
+
+    determineWinner(){
+        const hands = this.players
+            .filter(player => player.isInRound)
+            .map(player => ({
+                player: player,
+                hand: pokerHandEvaluator.evaluate(player.hand, this.communityCards)
+            }));
+
+        const bestHands = pokerHandEvaluator.getBestHands(hands.map(hand => hand.hand));
+        const winners = hands.filter(hand => bestHands.some(bestHand => pokerHandEvaluator.compare(hand.hand, bestHand) === 0));
+
+        if (winners.length === 1) {
+            return winners[0].player;
+        } else {
+            return winners.map(winner => winner.player);
+        }
+    }
+
+    evaluateHand(playerHand, communityCards) {
+        const allCards = playerHand.concat(communityCards);
+        return pokerHandEvaluator.evaluate(allCards).strength;
+    }
+
+    lastPlayerInRound(){
+        let winner;
+        this.players.forEach(player => {
+            console.log(player);
+            if(player.isInRound===true) {
+                console.log('player found');
+                winner= player;
+            }
+        });
+        return winner;
+    }
+
+    numPlayersInRound(){
+        let index = 0;
+        this.players.forEach(player => {
+            if (player.isInRound) {
+                index++;
+            }
+        });
+        return index;
     }
     
     getRoundState(){
@@ -264,13 +329,14 @@ class Round {
 
     positionInQueue(playerToFind){
         let counter = 0;
-        for(var player in this.players){
-            if(player.userId===playerToFind.userId){
+        for (let player of this.players) {
+            if (player.userId === playerToFind.userId) {
                 return counter;
-            }else{
+            } else {
                 counter++;
             }
         }
+        return -1;  // -1 if the player is not found
     }
 
     updatePlayer(){
@@ -280,7 +346,7 @@ class Round {
             players: this.players,
             deck: this.deck,
             smallBlindAmount: this.smallBlindAmount,
-            currentBet: this.currentBet,
+            highestBet: this.highestBet,
             pot: this.pot,
             communityCards: this.communityCards,
             hands: this.hands,
@@ -305,6 +371,15 @@ class Round {
                 currentPlayer: this.currentPlayer,
                 currentSmallBlind: this.currentSmallBlind,
                 playerResponses: this.playerResponses
+            }
+        });
+    }
+
+    moveBetstoPot(){
+        this.players.forEach(player => {
+            if (player.isPlaying) {
+               this.pot += parseInt(player.currentBet);
+               player.currentBet = 0;
             }
         });
     }

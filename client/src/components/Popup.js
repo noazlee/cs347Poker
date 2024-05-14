@@ -23,6 +23,7 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
             value: raiseValue
         });
         togglePopup(false);
+        props.toggleCurrentPlayer(false);
         props.toggleButtons(true);
     }
 
