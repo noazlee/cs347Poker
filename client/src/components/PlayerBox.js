@@ -38,13 +38,13 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                 <div>
                     <h2>{player.username}</h2>
                     {getBlindIcon(blind)}
-                </div>
-                <div className="playerCards">
-                    {player.hand.map((card, index) => {
-                        const cardSuit = card.suite;
-                        const cardValue = card.value;
-                        return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
-                    })}
+                    <div className="playerCards">
+                        {player.hand.map((card, index) => {
+                            const cardSuit = card.suite;
+                            const cardValue = card.value;
+                            return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
+                        })}
+                    </div>
                 </div>
                 <div className="bettingTab">
                     {playerOne ? (
