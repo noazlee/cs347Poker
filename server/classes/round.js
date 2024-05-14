@@ -10,7 +10,7 @@ class Round {
         this.players = players;  
         this.deck = new Deck();
         this.smallBlindAmount = smallBlindAmount;
-        this.currentBet = this.smallBlindAmount * 2;
+        this.highestBet = smallBlindAmount * 2;
         this.pot = 0;
         this.communityCards = [];
         this.hands = [];
@@ -35,6 +35,19 @@ class Round {
             player.addCardToHand(this.deck.dealOneCard());
         });
 
+        this.pot = 0;
+        
+        await this.setBettingOrder();
+
+        this.players[this.currentSmallBlind].currentBet = this.smallBlindAmount;
+        this.players[this.currentSmallBlind].chips -= this.smallBlindAmount;
+        this.players[(this.currentSmallBlind+1)%this.players.length].currentBet = this.smallBlindAmount * 2; //big blind
+        this.players[(this.currentSmallBlind+1)%this.players.length].chips -= this.smallBlindAmount * 2;
+
+        this.players.forEach(player=>{
+            console.info(player);
+        })
+
         this.io.to(this.gameId).emit('update-round-data', {
             round: {
                 gameId: this.gameId,
@@ -54,11 +67,6 @@ class Round {
             }
         });
 
-        this.pot = 0;
-        this.players.forEach(player=>{
-            // console.info(player);
-        })
-        await this.setBettingOrder();
         await this.promptPlayerAction();
     }
 
@@ -73,7 +81,7 @@ class Round {
             type: "Flop",
             cards: this.communityCards
         })
-        console.log(this.communityCards);
+        this.getRoundState();
         this.promptPlayerAction();
     }
 
@@ -104,9 +112,18 @@ class Round {
 
         const player = this.players[this.currentPlayer];
         console.log(player.userId, "turn"); 
+        var acceptableMoves;
+        console.log(player.currentBet);
+        console.log(this.highestBet);
+        if(player.currentBet<this.highestBet){
+            acceptableMoves = ['Raise', 'Fold', 'Call'];
+        }else{
+            acceptableMoves = ['Raise', 'Fold', 'Check'];
+        }
+
         if (player.isInRound) {
             this.io.to(player.socketId).emit('your-turn', {
-                acceptableMoves: ['Check', 'Raise', 'Fold', 'Call']
+                acceptableMoves: acceptableMoves
             });
             return new Promise((resolve) => {
                 this.playerResponses.set(player.socketId, resolve);
@@ -135,17 +152,21 @@ class Round {
                 this.advanceToNextPlayer();
                 break;
             case 'call':
-                player.call(data.value);
+                player.call(this.highestBet);
+                this.updatePlayer();
+                console.log(this.getRoundState());
                 this.advanceToNextPlayer();
                 break;
             case 'raise':
                 this.currentBet += data.value;
                 this.anchor = this.positionInQueue(player);
                 player.raise(data.value);
+                this.updatePlayer();
                 this.advanceToNextPlayer();
                 break;
             case 'fold':
                 player.isInRound = false;
+                this.updatePlayer();
                 this.advanceToNextPlayer();
                 break;
             default:
@@ -224,15 +245,63 @@ class Round {
         // this.game.startNewRound(); 
     }
     
+    getRoundState(){
+        return [
+            this.players,
+            this.highestBet,
+            this.pot,
+            this.communityCards,
+            this.stage,
+            this.currentPlayer,
+            this.startingPlayer
+        ]
+    }
+
     positionInQueue(playerToFind){
         let counter = 0;
-        for(player in players){
+        for(var player in this.players){
             if(player.userId===playerToFind.userId){
                 return counter;
             }else{
                 counter++;
             }
         }
+    }
+
+    updatePlayer(){
+        console.log('updating player to client');
+        console.log({gameId: this.gameId,
+            index: this.index,
+            players: this.players,
+            deck: this.deck,
+            smallBlindAmount: this.smallBlindAmount,
+            currentBet: this.currentBet,
+            pot: this.pot,
+            communityCards: this.communityCards,
+            hands: this.hands,
+            stage: this.stage,
+            startingPlayer: this.startingPlayer,
+            currentPlayer: this.currentPlayer,
+            currentSmallBlind: this.currentSmallBlind,
+            playerResponses: this.playerResponses});
+        this.io.to(this.gameId).emit('update-round-data', {
+            round: {
+                gameId: this.gameId,
+                index: this.index,
+                players: this.players,
+                deck: this.deck,
+                smallBlindAmount: this.smallBlindAmount,
+                currentBet: this.currentBet,
+                pot: this.pot,
+                communityCards: this.communityCards,
+                hands: this.hands,
+                stage: this.stage,
+                startingPlayer: this.startingPlayer,
+                currentPlayer: this.currentPlayer,
+                currentSmallBlind: this.currentSmallBlind,
+                playerResponses: this.playerResponses
+            }
+        });
     }
 
 }
