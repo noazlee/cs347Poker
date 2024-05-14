@@ -4,17 +4,24 @@ import socket from '../socket';
 
 
 export default function Popup ({ isDisplayed, togglePopup, props }) {
-    const [raiseAmount, changeRaiseAmount] = useState(0)
+    const [raiseAmount, changeRaiseAmount] = useState(1)
 
     const goAllIn = () => {
-        changeRaiseAmount(50);
+        changeRaiseAmount(props.maxChips);
     }
 
     const handleSubmit = () => {
-        console.log(document.getElementById('raiseAmount').value);
-        console.log(raiseAmount);
+        let raiseValue = Number(document.getElementById('raiseAmount').value);
 
-        socket.emit('raise', {amount: raiseAmount});
+        if (raiseValue < 1) { raiseValue = 1 }
+        
+        if (raiseValue > props.maxChips) { raiseValue = props.maxChips }
+
+        socket.emit('player-action', {
+            action: 'raise',
+            gameId: props.gameId,
+            value: raiseValue
+        });
         togglePopup(false);
         props.toggleButtons(true);
     }
@@ -23,7 +30,7 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
         <div className='popup'>
             <div id='raiseForm'>
                 <h2>Select Amount to Raise</h2>
-                <input type='number' name='raiseAmount' id='raiseAmount' value={raiseAmount} onChange={(e) => changeRaiseAmount(e.target.value)}/>
+                <input type='number' name='raiseAmount' id='raiseAmount' min="1" max={props.maxChips} value={raiseAmount} onChange={(e) => changeRaiseAmount(e.target.value)}/>
                 <button onClick={goAllIn}>Go All In!</button>
                 <button onClick={() => {
                     togglePopup(false);

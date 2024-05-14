@@ -7,8 +7,9 @@ import socket from '../socket';
 
 export default function Table({ props }) {
     const [roundData, setRoundData] = useState(undefined);
-    const [isCurrentPlayer, setIsCurrentPlayer] = useState(false);
+    const [playerOneCurrent, setPlayerOneCurrent] = useState(false);
     const [moves, setMoves] = useState([]);
+    const [communityCards, setCommunityCards] = useState([]);
     const {gameId, userId} = useParams();
 
     useEffect(() => {
@@ -17,25 +18,32 @@ export default function Table({ props }) {
         });
 
         socket.on('your-turn', (data) => {
-            console.log("My turn!");
-            setIsCurrentPlayer(true);
+            setPlayerOneCurrent(true);
             setMoves(data.acceptableMoves);
         });
+
+        socket.on('shown-cards', (data) => {
+            setCommunityCards(data.cards);
+        })
 
         return () => {
             socket.off('update-round-data');
             socket.off('your-turn');
+            socket.off('shown-cards');
         };
     }, []);
 
     const generatePlayerBoxes = (data) => {
+        const currentPlayerId = data.players[data.currentPlayer].userId;
         let smallBlindPlayerId;
         let bigBlindPlayerId;
         let box = 1;
 
+        console.log(`Now playing: Player ${data.currentPlayer}`);
+
         if (data.players.length >= 2) {
-            smallBlindPlayerId = data.players[data.currentSmallBlind].socketId;
-            bigBlindPlayerId = data.players[data.currentSmallBlind + 1].socketId;
+            smallBlindPlayerId = data.players[data.currentSmallBlind].userId;
+            bigBlindPlayerId = data.players[data.currentSmallBlind + 1].userId;
         } else {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }
@@ -61,14 +69,15 @@ export default function Table({ props }) {
                         <PlayerBox
                             player={player} 
                             playerOne={isPlayerOne}
-                            isCurrentPlayer={isCurrentPlayer}
+                            isCurrentPlayer={playerOneCurrent}
                             blind={blindStatus}
                             moves={moves}
                             props={{
-                                toggleCurrentPlayer: setIsCurrentPlayer
+                                toggleCurrentPlayer: setPlayerOneCurrent
                             }}
                             gameId={gameId}
                             userId={userId}
+                            active={player.userId === currentPlayerId ? true : false}
                         />
                     </section>
                 )
@@ -82,7 +91,7 @@ export default function Table({ props }) {
             <div className='table'>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
-                    <Deck props={{cards: roundData.communityCards}}/>
+                    <Deck props={{communityCards: communityCards}}/>
                 </section>
             </div>
         )
