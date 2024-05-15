@@ -183,8 +183,38 @@ class Round {
         this.io.to(this.game.gameId).emit('round-ended', { winner: winner.userId });
         // this.game.startNewRound(); 
     }
-    
 
+    // go loop through each player
+    // take a list of 7 cards from the com cards and their cards
+    // check if their hand matches 10 ranks of poker hands
+    // use the rank to create a list of the 5 best cards for the hand
+    // store the 'strength' value and the cards in an array
+    determineWinner(){
+        //const comCards = this.communityCards;
+        let winner = null;
+        let bestHandStrength = 0;
+        
+        this.players.forEach(player => {
+            if (player.isInRound) {
+                const playerCards = [];
+                for (let i = 0; i < player.hand.length; i++) {
+                    playerCards.push(player.hand[i]);
+                }
+                for (let i = 0; i < this.communityCards.length; i++) {
+                    playerCards.push(this.communityCards[i]);
+                }
+
+                const playerHand = evaluateHand(playerCards); // Function to evaluate the player's hand
+                
+                if (!winner || playerHand.rank > bestHandStrength) {
+                    bestHandStrength = playerHand.rank;
+                    winner = player;
+                }
+            }            
+        });
+        return winner
+    }
+  
 }
 
 module.exports = Round;
