@@ -275,28 +275,28 @@ class Round {
         this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind });
     }
 
-    determineWinner(){
-        const hands = this.players
-            .filter(player => player.isInRound)
-            .map(player => ({
-                player: player,
-                hand: pokerHandEvaluator.evaluate(player.hand, this.communityCards)
-            }));
+    // determineWinner(){
+    //     const hands = this.players
+    //         .filter(player => player.isInRound)
+    //         .map(player => ({
+    //             player: player,
+    //             hand: pokerHandEvaluator.evaluate(player.hand, this.communityCards)
+    //         }));
 
-        const bestHands = pokerHandEvaluator.getBestHands(hands.map(hand => hand.hand));
-        const winners = hands.filter(hand => bestHands.some(bestHand => pokerHandEvaluator.compare(hand.hand, bestHand) === 0));
+    //     const bestHands = pokerHandEvaluator.getBestHands(hands.map(hand => hand.hand));
+    //     const winners = hands.filter(hand => bestHands.some(bestHand => pokerHandEvaluator.compare(hand.hand, bestHand) === 0));
 
-        if (winners.length === 1) {
-            return winners[0].player;
-        } else {
-            return winners.map(winner => winner.player);
-        }
-    }
+    //     if (winners.length === 1) {
+    //         return winners[0].player;
+    //     } else {
+    //         return winners.map(winner => winner.player);
+    //     }
+    // }
 
-    evaluateHand(playerHand, communityCards) {
-        const allCards = playerHand.concat(communityCards);
-        return pokerHandEvaluator.evaluate(allCards).strength;
-    }
+    // evaluateHand(playerHand, communityCards) {
+    //     const allCards = playerHand.concat(communityCards);
+    //     return pokerHandEvaluator.evaluate(allCards).strength;
+    // }
 
     lastPlayerInRound(){
         let winner;
