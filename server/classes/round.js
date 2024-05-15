@@ -127,10 +127,10 @@ class Round {
         }
 
         if (player.isInRound) {
-            this.io.to(player.socketId).emit('your-turn', {
+            this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
                 acceptableMoves: acceptableMoves
             });
-            return new Promise((resolve) => {
+            return new Promise((resolve) => { 
                 this.playerResponses.set(player.socketId, resolve);
             });
         } else {
@@ -197,10 +197,13 @@ class Round {
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
             console.log(this.currentPlayer);
             console.log(this.anchor);
-            if(this.anchor){
+            if(this.anchor!=null){
                 if(this.currentPlayer==this.anchor){
                     console.log('betting round done, advancing stage');
+                    this.anchor=null;
                     this.advanceStage();
+                }else{
+                    this.promptPlayerAction();
                 }
             }else{
                 if(this.currentPlayer==this.startingPlayer){
