@@ -46,7 +46,7 @@ module.exports = function(io){
         });
 
         // Player move during round of betting
-        socket.once('player-action', (data) => {
+        socket.on('player-action', (data) => {
             const game = games[data.gameId];
             console.log('Action received', data.action, data.gameId);
             if (game) {
