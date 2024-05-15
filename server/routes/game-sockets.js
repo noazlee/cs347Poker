@@ -57,7 +57,7 @@ module.exports = function(io){
             }
         });
 
-        socket.once('round-end-client', (data) => {
+        socket.on('round-end-client', (data) => {
             const game = games[data.gameId];
             console.log('Round ended');
             if (game) {
@@ -67,7 +67,7 @@ module.exports = function(io){
         });
     
         // Player leaving a game
-        socket.once('leave-game', (data) => {
+        socket.on('leave-game', (data) => {
             const game = games[data.gameId];
             if (game) {
                 game.removePlayer(data.playerId);
