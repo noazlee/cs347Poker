@@ -1,9 +1,29 @@
 /* Basic styles for the page */
 
+@keyframes moveBackground {
+  from {
+      background-position: 0 0;
+  }
+  to {
+      background-position: 100% 0;
+  }
+}
+
+
+@font-face {
+  font-family: 'CardFont';
+  src: url(CardFont.ttf) format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 body, html {
   height: 100%;
   margin: 0;
   font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .error-box {
@@ -23,14 +43,26 @@ body, html {
   justify-content: center;
   align-items: center;
   height: 100%;
+  width:100%;
+}
+
+/* add images of aces next to title - make a and ace */
+.title { 
+  font-family:'CardFont';
+  font-size: 36px;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .form-box {
-  background: #f9f9f9;
+  background: rgba(181, 160, 120, 0.891);
   padding: 40px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .form-box h2 {
@@ -49,7 +81,7 @@ body, html {
 .form-box button {
   width: 100%;
   padding: 10px;
-  background-color: #5cb85c;
+  background-color: #f46e6e;
   border: none;
   border-radius: 4px;
   color: white;
@@ -57,7 +89,7 @@ body, html {
 }
 
 .form-box button:hover {
-  background-color: #4cae4c;
+  background-color: #ae4c4c;
 }
 
 .form-box p {
@@ -73,34 +105,109 @@ body, html {
   text-decoration: underline;
 }
 
+.navigation-tab {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(181, 160, 120, 0.891);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+
 .home-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: #f4f4f9;
+  background-color: rgba(181, 160, 120, 0.891);
   color: #333;
   font-family: 'Arial', sans-serif;
+  padding: 40px; 
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.home-container button{
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  color: white;
+  background-color:#f46e6e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.home-container button:hover{
+  background-color: #ae4c4c;
 }
 
 .home-title {
   margin-bottom: 20px;
   color: #2c3e50;
+  font-size: 32px;
 }
 
-.home-button {
+.home-button, .navigation-tab button {
   padding: 10px 20px;
   margin: 10px;
   font-size: 16px;
   color: white;
-  background-color: #3498db;
+  background-color:#f46e6e;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.home-button:hover {
-  background-color: #2980b9;
+.home-button:hover, .navigation-tab button:hover {
+  background-color: #ae4c4c;
+}
+
+.join-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding:10px;
+}
+.join-form input[type="text"]{
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #fff; 
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+}
+.join-form button{
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color:#f46e6e;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.join-form button:hover {
+  background-color: #ae4c4c;
+}
+
+table {
+  width: 80%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
 }

@@ -9,7 +9,7 @@ module.exports = function(io){
     
         // Create a new game
         socket.on('create-game', (data) => {
-            const newGame = new Game(socket, data.hostId, socket.id);
+            const newGame = new Game(io, data.hostId, data.username, socket.id);
             games[newGame.gameId] = newGame;
             socket.join(newGame.gameId);
             console.info("Game created:", newGame.gameId);
@@ -20,21 +20,21 @@ module.exports = function(io){
         socket.on('join-game', (data) => {
             const game = games[data.gameId];
             if (game && game.status === 'waiting') {
-                game.addPlayer(data.playerId, socket.id, false);
+                game.addPlayer(data.playerId, socket.id, data.username, false);
                 socket.join(data.gameId);
 
                 //checking socket room
-                if (io.sockets.adapter.rooms.has(data.gameId)) {
-                    const room = io.sockets.adapter.rooms.get(data.gameId);
-                    console.log(`Sockets in room ${data.gameId}:`);
-                    room.forEach((value, socketId) => {
-                        console.log(socketId);
-                    });
-                } else {
-                    console.log(`No active room with ID: ${data.gameId}`);
-                }
+                // if (io.sockets.adapter.rooms.has(data.gameId)) {
+                //     const room = io.sockets.adapter.rooms.get(data.gameId);
+                //     console.log(`Sockets in room ${data.gameId}:`);
+                //     room.forEach((value, socketId) => {
+                //         console.log(socketId);
+                //     });
+                // } else {
+                //     console.log(`No active room with ID: ${data.gameId}`);
+                // }
 
-                io.to(data.gameId).emit('update-players', { players: game.players.map(player => player.userId) });
+                io.to(data.gameId).emit('update-players', { players: game.players.map(player => ({userId: player.userId, username: player.username})) });
                 io.to(data.gameId).emit('player-joined', { 
                     player_names: game.players.map(p => p.userId),
                     playerId: data.playerId,
@@ -48,11 +48,21 @@ module.exports = function(io){
         // Player move during round of betting
         socket.on('player-action', (data) => {
             const game = games[data.gameId];
+            console.log('Action received', data.action, data.gameId);
             if (game) {
                 const round = game.currentRound;
                 if (round) {
                     round.handlePlayerAction(socket, data);
                 }
+            }
+        });
+
+        socket.on('round-end-client', (data) => {
+            const game = games[data.gameId];
+            console.log('Round ended');
+            if (game) {
+                console.log('starting new round');
+                game.startNewRound(data.prevIndex);
             }
         });
     
@@ -76,7 +86,7 @@ module.exports = function(io){
         // Start the game
         socket.on('start-game', (data) => {
             const game = games[data.gameId];
-            if (game) {
+            if (game) { //changing this to check host causes the game to BREAK - binary error
                 game.startGame();  // NOT WORKING YET
                 console.info(`Game has started ${game.gameId}`);
                 // io.to(data.gameId).emit('game-started', {});
@@ -86,6 +96,18 @@ module.exports = function(io){
         // Disconnecting
         socket.on('disconnect', () => {
             console.info('Client disconnected', socket.id);
+        });
+
+        socket.on('check', (data) => {
+            console.log('check');
+        });
+
+        socket.on('fold', (data) => {
+            console.log('fold');
+        });
+
+        socket.on('raise', (data) => {
+            console.log('raise', data.amount);
         });
     });
 }

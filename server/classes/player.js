@@ -1,5 +1,6 @@
 class Player{
-    constructor(userId, socketId, chips, isAi){
+    constructor(userId, socketId, username, chips, isAi){
+        this.username = username;
         this.userId = userId;
         this.socketId = socketId;
         this.chips = chips;
@@ -8,6 +9,7 @@ class Player{
         this.isInRound = true;
         this.currentBet = 0;
         this.isAi = isAi;
+        this.latestMove = "";
     }
 
     addCardToHand(card) {
@@ -20,10 +22,11 @@ class Player{
     }
 
     raise(amount) {
-        if (amount > this.chips) {
+        const amountToRaise = amount - this.currentBet;
+        if (amountToRaise > this.chips) {
             throw new Error('Insufficient chips to raise');
         }
-        this.chips -= amount;
+        this.chips -= amountToRaise;
         this.currentBet = amount;
     }   
 

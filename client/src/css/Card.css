@@ -1,3 +1,26 @@
 .card{
-    display: inline-block; 
+    display: inline-block;
+}
+
+.visibleCard {
+    perspective: 1000px;
+}
+
+.flippableCard {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s ease;
+}
+
+.flipped {
+    transform: rotateY(180deg);
+}
+
+.cardFront, .cardBack {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.cardFront {
+    transform: rotateY(180deg);
 }

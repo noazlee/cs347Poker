@@ -1,49 +1,78 @@
 const Deck = require('./deck');
+const pokerHandEvaluator = require('./poker-hand-evaluator');
 
 // round.js
 class Round {
-    constructor(io, gameId, players, smallBlindAmount) {
+
+    constructor(io, gameId, prevIndex, players, smallBlindAmount) {
         this.io = io;
         this.gameId = gameId;
+        this.index = prevIndex+1;
         this.players = players;  
         this.deck = new Deck();
         this.smallBlindAmount = smallBlindAmount;
-        this.currentBet = this.smallBlindAmount * 2;
+        this.highestBet = smallBlindAmount * 2;
         this.pot = 0;
         this.communityCards = [];
         this.hands = [];
         this.stage = 0; 
-        this.startingPlayer = 0;
+        this.startingPlayer = (prevIndex+1)%this.players.length;
+        this.anchor = null; // used when someone raises
         this.currentPlayer = 0;
-        this.currentSmallBlind = 0;  // Index of the small blind in the players array
+        this.currentSmallBlind = (prevIndex+1)%this.players.length;  // Index of the small blind in the players array
+        this.playerResponses = new Map(); 
     }
 
-    start() {
+    async start() {
         this.players.forEach(player => {
             if (player.isPlaying) {
                 player.resetForNewRound();
             }
         });
 
+        console.log(this.currentSmallBlind);
+
         this.deck.shuffle();
         this.players.filter(player => player.isInRound).forEach(player => {
             player.addCardToHand(this.deck.dealOneCard());
             player.addCardToHand(this.deck.dealOneCard());
-            console.log('emitting deal-cards to ', player.socketId);
-            this.io.to(player.socketId).emit('deal-cards', {
-                hand: player.hand.map(card => ({
-                    suite: card.suite,
-                    value: card.value
-                }))
-            });
         });
 
         this.pot = 0;
+        
+        await this.setBettingOrder();
+
+        this.players[this.currentSmallBlind].currentBet = this.smallBlindAmount;
+        this.pot+=this.players[this.currentSmallBlind].currentBet;
+        this.players[this.currentSmallBlind].chips -= this.smallBlindAmount;
+        this.players[(this.currentSmallBlind+1)%this.players.length].currentBet = this.smallBlindAmount * 2; //big blind
+        this.pot+= this.players[(this.currentSmallBlind+1)%this.players.length].currentBet 
+        this.players[(this.currentSmallBlind+1)%this.players.length].chips -= this.smallBlindAmount * 2;
+
         this.players.forEach(player=>{
             console.info(player);
         })
-        this.setBettingOrder();
-        this.promptPlayerAction();
+
+        this.io.to(this.gameId).emit('update-round-data', {
+            round: {
+                gameId: this.gameId,
+                index: this.index,
+                players: this.players,
+                deck: this.deck,
+                smallBlindAmount: this.smallBlindAmount,
+                currentBet: this.currentBet,
+                pot: this.pot,
+                communityCards: this.communityCards,
+                hands: this.hands,
+                stage: this.stage,
+                startingPlayer: this.startingPlayer,
+                currentPlayer: this.currentPlayer,
+                currentSmallBlind: this.currentSmallBlind,
+                playerResponses: this.playerResponses
+            }
+        });
+
+        await this.promptPlayerAction();
     }
 
     dealFlop(){
@@ -57,7 +86,8 @@ class Round {
             type: "Flop",
             cards: this.communityCards
         })
-        this.startBettingRound();
+        this.getRoundState();
+        this.promptPlayerAction();
     }
 
     dealTurn(){
@@ -67,7 +97,7 @@ class Round {
             type: "Turn",
             cards: this.communityCards
         })
-        this.startBettingRound();
+        this.promptPlayerAction();
     }
 
     dealRiver(){
@@ -77,65 +107,113 @@ class Round {
             type: "River",
             cards: this.communityCards
         })
-        this.startBettingRound();
+        this.promptPlayerAction();
     }
 
-    promptPlayerAction() {
+    async promptPlayerAction() {
         if (this.currentPlayer >= this.players.length) {
             this.currentPlayer = 0;  // Wrap-around
         }
 
         const player = this.players[this.currentPlayer];
+        console.log(player.userId, "turn"); 
+        var acceptableMoves;
+        console.log(player.currentBet);
+        console.log(this.highestBet);
+        if(player.currentBet<this.highestBet){
+            acceptableMoves = ['Raise', 'Fold', 'Call'];
+        }else{
+            acceptableMoves = ['Raise', 'Fold', 'Check'];
+        }
+
         if (player.isInRound) {
             this.io.to(player.socketId).emit('your-turn', {
-                acceptableMoves: ['Check', 'Raise', 'Fold', 'Call']
+                acceptableMoves: acceptableMoves
+            });
+            return new Promise((resolve) => {
+                this.playerResponses.set(player.socketId, resolve);
             });
         } else {
-            this.advanceToNextPlayer();  // Skip if the player is not active
+            await this.advanceToNextPlayer();  // Skip if the player is not active
         }
     }
 
     handlePlayerAction(socket, data) {
-        // Process the action data received
-        console.log(`Action received from ${socket.id}: ${data.action}`);
-
-        // Verify it's the correct player's turn
-        const player = this.players[this.currentPlayer];
-        if (socket.id !== player.socketId) {
-            return;  // It's not this player's turn
+        const resolve = this.playerResponses.get(socket.id);
+        console.log('in player action', data.action);
+        if (resolve) {
+            resolve();
+            this.playerResponses.delete(socket.id);
+            this.processPlayerAction(socket, data);
         }
-        
-        // Example processing
+    }
+
+    processPlayerAction(socket, data) {
+        // Process the action
+        console.log(`Action received from ${socket.id}: ${data.action}`);
+        const player = this.players[this.currentPlayer];
         switch (data.action) {
-            case 'Check':
-                // Do nothing, just log it
+            case 'check':
+                player.latestMove = "Check";
+                this.advanceToNextPlayer();
+                this.updatePlayer();
                 break;
-            case 'Raise':
-                // Update pot and player's bet
+            case 'call':
+                player.latestMove = "Call";
+                player.call(this.highestBet);
+                console.log(this.getRoundState());
+                this.advanceToNextPlayer();
+                this.updatePlayer();
                 break;
-            case 'Fold':
-                // Mark player as folded
+            case 'raise':
+                player.latestMove = "Raise";
+                this.highestBet = data.value;
+                this.anchor = this.positionInQueue(player);
+                console.log('raise anchor: ',this.anchor);
+                player.raise(data.value);
+                this.advanceToNextPlayer();
+                this.updatePlayer();
+                break;
+            case 'fold':
+                player.latestMove = "Fold";
                 player.isInRound = false;
+                const numPlayers = this.numPlayersInRound();
+                if(numPlayers>1){
+                    this.advanceToNextPlayer();
+                }else{
+                    this.endRound();
+                }
+                this.updatePlayer();
                 break;
             default:
-                // Unhandled action
                 break;
         }
-
-        // Move to the next player or advance the game state
-        this.advanceToNextPlayer();
     }
 
     // Moves to the next player
-    advanceToNextPlayer() {
+    async advanceToNextPlayer() {
         do {
+            console.log(this.currentPlayer);
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+            console.log(this.currentPlayer);
+            console.log(this.anchor);
+            if(this.anchor){
+                if(this.currentPlayer==this.anchor){
+                    console.log('betting round done, advancing stage');
+                    this.advanceStage();
+                }
+            }else{
+                if(this.currentPlayer==this.startingPlayer){
+                    console.log('betting round done, advancing stage');
+                    this.advanceStage();
+                }
+            }
         } while (!this.players[this.currentPlayer].isInRound);
 
         if (this.allPlayersActed()) {
             this.advanceStage();
         } else {
-            this.promptPlayerAction();
+            await this.promptPlayerAction();
         }
     }
 
@@ -146,6 +224,9 @@ class Round {
 
     advanceStage() {
         // Logic to move to the next stage of the game (flop, turn, river)
+        this.moveBetstoPot();
+        this.updatePlayer();
+        this.highestBet = 0;
         this.stage++;
         switch (this.stage) {
             case 1:
@@ -166,7 +247,7 @@ class Round {
         }
     }
 
-    setBettingOrder(){
+    setBettingOrder(){    
         if (this.stage==0) { //if first stage
             this.startingPlayer = (this.currentSmallBlind + 2) % this.players.length; 
             this.currentPlayer = this.startingPlayer;
@@ -179,9 +260,130 @@ class Round {
     }
 
     endRound() {
-        const winner = this.determineWinner();
-        this.io.to(this.game.gameId).emit('round-ended', { winner: winner.userId });
-        // this.game.startNewRound(); 
+        let winner;
+        if(this.numPlayersInRound()>1){
+            winner = this.determineWinner();
+        }else{
+            winner = this.lastPlayerInRound();
+        }
+        winner.chips += this.pot;
+        console.log('winner:',winner);
+
+        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind });
+    }
+
+    determineWinner(){
+        const hands = this.players
+            .filter(player => player.isInRound)
+            .map(player => ({
+                player: player,
+                hand: pokerHandEvaluator.evaluate(player.hand, this.communityCards)
+            }));
+
+        const bestHands = pokerHandEvaluator.getBestHands(hands.map(hand => hand.hand));
+        const winners = hands.filter(hand => bestHands.some(bestHand => pokerHandEvaluator.compare(hand.hand, bestHand) === 0));
+
+        if (winners.length === 1) {
+            return winners[0].player;
+        } else {
+            return winners.map(winner => winner.player);
+        }
+    }
+
+    evaluateHand(playerHand, communityCards) {
+        const allCards = playerHand.concat(communityCards);
+        return pokerHandEvaluator.evaluate(allCards).strength;
+    }
+
+    lastPlayerInRound(){
+        let winner;
+        this.players.forEach(player => {
+            console.log(player);
+            if(player.isInRound===true) {
+                console.log('player found');
+                winner= player;
+            }
+        });
+        return winner;
+    }
+
+    numPlayersInRound(){
+        let index = 0;
+        this.players.forEach(player => {
+            if (player.isInRound) {
+                index++;
+            }
+        });
+        return index;
+    }
+    
+    getRoundState(){
+        return [
+            this.players,
+            this.highestBet,
+            this.pot,
+            this.communityCards,
+            this.stage,
+            this.currentPlayer,
+            this.startingPlayer
+        ]
+    }
+
+    positionInQueue(playerToFind){
+        let counter = 0;
+        for (let player of this.players) {
+            if (player.userId === playerToFind.userId) {
+                return counter;
+            } else {
+                counter++;
+            }
+        }
+        return -1;  // -1 if the player is not found
+    }
+
+    updatePlayer(){
+        console.log('updating player to client');
+        console.log({gameId: this.gameId,
+            index: this.index,
+            players: this.players,
+            deck: this.deck,
+            smallBlindAmount: this.smallBlindAmount,
+            highestBet: this.highestBet,
+            pot: this.pot,
+            communityCards: this.communityCards,
+            hands: this.hands,
+            stage: this.stage,
+            startingPlayer: this.startingPlayer,
+            currentPlayer: this.currentPlayer,
+            currentSmallBlind: this.currentSmallBlind,
+            playerResponses: this.playerResponses});
+        this.io.to(this.gameId).emit('update-round-data', {
+            round: {
+                gameId: this.gameId,
+                index: this.index,
+                players: this.players,
+                deck: this.deck,
+                smallBlindAmount: this.smallBlindAmount,
+                currentBet: this.currentBet,
+                pot: this.pot,
+                communityCards: this.communityCards,
+                hands: this.hands,
+                stage: this.stage,
+                startingPlayer: this.startingPlayer,
+                currentPlayer: this.currentPlayer,
+                currentSmallBlind: this.currentSmallBlind,
+                playerResponses: this.playerResponses
+            }
+        });
+    }
+
+    moveBetstoPot(){
+        this.players.forEach(player => {
+            if (player.isPlaying) {
+               this.pot += parseInt(player.currentBet);
+               player.currentBet = 0;
+            }
+        });
     }
 
     // go loop through each player

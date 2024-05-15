@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const acceptedURL  = ['http://10.133.26.36:3001', 'http://localhost:3001']
 const io = socketIo(server,{
     cors: {
-        origin: acceptedURL,
+        origin: acceptedURL, 
         methods: ["GET", "POST"],
         credentials:true
     },
@@ -21,7 +21,7 @@ const io = socketIo(server,{
 });
 
 app.use(cors({
-    origin: acceptedURL
+    origin: acceptedURL 
   }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -30,14 +30,14 @@ const { connectDb } = require('./db');
 
 // const pokerLogic = require('./routes/poker-logic.js');
 const userLogic = require('./routes/user-logic.js');
-const gameLogic = require('./routes/game-logic.js');
 const gameSockets = require('./routes/game-sockets.js');
+const gameData = require('./routes/game-data');
 // const registerSocketHandlers = require('./socketHandlers');
 
 // registerSocketHandlers(io);
 gameSockets(io);
 app.use('/api',userLogic);
-app.use('/api',gameLogic);
+app.use('/api',gameData);
 //app.use(pokerLogic); commented out because it is breaking the execution
 
 const port = process.env.PORT || 3000;

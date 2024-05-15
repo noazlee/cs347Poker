@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import BettingControls from "./BettingControls";
 import Card from "./Card";
 import ChipsDisplay from "./ChipsDisplay";
@@ -6,9 +6,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, isPlayerOne, blind, chips, socket}) {
-    const [hand, setHand] = useState([]);
-
+export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId , userId, active}) {
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -35,39 +33,34 @@ export default function PlayerBox({ player, isPlayerOne, blind, chips, socket}) 
         }
     }
 
-    useEffect(() => {
-        const handleDealCards = (data) => {
-            console.log(data);
-            if (data.playerId === player.userId) {
-                setHand(data.hand);
-            }
-        };
-
-        socket.on('deal-cards', handleDealCards);
-
-        return () => {
-            socket.off('deal-cards', handleDealCards);
-        };
-    }, [socket, player.userId]);
-
-    const blindIcon = getBlindIcon(blind);
-
     return (
-            <div className="playerBox">
+            <div className={"playerBox " + (active === true ? "active" : "inactive")}>
                 <div>
-                    <h2>{player.userId}</h2>
-                    {blindIcon}
+                    <h2>{player.username}</h2>
+                    {getBlindIcon(blind)}
+                    <div className="playerCards">
+                        {player.hand.map((card, index) => {
+                            const cardSuit = card.suite;
+                            const cardValue = card.value;
+                            return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
+                        })}
+                    </div>
                 </div>
-                <div className="playerCards">
-                {hand.map((card, index) => (
-                    <Card key={index} isVisible={true} card={card} />
-                ))}
+                <div className="bettingTab">
+                    {playerOne ? (
+                        <BettingControls props={{
+                            initialChips: player.chips,
+                            currentBet: player.currentBet,
+                            moves: moves,
+                            isTurn: isCurrentPlayer,
+                            toggleCurrentPlayer: props.toggleCurrentPlayer,
+                            gameId:gameId
+                        }}/>
+                    ) : (
+                        <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
+                    )}
+                    <p>Latest Move: {player.latestMove}</p>
+                </div>
             </div>
-            {isPlayerOne ? (
-                <BettingControls props={{ initialChips: chips, currentBet: 0 }}/>
-            ) : (
-                <ChipsDisplay props={{ initialChips: chips, currentBet: 0 }}/>
-            )}
-        </div>
         )
 }
