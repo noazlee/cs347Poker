@@ -28,6 +28,8 @@ export default function Table({ props }) {
 
         socket.on('round-ended', (data)=>{
             console.log('game ended on client');
+            console.log(data.cards);
+            setCommunityCards(data.cards);
             if(socket.id===data.winner.socketId){ //ensures this is not sent twice
                 socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner, prevIndex: data.prevIndex});
             }

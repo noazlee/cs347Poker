@@ -270,9 +270,10 @@ class Round {
             winner = this.lastPlayerInRound();
         }
         winner.chips += this.pot;
+        
         console.log('winner:',winner);
 
-        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind });
+        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind, cards: [] });
     }
 
     // determineWinner(){
