@@ -19,7 +19,7 @@ class Round {
         this.startingPlayer = (prevIndex+1)%this.players.length;
         this.anchor = null; // used when someone raises
         this.currentPlayer = 0;
-        this.currentSmallBlind = 0;  // Index of the small blind in the players array
+        this.currentSmallBlind = (prevIndex+1)%this.players.length;  // Index of the small blind in the players array
         this.playerResponses = new Map(); 
     }
 
@@ -29,6 +29,8 @@ class Round {
                 player.resetForNewRound();
             }
         });
+
+        console.log(this.currentSmallBlind);
 
         this.deck.shuffle();
         this.players.filter(player => player.isInRound).forEach(player => {
@@ -267,7 +269,7 @@ class Round {
         winner.chips += this.pot;
         console.log('winner:',winner);
 
-        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner });
+        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind });
     }
 
     determineWinner(){

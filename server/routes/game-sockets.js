@@ -62,7 +62,7 @@ module.exports = function(io){
             console.log('Round ended');
             if (game) {
                 console.log('starting new round');
-                game.startNewRound();
+                game.startNewRound(data.prevIndex);
             }
         });
     

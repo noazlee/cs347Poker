@@ -29,7 +29,7 @@ export default function Table({ props }) {
         socket.on('round-ended', (data)=>{
             console.log('game ended on client');
             if(socket.id===data.winner.socketId){ //ensures this is not sent twice
-                socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner});
+                socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner, prevIndex: data.prevIndex});
             }
         })
 
@@ -51,7 +51,7 @@ export default function Table({ props }) {
 
         if (data.players.length >= 2) {
             smallBlindPlayerId = data.players[data.currentSmallBlind].userId;
-            bigBlindPlayerId = data.players[data.currentSmallBlind + 1].userId;
+            bigBlindPlayerId = data.players[(data.currentSmallBlind + 1) % data.players.length].userId;
         } else {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }

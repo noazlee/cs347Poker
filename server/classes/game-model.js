@@ -59,8 +59,8 @@ class Game {
         this.currentRound.start();
     }
 
-    startNewRound(){
-        this.currentRound = new Round(this.io, this.gameId, 0, this.players, this.smallBlindAmount);
+    startNewRound(prevIndex){
+        this.currentRound = new Round(this.io, this.gameId, prevIndex, this.players, this.smallBlindAmount);
         this.currentRound.start();
     }
 }
