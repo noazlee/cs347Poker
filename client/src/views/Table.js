@@ -4,17 +4,22 @@ import Deck from '../components/Deck';
 import '../css/Table.css'
 import { useParams } from 'react-router-dom';
 import socket from '../socket';
+import WinDisplay from '../components/WinDisplay';
 
 export default function Table({ props }) {
     const [roundData, setRoundData] = useState(undefined);
     const [playerOneCurrent, setPlayerOneCurrent] = useState(false);
     const [moves, setMoves] = useState([]);
     const [communityCards, setCommunityCards] = useState([]);
+    const [roundOver, setRoundOver] = useState(false);
+    const [winnerData, setWinnerData] = useState(undefined);
     const {gameId, userId} = useParams();
 
     useEffect(() => {
+
         socket.on('update-round-data', (data) => {
             setRoundData(data.round);
+            setRoundOver(false);
         });
 
         socket.on('your-turn', (data) => {
@@ -24,16 +29,13 @@ export default function Table({ props }) {
 
         socket.on('shown-cards', (data) => {
             setCommunityCards(data.cards);
-        })
+        });
 
         socket.on('round-ended', (data)=>{
             console.log('game ended on client');
-            console.log(data.cards);
-            setCommunityCards(data.cards);
-            if(socket.id===data.winner.socketId){ //ensures this is not sent twice
-                socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner, prevIndex: data.prevIndex});
-            }
-        })
+            setWinnerData(data);
+            setRoundOver(true);
+        });
 
         return () => {
             socket.off('update-round-data');
@@ -101,7 +103,11 @@ export default function Table({ props }) {
             <div className='table'>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
-                    <Deck props={{communityCards: communityCards}}/>
+                    {roundOver === false ? (
+                        <Deck props={{communityCards: communityCards, pot: roundData.pot}}/>
+                    ) : (
+                        <WinDisplay props={winnerData} />
+                    )}
                 </section>
             </div>
         )

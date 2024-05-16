@@ -53,6 +53,9 @@ class Round {
             console.info(player);
         })
 
+        this.io.to(this.gameId).emit('shown-cards', {
+            cards: []
+        });
         this.io.to(this.gameId).emit('update-round-data', {
             round: {
                 gameId: this.gameId,
@@ -160,7 +163,10 @@ class Round {
                 break;
             case 'call':
                 player.latestMove = "Call";
+                // let previousCall = player.currentBet;
                 player.call(this.highestBet);
+                // let currentCall = player.currentBet;
+                // this.pot += (currentCall - previousCall);
                 console.log(this.getRoundState());
                 this.advanceToNextPlayer();
                 this.updatePlayer();
@@ -170,7 +176,10 @@ class Round {
                 this.highestBet = data.value;
                 this.anchor = this.positionInQueue(player);
                 console.log('raise anchor: ',this.anchor);
+                // let previousRaise = player.currentBet;
                 player.raise(data.value);
+                // let currentRaise = player.currentBet;
+                // this.pot += (currentRaise - previousRaise);
                 this.advanceToNextPlayer();
                 this.updatePlayer();
                 break;
@@ -180,10 +189,10 @@ class Round {
                 const numPlayers = this.numPlayersInRound();
                 if(numPlayers>1){
                     this.advanceToNextPlayer();
+                    this.updatePlayer();
                 }else{
                     this.endRound();
                 }
-                this.updatePlayer();
                 break;
             default:
                 break;
@@ -273,7 +282,7 @@ class Round {
         
         console.log('winner:',winner);
 
-        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind, cards: [] });
+        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind });
     }
 
     // determineWinner(){
@@ -382,12 +391,14 @@ class Round {
     }
 
     moveBetstoPot(){
+        let totalBets = 0;
         this.players.forEach(player => {
             if (player.isPlaying) {
-               this.pot += parseInt(player.currentBet);
+               totalBets += parseInt(player.currentBet);
                player.currentBet = 0;
             }
         });
+        this.pot = totalBets;
     }
 
     // go loop through each player

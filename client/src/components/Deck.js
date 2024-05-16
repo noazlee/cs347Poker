@@ -5,6 +5,10 @@ import '../css/Deck.css';
 export default function Deck({ props }) {
     return (
         <div className='deck'>
+            <section id='pot'>
+                <h2>Pot:</h2>
+                <p>{props.pot}</p>
+            </section>
             <section id='revealedCards'>
                 {props.communityCards && props.communityCards.map((card, index) => {
                     return <Card key={index} isVisible={true} suit={card.suite} value={card.value} />
