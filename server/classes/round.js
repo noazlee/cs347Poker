@@ -154,6 +154,9 @@ class Round {
         const player = this.players[this.currentPlayer];
         switch (data.action) {
             case 'check':
+                console.log(this.currentPlayer);
+                console.log(this.startingPlayer);
+                console.log(this.anchor);
                 player.latestMove = "Check";
                 this.advanceToNextPlayer();
                 this.updatePlayer();
@@ -233,6 +236,7 @@ class Round {
         this.stage++;
         switch (this.stage) {
             case 1:
+                this.setBettingOrder();
                 this.dealFlop();
                 break;
             case 2:
