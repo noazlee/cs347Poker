@@ -2,11 +2,13 @@ import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
 import '../css/Table.css'
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
 
 export default function Table({ props }) {
+    const location = useLocation();
+    const hostId = location.state.hostId;
     const [roundData, setRoundData] = useState(undefined);
     const [playerOneCurrent, setPlayerOneCurrent] = useState(false);
     const [moves, setMoves] = useState([]);
@@ -106,7 +108,7 @@ export default function Table({ props }) {
                     {roundOver === false ? (
                         <Deck props={{communityCards: communityCards, pot: roundData.pot}}/>
                     ) : (
-                        <WinDisplay props={winnerData} />
+                        <WinDisplay props={{isHost: (hostId === userId ? true : false), data: winnerData}} />
                     )}
                 </section>
             </div>
