@@ -1,5 +1,7 @@
 const Round = require('./round');
 const Player = require('./player');
+const Ai1 = require('./AI/ai1');
+
 
 const MAXNUMPLAYERS = 2;
 const POTAMOUNT = 10000;
@@ -52,8 +54,13 @@ class Game {
         }
     }
 
-    addAiPlayers(){
-        // to be implemented
+    addAiPlayers(userId, socketId, username, isAI){
+        if (this.Ai1.some(p => p.userId === userId)) {
+            console.log("Player already exists:", userId);
+            return false; 
+        }
+        let newPlayer = new Ai1(userId, socketId, username, POTAMOUNT,isAI);
+        this.players.push(newPlayer);
     }
 
     startGame() {

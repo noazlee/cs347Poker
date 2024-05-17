@@ -130,12 +130,17 @@ class Round {
         }
 
         if (player.isInRound) {
+            if(player.isAi){
+                player.makemove(acceptableMoves);
+                await this.advanceToNextPlayer;
+            }else{
             this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
                 acceptableMoves: acceptableMoves
             });
             return new Promise((resolve) => { 
                 this.playerResponses.set(player.socketId, resolve);
             });
+        }
         } else {
             await this.advanceToNextPlayer();  // Skip if the player is not active
         }
