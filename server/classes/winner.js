@@ -13,8 +13,10 @@ class Winner {
     // rank, rank of your card
     // iterate through the array playerCards to determine the strength
     evaluateHand(playerCards){
+
         // Sort the player's cards by value
         playerCards.sort((a, b) => a.value - b.value);
+
         let highestCardNum;
         for(let card in playerCards){
             highestCardNum = 0;
@@ -42,7 +44,7 @@ class Winner {
             return { rank: 5, cards: playerCards, kicker: highestCardNum }; // Flush
         } else if (this.isStraight(playerCards)) {
             console.log('is a straight');
-            return { rank: 4, cards: playerCard, kicker: highestCardNums }; // Straight
+            return { rank: 4, cards: playerCards, kicker: highestCardNum }; // Straight
         } else if (this.isThreeOfAKind(playerCards)) {
             console.log('is a three of a kind');
             return { rank: 3, cards: playerCards, kicker: highestCardNum }; // Three of a kind

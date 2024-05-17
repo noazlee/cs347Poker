@@ -415,6 +415,7 @@ class Round {
                     playerCards.push(this.communityCards[i]);
                 }
 
+                playerCards.sort((a, b) => a.value - b.value);
                 const playerHand = this.winner.evaluateHand(playerCards); // Function to evaluate the player's hand
                 console.log(player.userId, playerCards);
                 
