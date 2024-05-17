@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
 import socket from '../socket';
 import { buildImgUrl } from '../utils/utils';
 
 const GameRoom = () => {
+    const location = useLocation();
     const { gameId, userId } = useParams();
+    const [hostId, setHostId] = useState(location.state.hostId);
     const [username, setUsername] = useState('');
+    const [hostname, setHostname] = useState('');
     const [players, setPlayers] = useState([]);
     const navigate = useNavigate();
 
@@ -46,6 +49,18 @@ const GameRoom = () => {
     }, [userId]);
 
     useEffect(() => {
+        const fetchHost = async () => {
+            try {
+                const response = await axios.get(`/api/users/${hostId}`);
+                setHostname(response.data.username);
+            } catch (e) {
+                console.error('Failed to fetch hostname', e);
+            }
+        };
+        fetchHost();
+    }, [hostId]);
+
+    useEffect(() => {
         // Setup socket listeners
         socket.emit('join-game', { playerId: userId, gameId, username});  // Join the game room on component mount
 
@@ -65,34 +80,45 @@ const GameRoom = () => {
     };
 
     const leaveGame = () => {
-        console.info(socket.id, " leaving game...");
-        // socket.emit('leave-game', { gameId, userId }); add later
+        console.info(userId, " leaving game...");
+        socket.emit('leave-game', { gameId, playerId: userId });
         navigate(`/home/${userId}`); 
     };
 
     useEffect(() => {
+        socket.on('player-left', (data) => {
+            console.info(`${data.playerId} left game ${data.gameId}`);
+            setHostId(data.newHostId);
+            setPlayers(data.players);
+        });
+
         socket.on('game-started', (data) => {
             console.info('game started', data, socket.id);
-            navigate(`/table/${data.gameId}/${userId}`, {state: {gameId: data.gameId, players: data.players}});
+            navigate(`/table/${data.gameId}/${userId}`, {state: {gameId: data.gameId, players: data.players, hostId: hostId}});
         });
     
         return () => {
             socket.off('game-started');
+            socket.off('player-left');
         };
-    }, [gameId, userId, navigate]);
+    }, [gameId, userId, hostId, navigate]);
 
     return (
         <div style={backgroundStyle}>
         <div className="home-container">
             <h1>Game ID: {gameId}</h1>
-            <h1>Host: {username || 'Loading...'}</h1>
+            <h1>Host: {hostname || 'Loading...'}</h1>
             <h3>Players in the room:</h3>
             <ul>
                 {players.map((player, index) => (
                     <li key={index}>{player.username}</li>
                 ))}
             </ul>
-            <button className="home-button" onClick={startGame}>Start Game</button>
+            {userId === hostId ? (
+                <button className="home-button" onClick={startGame}>Start Game</button>
+            ) : (
+                <p>Waiting for host to start game...</p>
+            )}
             <button className="home-button" onClick={leaveGame}>Leave Game</button>
         </div>
         </div>

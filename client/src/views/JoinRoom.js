@@ -39,11 +39,13 @@ useEffect(() => {
         setPlayers(data.player_names);
         if (data.playerId === userId && data.gameId === gameId) {
             console.log("Navigating to game room...");
-            navigate(`/game/${gameId}/${userId}`);
+            navigate(`/game/${gameId}/${userId}`, {state: {hostId: data.hostId}});
         }
     };
 
-    socket.on('player-joined',handlePlayerJoined)
+    socket.on('player-joined', (data) => {
+        handlePlayerJoined(data)
+    })
 
     return () => {
         socket.off('player-joined');

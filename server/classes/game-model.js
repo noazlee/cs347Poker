@@ -34,6 +34,24 @@ class Game {
         this.players.push(newPlayer);
     }
 
+    removePlayer(playerId) {
+        let playerIndex = undefined;
+        for (let i = 0; i < this.players.length; i++) {
+            if (this.players[i].userId === playerId) {
+                playerIndex = i;
+            }
+        }
+        
+        if (playerIndex === undefined) {
+            console.error(`tried to remove player ${playerId}, but could not find it in game`);
+        } else {
+            this.players.splice(playerIndex, 1);
+            if (this.hostId === playerId) {
+                this.hostId = this.players[0].userId;
+            }
+        }
+    }
+
     addAiPlayers(){
         // to be implemented
     }
