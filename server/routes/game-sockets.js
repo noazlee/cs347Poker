@@ -51,6 +51,7 @@ module.exports = function(io){
             const game = games[data.gameId];
             console.log('Action received', data.action, data.gameId);
             if (game) {
+                io.to(data.gameId).emit('player-action', { username: data.username, action: data.action });
                 const round = game.currentRound;
                 if (round) {
                     round.handlePlayerAction(socket, data);

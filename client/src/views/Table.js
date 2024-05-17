@@ -27,8 +27,7 @@ export default function Table({ props }) {
         });
 
         socket.on('player-action', (data) => {
-            console.log(data);
-            toast(`Game updated! Player: ${data.username} Action ${data.action}`);
+            toast(`Game updated! Player: ${data.username} Action: ${data.action}`);
         });
 
         socket.on('your-turn', (data) => {
