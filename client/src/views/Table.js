@@ -5,6 +5,8 @@ import '../css/Table.css'
 import { useParams, useLocation } from 'react-router-dom';
 import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Table({ props }) {
     const location = useLocation();
@@ -22,6 +24,11 @@ export default function Table({ props }) {
         socket.on('update-round-data', (data) => {
             setRoundData(data.round);
             setRoundOver(false);
+        });
+
+        socket.on('player-action', (data) => {
+            console.log(data);
+            toast(`Game updated! Player: ${data.username} Action ${data.action}`);
         });
 
         socket.on('your-turn', (data) => {
@@ -111,6 +118,7 @@ export default function Table({ props }) {
                         <WinDisplay props={{isHost: (hostId === userId ? true : false), data: winnerData}} />
                     )}
                 </section>
+                <ToastContainer />
             </div>
         )
     );
