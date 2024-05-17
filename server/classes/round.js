@@ -264,44 +264,21 @@ class Round {
         console.info("Current player:",this.currentPlayer, this.players[this.startingPlayer].userId);
     }
 
-    endRound() {
-        let winner;
+    async endRound() {
+        let winner, handRank;
         if(this.numPlayersInRound()>1){
-            winner = this.determineWinner();
-            this.winner = winner; // Set this.winner to the winning player
+            [winner, handRank] = this.determineWinner();
+            this.winner = winner; // Set this.winner to the winning player 
+            console.log('rank: ', handRank);
         }else{
             winner = this.lastPlayerInRound();
             this.winner = winner;
         }
+        console.log('winner',winner.userId);
         winner.chips += this.pot;
-        
-        console.log('winner:',winner);
 
-        this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind, cards: [] });
+        await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winner, prevIndex: this.currentSmallBlind, cards: [] });
     }
-
-    // determineWinner(){
-    //     const hands = this.players
-    //         .filter(player => player.isInRound)
-    //         .map(player => ({
-    //             player: player,
-    //             hand: pokerHandEvaluator.evaluate(player.hand, this.communityCards)
-    //         }));
-
-    //     const bestHands = pokerHandEvaluator.getBestHands(hands.map(hand => hand.hand));
-    //     const winners = hands.filter(hand => bestHands.some(bestHand => pokerHandEvaluator.compare(hand.hand, bestHand) === 0));
-
-    //     if (winners.length === 1) {
-    //         return winners[0].player;
-    //     } else {
-    //         return winners.map(winner => winner.player);
-    //     }
-    // }
-
-    // evaluateHand(playerHand, communityCards) {
-    //     const allCards = playerHand.concat(communityCards);
-    //     return pokerHandEvaluator.evaluate(allCards).strength;
-    // }
 
     lastPlayerInRound(){
         let winner;
@@ -399,43 +376,24 @@ class Round {
     // check if their hand matches 10 ranks of poker hands
     // use the rank to create a list of the 5 best cards for the hand
     // store the 'strength' value and the cards in an array
-    determineWinner(){
-        //const comCards = this.communityCards;
+    determineWinner() {
         let roundWinner = null;
-        let bestHandStrength = 0;
-        let bestHandKicker = 0;
-        
+        let bestHand = { rank: -1, kicker: -1 };
+    
         this.players.forEach(player => {
             if (player.isInRound) {
-                const playerCards = [];
-                for (let i = 0; i < player.hand.length; i++) {
-                    playerCards.push(player.hand[i]);
-                }
-                for (let i = 0; i < this.communityCards.length; i++) {
-                    playerCards.push(this.communityCards[i]);
-                }
-
-                playerCards.sort((a, b) => a.value - b.value);
-                const playerHand = this.winner.evaluateHand(playerCards); // Function to evaluate the player's hand
-                console.log(player.userId, playerCards);
-                
-                if (!roundWinner || playerHand.rank > bestHandStrength) {
-                    console.log('New best hand');
-                    bestHandKicker = playerHand.kicker;
-                    bestHandStrength = playerHand.rank;
+                const playerCards = [...player.hand, ...this.communityCards];
+                const playerHand = this.winner.evaluateHand(playerCards);
+    
+                if (playerHand.rank > bestHand.rank || 
+                    (playerHand.rank === bestHand.rank && playerHand.kicker > bestHand.kicker)) {
+                    bestHand = playerHand;
                     roundWinner = player;
                 }
-                if (playerHand.rank == bestHandStrength) {
-                    if(playerHand.kicker > bestHandKicker){
-                        console.log('New best hand');
-                        bestHandKicker = playerHand.kicker;
-                        bestHandStrength = playerHand.rank;
-                        roundWinner = player;
-                    }
-                }
-            }            
+            }
         });
-        return roundWinner
+    
+        return [roundWinner, bestHand.rank];
     }
   
 }

@@ -4,7 +4,6 @@ const Player = require('./player');
 class Winner {
     constructor(players) {
         this.players = players;
-        this.hands = [];
     }
 
     // Function that will determine the rank/strength of your hand
@@ -15,16 +14,8 @@ class Winner {
     evaluateHand(playerCards){
 
         // Sort the player's cards by value
-        playerCards.sort((a, b) => a.value - b.value);
-
-        let highestCardNum;
-        for(let card in playerCards){
-            highestCardNum = 0;
-            let cardNum = this.convertCardToNumber(card);
-            if(cardNum>highestCardNum){
-                highestCardNum=cardNum;
-            }
-        }
+        playerCards.sort((a, b) => this.convertCardToNumber(a) - this.convertCardToNumber(b));
+        const highestCardNum = Math.max(...playerCards.map(card => this.convertCardToNumber(card))); // returns highest card from spreaded array
 
         // Check for specific hand patterns
         if (this.isRoyalStraightFlush(playerCards)) {
@@ -42,16 +33,18 @@ class Winner {
         } else if (this.isFlush(playerCards)) {
             console.log('is a flush');
             return { rank: 5, cards: playerCards, kicker: highestCardNum }; // Flush
-        } else if (this.isStraight(playerCards)) {
+        } else if (this.isStraight(playerCards).isStraight) {
             console.log('is a straight');
             return { rank: 4, cards: playerCards, kicker: highestCardNum }; // Straight
-        } else if (this.isThreeOfAKind(playerCards)) {
+        } else if (this.isThreeOfAKind(playerCards)!= false) {
             console.log('is a three of a kind');
             return { rank: 3, cards: playerCards, kicker: highestCardNum }; // Three of a kind
-        } else if (this.isTwoPair(playerCards)) {
+        } else if (this.isTwoPair(playerCards)!= false) {
+            const { pairs, kicker } = this.isTwoPair(playerCards);
             console.log('is a two pair');
             return { rank: 2, cards: playerCards, kicker: highestCardNum }; // Two pair
-        } else if (this.isPair(playerCards)) {
+        } else if (this.isPair(playerCards)!=false) {
+            const { pair, kicker } = this.isPair(playerCards);
             console.log('is a pair');
             return { rank: 1, cards: playerCards, kicker: highestCardNum }; // Pair
         } else {
@@ -61,11 +54,7 @@ class Winner {
     }
 
     isRoyalStraightFlush(cards){
-        if (!this.isStraightFlush(cards)) {
-            return false;
-        }
-        const values = cards.map(card => card.value);
-        return values.includes(10) && values.includes(11) && values.includes(12) && values.includes(13) && values.includes(1);
+        return this.isStraightFlush(cards) && cards.some(card => card.value === 14); //checks if royal flush has an ace in it
     }
 
     isStraightFlush(cards) {
@@ -76,15 +65,19 @@ class Winner {
     }
 
     isFourOfAKind(cards) {
-        const values = cards.map(card => card.value);
-        values.sort((a, b) => a - b);
+        const values = cards.map(card => this.convertCardToNumber(card));
 
-        for (let i = 0; i <= values.length - 4; i++) {
-            if (values[i] === values[i + 3]) {
-                return true;
-            }
-        }
-        return false;
+        const hasFourOfAKind = values.some((value, _, arr) => {
+            // Filter the array to include only the elements equal to the current value
+            const filteredValues = arr.filter(v => v === value);
+            
+            // Check if the length of the filtered array is exactly 4
+            const isFourOfAKind = filteredValues.length === 4;
+            
+            return isFourOfAKind;
+            });
+
+        return hasFourOfAKind;
     }
 
     isFullHouse(cards) {
@@ -95,139 +88,126 @@ class Winner {
     }
 
     isFlush(cards) {
-        let isFlush = false;
-        let suiteDict = {
-            'Clubs' : 0,
-            'Diamonds':0,
-            'Spades':0,
-            'Hearts':0
-        }
-        for (let i = 1; i < cards.length; i++) {
-            let card = cards[i];
-            if(card.suite=='Clubs'){
-                suiteDict['Clubs']+=1;
-            }else if(card.suite=='Diamonds'){
-                suiteDict['Diamonds']+=1;
-            }else if(card.suite=='Spades'){
-                suiteDict['Spades']+=1;
-            }else{
-                suiteDict['Hearts']+=1;
-            }
-        }
-        if(suiteDict['Clubs']>=5){
-            isFlush  = true;
-        }
-        if(suiteDict['Diamonds']>=5){
-            isFlush  = true;
-        }
-        if(suiteDict['Spades']>=5){
-            isFlush  = true;
-        }
-        if(suiteDict['Hearts']>=5){
-            isFlush  = true;
-        }
-        return isFlush;
+        const suitCounts = new Map();
+        cards.forEach(card => {
+            suitCounts.set(card.suite, (suitCounts.get(card.suite) || 0) + 1);
+        });
+        const hasFlush = Array.from(suitCounts.values()).some(count => count >= 5);
+        return hasFlush;
     }
 
     isStraight(cards) {
-        const values = cards.map(card => card.value);
-        //const values = cards.map(card => this.cardValueToInt(card.value));
-        values.sort((a, b) => a - b);
-
-        for (let i = 0; i < values.length - 1; i++) {
-            if (values[i + 1] - values[i] !== 1) {
-                return false;
+        const uniqueValues = Array.from(new Set(cards.map(card => this.convertCardToNumber(card))));
+        uniqueValues.sort((a, b) => a - b);
+        if (uniqueValues.length < 5){
+            return { isStraight: false };
+        } 
+        for (let i = 0; i <= uniqueValues.length - 5; i++) {
+            const sequence = uniqueValues.slice(i, i + 5);
+    
+            let isConsecutive = true;
+            for (let j = 0; j < 4; j++) {
+                if (sequence[j] + 1 !== sequence[j + 1]) {
+                    isConsecutive = false;
+                }
+            }
+    
+            if (isConsecutive) {
+                const highestStraightCard = sequence[4];
+                return { isStraight: true, highestStraightCard };
             }
         }
-        return true;
+        return { isStraight: false };
     }
 
     isThreeOfAKind(cards) {
-        const values = cards.map(card => card.value);
-        values.sort((a, b) => a - b);
+        const values = cards.map(card => this.convertCardToNumber(card));
+        const triples = [];
+        const kickers = [];
 
-        for (let i = 0; i <= values.length - 3; i++) {
-            if (values[i] === values[i + 2]) {
-                return true;
+        values.forEach((value, index, array) => {
+            const valueCount = array.filter(v => v === value).length;
+            if (valueCount === 3 && !triples.includes(value)) {
+                triples.push(value);
+            } else if (valueCount === 1) {
+                kickers.push(value);
             }
+        });
+
+        triples.sort((a, b) => b - a);
+        kickers.sort((a, b) => b - a);
+
+        if (triples.length >= 1) {
+            return { threeOfAKind: triples[0], kickers: kickers.slice(0, 2) };
         }
+
         return false;
     }
 
     isTwoPair(cards) {
-        const values = cards.map(card => card.value);
-        //const values = cards.map(card => this.cardValueToInt(card.value));
-        values.sort((a, b) => a - b);
 
-        let pairCount = 0;
-        let distinctValues = [];
-
-        for (let i = 0; i < values.length - 1; i++) {
-            if (values[i] === values[i + 1]) {
-                if (!distinctValues.includes(values[i])) {
-                    distinctValues.push(values[i]);
-                    pairCount++;
-                }
-                i++;
+        const values = cards.map(card => this.convertCardToNumber(card));
+        const pairs = [];
+        const kickers=[];
+        values.forEach((value, index, array) => {
+            const valueCount = array.filter(v => v === value).length;
+            // If 'value' appears exactly twice, it forms a pair
+            if (valueCount === 2 && !pairs.includes(value)) {
+                pairs.push(value);
+            } else if (valueCount === 1) {
+                kickers.push(value);
             }
-        }
+        });
 
-        return pairCount >= 2;
-    }
+        pairs.sort((a, b) => b - a);
+        kickers.sort((a, b) => b - a);
 
-    isPair(cards) {
-        const values = cards.map(card => card.value);
-        //const values = cards.map(card => this.cardValueToInt(card.value));
-        values.sort((a, b) => a - b);
-
-        for (let i = 0; i < values.length - 1; i++) {
-            if (values[i] === values[i + 1]) {
-                return true; 
-            }
+        if (pairs.length >= 2) {
+            return { pairs: pairs.slice(0, 2), kicker: kickers[0] };
         }
         return false;
     }
 
-    convertCardToNumber(card){
-        let val = 0;
-        if(card.value=='2'){
-            return 2;
+    isPair(cards) {
+        const values = cards.map(card => this.convertCardToNumber(card));
+        const pairs = [];
+        const kickers = [];
+
+        values.forEach((value, index, array) => {
+            const valueCount = array.filter(v => v === value).length;
+            if (valueCount === 2 && !pairs.includes(value)) {
+                pairs.push(value);
+            } else if (valueCount === 1) {
+                kickers.push(value);
+            }
+        });
+
+        pairs.sort((a, b) => b - a);
+        kickers.sort((a, b) => b - a);
+
+        if (pairs.length >= 1) {
+            return { pair: pairs[0], kicker: kickers[0] };
         }
-        if(card.value=='3'){
-            return 3;
-        }
-        if(card.value=='4'){
-            return 4;
-        }
-        if(card.value=='5'){
-            return 5;
-        }
-        if(card.value=='6'){
-            return 6;
-        }
-        if(card.value=='7'){
-            return 7;
-        }
-        if(card.value=='8'){
-            return 8;
-        }
-        if(card.value=='9'){
-            return 9;
-        }
-        if(card.value=='10'){
-            return 10;
-        }
-        if(card.value=='J'){
-            return 11;
-        }
-        if(card.value=='Q'){
-            return 12;
-        }
-        if(card.value=='K'){
-            return 13;
-        }
-        if(card.value=='A'){
-            return 14;
+
+        return false;
+    }
+
+    convertCardToNumber(card) {
+        switch (card.value) {
+            case '2': return 2;
+            case '3': return 3;
+            case '4': return 4;
+            case '5': return 5;
+            case '6': return 6;
+            case '7': return 7;
+            case '8': return 8;
+            case '9': return 9;
+            case '10': return 10;
+            case 'J': return 11;
+            case 'Q': return 12;
+            case 'K': return 13;
+            case 'A': return 14;
+            default: return 0;
         }
     }
 
