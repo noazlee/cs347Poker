@@ -65,9 +65,9 @@ export default function Table({ props }) {
         return (
             data.players.map((player, index) => {
                 let blindStatus = 0;
-                if (player.socketId === smallBlindPlayerId) {
+                if (player.userId === smallBlindPlayerId) {
                     blindStatus = 1;
-                } else if (player.socketId === bigBlindPlayerId) {
+                } else if (player.userId === bigBlindPlayerId) {
                     blindStatus = 2;
                 }
 

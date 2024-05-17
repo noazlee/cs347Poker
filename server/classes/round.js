@@ -157,6 +157,9 @@ class Round {
         const player = this.players[this.currentPlayer];
         switch (data.action) {
             case 'check':
+                console.log(this.currentPlayer);
+                console.log(this.startingPlayer);
+                console.log(this.anchor);
                 player.latestMove = "Check";
                 this.advanceToNextPlayer();
                 this.updatePlayer();
@@ -242,6 +245,7 @@ class Round {
         this.stage++;
         switch (this.stage) {
             case 1:
+                this.setBettingOrder();
                 this.dealFlop();
                 break;
             case 2:
@@ -264,7 +268,8 @@ class Round {
             this.startingPlayer = (this.currentSmallBlind + 2) % this.players.length; 
             this.currentPlayer = this.startingPlayer;
         } else {
-            this.startingPlayer = (this.currentSmallBlind + 1) % this.players.length;  
+            console.log('changing starting player');
+            this.startingPlayer = this.currentSmallBlind; 
             this.currentPlayer = this.startingPlayer;
         }
         console.info("Starting player:",this.startingPlayer, this.players[this.startingPlayer].userId);
