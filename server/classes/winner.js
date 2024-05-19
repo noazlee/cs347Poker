@@ -38,15 +38,15 @@ class Winner {
             return { rank: 4, cards: playerCards, kicker: highestCardNum }; // Straight
         } else if (this.isThreeOfAKind(playerCards)!= false) {
             console.log('is a three of a kind');
-            return { rank: 3, cards: playerCards, kicker: highestCardNum }; // Three of a kind
+            return { rank: 3, cards: playerCards, kicker: threeOfAKind }; // Three of a kind
         } else if (this.isTwoPair(playerCards)!= false) {
             const { pairs, kicker } = this.isTwoPair(playerCards);
             console.log('is a two pair');
-            return { rank: 2, cards: playerCards, kicker: highestCardNum }; // Two pair
+            return { rank: 2, cards: playerCards, kicker: kicker }; // Two pair
         } else if (this.isPair(playerCards)!=false) {
             const { pair, kicker } = this.isPair(playerCards);
             console.log('is a pair');
-            return { rank: 1, cards: playerCards, kicker: highestCardNum }; // Pair
+            return { rank: 1, cards: playerCards, kicker: pair }; // Pair
         } else {
             console.log('is a high card');
             return { rank: 0, cards: playerCards, kicker: highestCardNum }; // High card
