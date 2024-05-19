@@ -3,7 +3,7 @@ const Player = require('./player');
 
 const MAXNUMPLAYERS = 2;
 const POTAMOUNT = 10000;
-const GAMEMODE = 'regular';
+const GAMEMODE = "Texas Hold 'Em";
 const SMALLBLINDAMOUNT = 200;
 
 class Game {
@@ -22,7 +22,6 @@ class Game {
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
-        this.addAiPlayers();
     }
 
     addPlayer(userId, socketId, username, isAI){
@@ -30,7 +29,7 @@ class Game {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Player(userId, socketId, username, POTAMOUNT,isAI);
+        let newPlayer = new Player(userId, socketId, username, this.startingChips, isAI);
         this.players.push(newPlayer);
     }
 
@@ -47,13 +46,23 @@ class Game {
         } else {
             this.players.splice(playerIndex, 1);
             if (this.hostId === playerId) {
-                this.hostId = this.players[0].userId;
+                let newHostIndex = 0;
+                while (this.players[newHostIndex].isAi === true) {
+                    newHostIndex++;
+                }
+                this.hostId = this.players[newHostIndex].userId;
             }
         }
     }
 
-    addAiPlayers(){
-        // to be implemented
+    addAiPlayer() {
+        console.log("Add AI");
+        // To be implemented: Add an AI player to the list of players
+    }
+
+    removeAiPlayer() {
+        console.log("Remove AI");
+        // To be implemented: Remove an AI player from the list of players
     }
 
     startGame() {

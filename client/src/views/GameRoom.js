@@ -4,6 +4,7 @@ import axios from 'axios';
 import '../App.css';
 import socket from '../socket';
 import { buildImgUrl } from '../utils/utils';
+import GameSettings from '../components/GameSettings';
 
 const GameRoom = () => {
     const location = useLocation();
@@ -12,6 +13,10 @@ const GameRoom = () => {
     const [username, setUsername] = useState('');
     const [hostname, setHostname] = useState('');
     const [players, setPlayers] = useState([]);
+    const [maxPlayers, setMaxPlayers] = useState(8);
+    const [blindAmount, setBlindAmount] = useState(400);
+    const [startingChips, setStartingChips] = useState(10000);
+    const [numAiPlayers, setNumAiPlayers] = useState(0);
     const navigate = useNavigate();
 
     const [backgroundPosition, setBackgroundPosition] = useState(0);
@@ -76,7 +81,15 @@ const GameRoom = () => {
 
     const startGame = () => {
         console.info(socket.id, " starting game...");
-        socket.emit('start-game', { gameId, username});
+        socket.emit('start-game', {
+            gameId,
+            username,
+            settings: {
+                maxPlayers,
+                blindAmount,
+                startingChips
+            }
+        });
     };
 
     const leaveGame = () => {
@@ -114,6 +127,17 @@ const GameRoom = () => {
                     <li key={index}>{player.username}</li>
                 ))}
             </ul>
+            {userId === hostId && <GameSettings props={{
+                gameId,
+                players,
+                maxPlayers,
+                setMaxPlayers,
+                blindAmount,
+                setBlindAmount,
+                startingChips,
+                setStartingChips,
+                numAiPlayers, setNumAiPlayers
+            }}/>}
             {userId === hostId ? (
                 <button className="home-button" onClick={startGame}>Start Game</button>
             ) : (

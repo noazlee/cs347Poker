@@ -46,6 +46,20 @@ module.exports = function(io){
             }
         });
 
+        socket.on('add-ai', (data) => {
+            console.log("Add AI");
+            const game = games[data.gameId];
+            game.addAiPlayer();
+            io.to(data.gameId).emit('update-players', { players: game.players.map(player => ({userId: player.userId, username: player.username})) });
+        });
+
+        socket.on('remove-ai', (data) => {
+            console.log("Remove AI");
+            const game = games[data.gameId];
+            game.removeAiPlayer();
+            io.to(data.gameId).emit('update-players', { players: game.players.map(player => ({userId: player.userId, username: player.username})) });
+        });
+
         // Player move during round of betting
         socket.on('player-action', (data) => {
             const game = games[data.gameId];
@@ -89,7 +103,13 @@ module.exports = function(io){
         socket.on('start-game', (data) => {
             const game = games[data.gameId];
             if (game) { //changing this to check host causes the game to BREAK - binary error
-                game.startGame();  // NOT WORKING YET
+                game.maxPlayers = data.settings.maxPlayers;
+                game.startingChips = data.settings.startingChips;
+                game.players.forEach(player => {
+                    player.chips = data.settings.startingChips;
+                });
+                game.smallBlindAmount = data.settings.blindAmount;
+                game.startGame();
                 console.info(`Game has started ${game.gameId}`);
                 // io.to(data.gameId).emit('game-started', {});
             }
