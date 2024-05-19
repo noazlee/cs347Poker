@@ -38,7 +38,8 @@ module.exports = function(io){
                 io.to(data.gameId).emit('player-joined', { 
                     player_names: game.players.map(p => p.userId),
                     playerId: data.playerId,
-                    gameId: data.gameId
+                    gameId: data.gameId,
+                    hostId: game.hostId
                 });
             } else {
                 console.log('Game not found or not joinable')
@@ -50,6 +51,7 @@ module.exports = function(io){
             const game = games[data.gameId];
             console.log('Action received', data.action, data.gameId);
             if (game) {
+                io.to(data.gameId).emit('player-action', { username: data.username, action: data.action });
                 const round = game.currentRound;
                 if (round) {
                     round.handlePlayerAction(socket, data);
@@ -73,12 +75,12 @@ module.exports = function(io){
                 game.removePlayer(data.playerId);
                 socket.leave(data.gameId);
 
-                console.info(`${data.playerId} left game ${data.gameId}`);
-                io.to(data.gameId).emit('player-left', { playerId: data.playerId, gameId: data.gameId });
-
                 if (game.players.length === 0) {
                     delete games[data.gameId];
                     console.info(`Game ${data.gameId} ended as all players have left.`);
+                } else {
+                    console.info(`${data.playerId} left game ${data.gameId}`);
+                    io.to(data.gameId).emit('player-left', { playerId: data.playerId, gameId: data.gameId, newHostId: game.hostId, players: game.players });
                 }
             }
         });

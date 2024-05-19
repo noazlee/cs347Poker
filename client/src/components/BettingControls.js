@@ -38,7 +38,8 @@ export default function BettingControls({ props }) {
         props.toggleCurrentPlayer(false);
         socket.emit('player-action', {
             action: 'call',
-            gameId:gameId
+            gameId:gameId,
+            username:props.username
         });
     }
 

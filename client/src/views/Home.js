@@ -53,7 +53,7 @@ const Home = () => {
         const handleGameCreated = (data) => {
             console.log('Game Created:', data);
             // Navigate to GameRoom directly after game creation
-            navigate(`/game/${data.gameId}/${userId}`);
+            navigate(`/game/${data.gameId}/${userId}`, {state: {hostId: data.hostId}});
         };
         socket.on('game-created', handleGameCreated);
         return () => {

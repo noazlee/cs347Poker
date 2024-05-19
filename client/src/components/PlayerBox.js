@@ -54,7 +54,8 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                             moves: moves,
                             isTurn: isCurrentPlayer,
                             toggleCurrentPlayer: props.toggleCurrentPlayer,
-                            gameId:gameId
+                            gameId:gameId,
+                            username:player.username,
                         }}/>
                     ) : (
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>

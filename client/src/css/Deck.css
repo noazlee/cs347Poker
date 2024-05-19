@@ -10,3 +10,8 @@
     flex-direction: row;
     justify-content: space-evenly;
 }
+
+#pot {
+    color: white;
+    text-align: center;
+}
