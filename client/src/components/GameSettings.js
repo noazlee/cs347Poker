@@ -46,15 +46,6 @@ export default function GameSettings({ props }) {
         }
     }
 
-    const subtractAi = () => {
-        if (props.numAiPlayers === 0) {
-            alert("This game already has zero AI players.");
-        } else {
-            socket.emit('remove-ai', {gameId});
-            props.setNumAiPlayers(props.numAiPlayers - 1);
-        }
-    }
-
     return (
         <div className='gameSettings'>
             <h3>Game Settings</h3>
@@ -88,9 +79,8 @@ export default function GameSettings({ props }) {
             </section>
             <section className='setting'>
                 <h4>AI Players</h4>
-                <button id='subtractAi' onClick={subtractAi}>&lt;</button>
                 <p>{props.numAiPlayers}</p>
-                <button id='addAi' onClick={addAi}>&gt;</button>
+                <button id='addAi' onClick={addAi}>Add AI</button>
             </section>
         </div>
     )

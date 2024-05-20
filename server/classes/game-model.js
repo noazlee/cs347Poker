@@ -33,7 +33,7 @@ class Game {
         this.players.push(newPlayer);
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId, isAi) {
         let playerIndex = undefined;
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].userId === playerId) {
@@ -57,11 +57,13 @@ class Game {
 
     addAiPlayer() {
         console.log("Add AI");
+        this.addPlayer(undefined, undefined, undefined, true)
         // To be implemented: Add an AI player to the list of players
     }
 
-    removeAiPlayer() {
+    removeAiPlayer(playerId) {
         console.log("Remove AI");
+        this.removePlayer(playerId, true);
         // To be implemented: Remove an AI player from the list of players
     }
 

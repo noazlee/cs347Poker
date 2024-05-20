@@ -21,6 +21,11 @@ const GameRoom = () => {
 
     const [backgroundPosition, setBackgroundPosition] = useState(0);
 
+    const subtractAi = (playerId) => {
+        socket.emit('remove-ai', {gameId: gameId, playerId});
+        props.setNumAiPlayers(props.numAiPlayers - 1);
+    }
+
     useEffect(() => {
         const interval = setInterval(() => {
             setBackgroundPosition(prevPosition => (prevPosition + 1) % 100); // This will move the background
@@ -123,9 +128,12 @@ const GameRoom = () => {
             <h1>Host: {hostname || 'Loading...'}</h1>
             <h3>Players in the room:</h3>
             <ul>
-                {players.map((player, index) => (
+                {players.map((player, index) => {
                     <li key={index}>{player.username}</li>
-                ))}
+                    (userId === hostId && player.isAi) && (
+                        <button id='subtractAi' onClick={() => subtractAi(player.userId)}>Remove AI</button>
+                    )
+                })}
             </ul>
             {userId === hostId && <GameSettings props={{
                 gameId,
