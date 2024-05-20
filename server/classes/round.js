@@ -130,6 +130,7 @@ class Round {
         }
 
         if (player.isInRound) {
+            // Send signal to client. Received by Table.js
             this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
                 acceptableMoves: acceptableMoves
             });
