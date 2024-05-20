@@ -1,8 +1,33 @@
 const Game = require('../classes/game-model');
 const Player = require('../classes/player');
+const { connectDb } = require('../db');
 
 module.exports = function(io){
     const games = {}; // This will store all game instances
+
+    async function addGame(date, gameId, players, chipsWon, winner, rounds) {
+        const db = await connectDb();
+
+        rounds.forEach(round=>{
+            round.io = null;
+        })
+
+        console.log(rounds);
+
+        const newGame = {
+            date:date,
+            gameId: gameId,
+            players: players,
+            chipsWon: chipsWon,
+            winner: winner,
+            rounds: rounds
+        };
+        
+        console.log('trying to access db');
+        
+        await db.collection('games').insertOne(newGame);
+        return newGame;
+    }
 
     io.on('connection', (socket) => {
         console.info('New client connected:', socket.id);
@@ -62,9 +87,18 @@ module.exports = function(io){
         socket.on('round-end-client', (data) => {
             const game = games[data.gameId];
             console.log('Round ended');
-            if (game) {
-                console.log('starting new round');
-                game.startNewRound(data.prevIndex);
+
+            if(data.stillPlaying===true){
+                if (game) {
+                    console.log('starting new round');
+                    game.startNewRound(data.prevIndex);
+                }
+            }else{
+                console.log('adding new game');
+                const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
+                console.log('game added');
+                console.log(newGame);
+                games[data.gameId]=null;
             }
         });
     

@@ -6,10 +6,25 @@ const POTAMOUNT = 10000;
 const GAMEMODE = 'regular';
 const SMALLBLINDAMOUNT = 200;
 
+const format24Hour = (
+    {
+        dd, mm, yyyy,
+        HH, MM, SS
+    }) => {
+    date = `${mm}/${dd}/${yyyy} ${HH}:${MM}:${SS}`;
+    console.log(date);
+    return date;
+    
+};
+
 class Game {
     constructor(ioInstance, hostId, username, hostSocketId) {
+
+        const curDate = new Date();
+
         this.io = ioInstance;
-        this.gameId = Math.random().toString(36).substring(2, 15);
+        this.date = format24Hour(curDate);
+        this.gameId = Math.random().toString(36).substring(2, 8);
         this.players = [];
         this.maxPlayers = MAXNUMPLAYERS;
         this.hostId = hostId;
@@ -79,6 +94,7 @@ class Game {
 
     startNewRound(prevIndex){
         this.currentRound = new Round(this.io, this.gameId, prevIndex, this.players, this.smallBlindAmount);
+        this.rounds.push(this.currentRound);
         this.currentRound.start();
     }
 }
