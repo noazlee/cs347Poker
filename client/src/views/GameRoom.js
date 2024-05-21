@@ -22,8 +22,8 @@ const GameRoom = () => {
     const [backgroundPosition, setBackgroundPosition] = useState(0);
 
     const subtractAi = (playerId) => {
-        socket.emit('remove-ai', {gameId: gameId, playerId});
-        props.setNumAiPlayers(props.numAiPlayers - 1);
+        // socket.emit('remove-ai', {gameId: gameId, playerId}); UNCOMMENT WHEN READY TO TEST AI
+        setNumAiPlayers(numAiPlayers - 1);
     }
 
     useEffect(() => {
@@ -123,16 +123,21 @@ const GameRoom = () => {
 
     return (
         <div style={backgroundStyle}>
-        <div className="home-container">
+        <div className='menu'>
+        <div className="home-container-2">
             <h1>Game ID: {gameId}</h1>
             <h1>Host: {hostname || 'Loading...'}</h1>
             <h3>Players in the room:</h3>
             <ul>
                 {players.map((player, index) => {
-                    <li key={index}>{player.username}</li>
-                    (userId === hostId && player.isAi) && (
-                        <button id='subtractAi' onClick={() => subtractAi(player.userId)}>Remove AI</button>
-                    )
+                    return (
+                        <div>
+                            <li key={index}>{player.username}</li>
+                            {(userId === hostId && player.isAi) && (
+                                <button id='subtractAi' onClick={() => subtractAi(player.userId)}>Remove AI</button>
+                            )}
+                        </div>
+                    );
                 })}
             </ul>
             {userId === hostId && <GameSettings props={{
@@ -147,11 +152,12 @@ const GameRoom = () => {
                 numAiPlayers, setNumAiPlayers
             }}/>}
             {userId === hostId ? (
-                <button className="home-button" onClick={startGame}>Start Game</button>
+                <button className="home-button" onClick={players.length === maxPlayers ? startGame : () => alert("Too few or too many players in the lobby to start the game.")}>Start Game</button>
             ) : (
                 <p>Waiting for host to start game...</p>
             )}
             <button className="home-button" onClick={leaveGame}>Leave Game</button>
+        </div>
         </div>
         </div>
     );

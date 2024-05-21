@@ -29,7 +29,14 @@ class Game {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Player(userId, socketId, username, this.startingChips, isAI);
+
+        let newPlayer;
+        if (!isAI) {
+            newPlayer = new Player(userId, socketId, username, this.startingChips, isAI);
+        } else {
+            // newPlayer = new AI
+            // Call method to add AI socket to gameId
+        }
         this.players.push(newPlayer);
     }
 
@@ -44,7 +51,8 @@ class Game {
         if (playerIndex === undefined) {
             console.error(`tried to remove player ${playerId}, but could not find it in game`);
         } else {
-            this.players.splice(playerIndex, 1);
+            let playerToRemove = this.players.splice(playerIndex, 1);
+            // If AI, call method to remove AI socket from gameId (reference AI object using playerToRemove[0])
             if (this.hostId === playerId) {
                 let newHostIndex = 0;
                 while (this.players[newHostIndex].isAi === true) {

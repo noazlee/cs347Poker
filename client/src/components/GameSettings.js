@@ -1,4 +1,5 @@
 import React from 'react';
+import '../css/GameSettings.css';
 import socket from '../socket';
 
 export default function GameSettings({ props }) {
@@ -22,7 +23,7 @@ export default function GameSettings({ props }) {
     const changeBlindAmount = (e) => {
         if (parseInt(e.target.value) <= 0) {
             alert("Small blind amount cannot be zero or less.");
-            props.setBlindAmount(e.target.value);
+            props.setBlindAmount(1);
         } else {
             props.setBlindAmount(e.target.value);
         }
@@ -41,7 +42,7 @@ export default function GameSettings({ props }) {
         if (props.players.length === props.maxPlayers) {
             alert("Not enough room to add another AI player.");
         } else {
-            socket.emit('add-ai', {gameId});
+            // socket.emit('add-ai', {gameId}); UNCOMMENT WHEN READY TO TEST AI
             props.setNumAiPlayers(props.numAiPlayers + 1);
         }
     }

@@ -114,12 +114,12 @@ module.exports = function(io){
         socket.on('start-game', (data) => {
             const game = games[data.gameId];
             if (game) { //changing this to check host causes the game to BREAK - binary error
-                game.maxPlayers = data.settings.maxPlayers;
-                game.startingChips = data.settings.startingChips;
+                game.maxPlayers = parseInt(data.settings.maxPlayers);
+                game.startingChips = parseInt(data.settings.startingChips);
                 game.players.forEach(player => {
-                    player.chips = data.settings.startingChips;
+                    player.chips = parseInt(data.settings.startingChips);
                 });
-                game.smallBlindAmount = data.settings.blindAmount;
+                game.smallBlindAmount = parseInt(data.settings.blindAmount);
                 game.startGame();
                 console.info(`Game has started ${game.gameId}`);
                 // io.to(data.gameId).emit('game-started', {});
