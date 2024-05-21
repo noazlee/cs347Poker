@@ -90,8 +90,11 @@ module.exports = function(io){
 
             if(data.stillPlaying===true){
                 if (game) {
-                    console.log('starting new round');
-                    game.startNewRound(data.prevIndex);
+                    let curRound = game.rounds[game.rounds.length-1];
+                    if(curRound.communityCards.length>3){ // prevents calling twice
+                        console.log('starting new round');
+                        game.startNewRound(data.prevIndex);
+                    }
                 }
             }else{
                 console.log('adding new game');

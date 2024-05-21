@@ -124,9 +124,17 @@ class Round {
         console.log(player.currentBet);
         console.log(this.highestBet);
         if(player.currentBet<this.highestBet){
-            acceptableMoves = ['Raise', 'Fold', 'Call'];
+            if(player.chips==0){
+                acceptableMoves = ['Fold', 'Check'];
+            }else{
+                acceptableMoves = ['Raise', 'Fold', 'Call'];
+            }
         }else{
-            acceptableMoves = ['Raise', 'Fold', 'Check'];
+            if(player.chips==0){
+                acceptableMoves = ['Fold', 'Check'];
+            }else{
+                acceptableMoves = ['Raise', 'Fold', 'Check'];
+            }
         }
 
         if (player.isInRound) {
@@ -312,6 +320,7 @@ class Round {
         if(numPplPlaying>1){
             await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winners, prevIndex: this.currentSmallBlind, cards: [], stillPlaying: true });
         }else{
+            console.log('emitting game ended to client');
             await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winners, prevIndex: this.currentSmallBlind, cards: [], stillPlaying: false });
         }
     }
@@ -399,6 +408,7 @@ class Round {
 
     moveBetstoPot(){
         let totalBets = 0;
+        console.log('moving bets to pot');
         this.players.forEach(player => {
             if (player.isPlaying) {
                 console.log(`Moving ${player.currentBet} from ${player.userId} to pot`);
