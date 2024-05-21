@@ -115,7 +115,7 @@ body, html {
 }
 
 
-.home-container {
+.home-container, .home-container-2 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -128,7 +128,18 @@ body, html {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
-.home-container button{
+.home-container-2 {
+  display: block;
+  max-height: 100%;
+  overflow-y: scroll;
+}
+
+.menu {
+  max-height: 100%;
+  display: flex;
+}
+
+.home-container button, .home-container-2 button{
   padding: 10px 20px;
   margin: 10px;
   font-size: 16px;
@@ -139,7 +150,7 @@ body, html {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-.home-container button:hover{
+.home-container button:hover, .home-container-2 button:hover{
   background-color: #ae4c4c;
 }
 

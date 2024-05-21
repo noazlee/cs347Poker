@@ -3,7 +3,7 @@ const Player = require('./player');
 
 const MAXNUMPLAYERS = 2;
 const POTAMOUNT = 10000;
-const GAMEMODE = 'regular';
+const GAMEMODE = "Texas Hold 'Em";
 const SMALLBLINDAMOUNT = 200;
 
 class Game {
@@ -22,7 +22,6 @@ class Game {
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
-        this.addAiPlayers();
     }
 
     addPlayer(userId, socketId, username, isAI){
@@ -30,11 +29,18 @@ class Game {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Player(userId, socketId, username, POTAMOUNT,isAI);
+
+        let newPlayer;
+        if (!isAI) {
+            newPlayer = new Player(userId, socketId, username, this.startingChips, isAI);
+        } else {
+            // newPlayer = new AI
+            // Call method to add AI socket to gameId
+        }
         this.players.push(newPlayer);
     }
 
-    removePlayer(playerId) {
+    removePlayer(playerId, isAi) {
         let playerIndex = undefined;
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].userId === playerId) {
@@ -45,15 +51,28 @@ class Game {
         if (playerIndex === undefined) {
             console.error(`tried to remove player ${playerId}, but could not find it in game`);
         } else {
-            this.players.splice(playerIndex, 1);
+            let playerToRemove = this.players.splice(playerIndex, 1);
+            // If AI, call method to remove AI socket from gameId (reference AI object using playerToRemove[0])
             if (this.hostId === playerId) {
-                this.hostId = this.players[0].userId;
+                let newHostIndex = 0;
+                while (this.players[newHostIndex].isAi === true) {
+                    newHostIndex++;
+                }
+                this.hostId = this.players[newHostIndex].userId;
             }
         }
     }
 
-    addAiPlayers(){
-        // to be implemented
+    addAiPlayer() {
+        console.log("Add AI");
+        this.addPlayer(undefined, undefined, undefined, true)
+        // To be implemented: Add an AI player to the list of players
+    }
+
+    removeAiPlayer(playerId) {
+        console.log("Remove AI");
+        this.removePlayer(playerId, true);
+        // To be implemented: Remove an AI player from the list of players
     }
 
     startGame() {
