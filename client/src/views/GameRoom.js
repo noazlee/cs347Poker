@@ -74,6 +74,7 @@ const GameRoom = () => {
         // Setup socket listeners
         socket.emit('join-game', { playerId: userId, gameId, username});  // Join the game room on component mount
 
+        // Sent from game-sockets.js file. Sent when new player joins the game room (specifically, when new socket connection is made).
         socket.on('update-players', (data) => {
             console.log("updated players");
             setPlayers(data.players);
@@ -104,12 +105,14 @@ const GameRoom = () => {
     };
 
     useEffect(() => {
+        // Sent from game-sockets.js file. Sent when a player leaves the game room.
         socket.on('player-left', (data) => {
             console.info(`${data.playerId} left game ${data.gameId}`);
             setHostId(data.newHostId);
             setPlayers(data.players);
         });
 
+        // Sent from game-sockets.js file. Sent when the host starts the game.
         socket.on('game-started', (data) => {
             console.info('game started', data, socket.id);
             navigate(`/table/${data.gameId}/${userId}`, {state: {gameId: data.gameId, players: data.players, hostId: hostId}});
