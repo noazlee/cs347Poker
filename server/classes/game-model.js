@@ -6,10 +6,26 @@ const POTAMOUNT = 10000;
 const GAMEMODE = "Texas Hold 'Em";
 const SMALLBLINDAMOUNT = 200;
 
+const format24Hour = (date) => {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); 
+    const yyyy = date.getFullYear();
+    const HH = String(date.getHours()).padStart(2, '0');
+    const MM = String(date.getMinutes()).padStart(2, '0');
+    const SS = String(date.getSeconds()).padStart(2, '0');
+
+    const newDate = `${mm}/${dd}/${yyyy} ${HH}:${MM}:${SS}`;
+    return newDate;
+};
+
 class Game {
     constructor(ioInstance, hostId, username, hostSocketId) {
+
+        const curDate = new Date();
+
         this.io = ioInstance;
-        this.gameId = Math.random().toString(36).substring(2, 15);
+        this.date = format24Hour(curDate);
+        this.gameId = Math.random().toString(36).substring(2, 8);
         this.players = [];
         this.maxPlayers = MAXNUMPLAYERS;
         this.hostId = hostId;
@@ -98,6 +114,7 @@ class Game {
 
     startNewRound(prevIndex){
         this.currentRound = new Round(this.io, this.gameId, prevIndex, this.players, this.smallBlindAmount);
+        this.rounds.push(this.currentRound);
         this.currentRound.start();
     }
 }

@@ -124,9 +124,17 @@ class Round {
         console.log(player.currentBet);
         console.log(this.highestBet);
         if(player.currentBet<this.highestBet){
-            acceptableMoves = ['Raise', 'Fold', 'Call'];
+            if(player.chips==0){
+                acceptableMoves = ['Fold', 'Check'];
+            }else{
+                acceptableMoves = ['Raise', 'Fold', 'Call'];
+            }
         }else{
-            acceptableMoves = ['Raise', 'Fold', 'Check'];
+            if(player.chips==0){
+                acceptableMoves = ['Fold', 'Check'];
+            }else{
+                acceptableMoves = ['Raise', 'Fold', 'Check'];
+            }
         }
 
         if (player.isInRound) {
@@ -278,6 +286,7 @@ class Round {
 
     async endRound() {
         let winners, handRank;
+        let numPplPlaying = 0;
         if(this.numPlayersInRound()>1){
             [winners, handRank] = this.determineWinner();
             this.winners = winners; 
@@ -299,7 +308,22 @@ class Round {
             winner.chips += this.pot;
         }
 
-        await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winners, prevIndex: this.currentSmallBlind, cards: [] });
+        this.players.forEach(player => {
+            if(player.isPlaying){
+                if(player.chips<=0){
+                    player.isPlaying = false;
+                }else{
+                    numPplPlaying += 1;
+                }
+            }
+        });
+
+        if(numPplPlaying>1){
+            await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winners, prevIndex: this.currentSmallBlind, cards: [], stillPlaying: true });
+        }else{
+            console.log('emitting game ended to client');
+            await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winners, prevIndex: this.currentSmallBlind, cards: [], stillPlaying: false });
+        }
     }
 
     lastPlayerInRound(){
@@ -385,6 +409,7 @@ class Round {
 
     moveBetstoPot(){
         let totalBets = 0;
+        console.log('moving bets to pot');
         this.players.forEach(player => {
             if (player.isPlaying) {
                 console.log(`Moving ${player.currentBet} from ${player.userId} to pot`);
@@ -405,6 +430,7 @@ class Round {
         let bestHand = { rank: -1, kicker: -1 };
     
         this.players.forEach(player => {
+
             if (player.isInRound) {
                 const playerCards = [...player.hand, ...this.communityCards];
                 console.log(player.userId, playerCards);
@@ -419,6 +445,8 @@ class Round {
                 }
             }
         });
+
+        
     
         return [roundWinners, bestHand.rank];
     }
