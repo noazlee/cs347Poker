@@ -20,10 +20,9 @@ class Ai extends Player {
 
         this.socket.on('your-turn', (data) => {
                 
-                // Do something with data.acceptableMoves
-
-                this.makemove();
-            });
+            // Do something with data.acceptableMoves
+            this.makemove();
+        });
 
         this.socket.on('shown-cards', (data) => {
             // Save data.cards to a variable
