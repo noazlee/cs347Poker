@@ -1,6 +1,5 @@
 const Game = require('../classes/game-model');
 const Player = require('../classes/player');
-const Ai1 = require('../classes/AI/ai1');
 
 module.exports = function(io){
     const games = {}; // This will store all game instances
@@ -14,30 +13,7 @@ module.exports = function(io){
             games[newGame.gameId] = newGame;
             socket.join(newGame.gameId);
             console.info("Game created:", newGame.gameId);
-            const aiId = `AI-${Date.now()}`; // Generate a unique AI ID
-            const aiPlayer = new Ai1(aiId, socket.id, 1000, aiId); // Create an AI1 player instance
-            newGame.addPlayer(aiPlayer.userId, socket.id, aiPlayer.username, true); // Add AI player to the game
-
-            // Emit game creation and player update events
-            socket.emit('game-created', { gameId: newGame.gameId, hostId: data.hostId, players: newGame.players.map(p => p.userId) });
-            io.to(newGame.gameId).emit('update-players', { players: newGame.players.map(player => ({ userId: player.userId, username: player.username })) });
-
-            console.info('Added AI Player', aiPlayer.username);
-        });
-
-        //adding ai to game
-        socket.on('add-ai', (data) => {
-            const game = games[data.gameId];
-            if (game && game.status === 'waiting'){
-                const aiId = `AI-${Date.now()}`; 
-                const aiPlayer = new Ai(aiId, socket.id, 'AI Player', 1000, true, aiId);
-                game.addPlayer(aiPlayer.userId, socket.id, aiPlayer.username, true);
-                socket.join(data.gameId);
-                io.to(data.gameId).emit('update-players', { players: game.players.map(player => ({ userId: player.userId, username: player.username })) });
-                console.info('Added AI Player', aiPlayer.username);
-            }else{
-                console.log('Game not found or not joinable');
-            }
+            socket.emit('game-created', { gameId: newGame.gameId, hostId: data.hostId,  players: newGame.players.map(p => p.userId)  });
         });
     
         // Player joining a game
@@ -108,6 +84,7 @@ module.exports = function(io){
                 }
             }
         });
+        
     
         // Start the game
         socket.on('start-game', (data) => {

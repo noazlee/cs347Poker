@@ -24,7 +24,7 @@ class Game {
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
-        this.addAiPlayers();
+        // this.addAiPlayers(hostId, hostSocketId, username, true);
     }
 
     addPlayer(userId, socketId, username, isAI){
@@ -54,13 +54,31 @@ class Game {
         }
     }
 
-    addAiPlayers(userId, socketId, username, isAI){
-        if (this.Ai1.some(p => p.userId === userId)) {
+    addAiPlayer(userId, socketId, username, isAI){
+        if (this.players.some(p => p.userId === userId)) {
             console.log("Player already exists:", userId);
             return false; 
         }
         let newPlayer = new Ai1(userId, socketId, username, POTAMOUNT,isAI);
         this.players.push(newPlayer);
+    }
+
+    removeAiPlayer(playerId) {
+        let playerIndex = undefined;
+        for (let i = 0; i < this.players.length; i++) {
+            if (this.players[i].userId === playerId) {
+                playerIndex = i;
+            }
+        }
+        
+        if (playerIndex === undefined) {
+            console.error(`tried to remove player ${playerId}, but could not find it in game`);
+        } else {
+            this.players.splice(playerIndex, 1);
+            if (this.hostId === playerId) {
+                this.hostId = this.players[0].userId;
+            }
+        }
     }
 
     startGame() {

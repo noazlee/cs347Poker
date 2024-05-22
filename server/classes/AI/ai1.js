@@ -10,7 +10,11 @@
 
 //gamesocket.js add ai player
 
-const Ai = require('./ai');
+//adding ai player to game-model.js add ai players
+
+//get the socket open
+
+const Ai = require('../ai-player');
 
 class Ai1 extends Ai {
     constructor(userId, socketId, chips, aiId) {
@@ -22,25 +26,19 @@ class Ai1 extends Ai {
         if (this.identifier >= 1 && this.identifier <= 9) {
             const decision = Math.random();
 
-            if (decision < 0.6 && acceptableMoves.includes('Fold')) {
+            if (decision < 0.2 && acceptableMoves.includes('Fold')) {
                 this.fold();
-
-            } else if (decision < 0.8 && acceptableMoves.includes('Call')) {
+            } else if (decision < 0.4 && acceptableMoves.includes('Call')) {
                 this.call();
-            } else if (decision < 0.9 && acceptableMoves.includes('AllIn')) {
+            } else if (decision < 0.6 && acceptableMoves.includes('AllIn')) {
                 this.allIn();
-
-            } else if (decision >= 0.9 && acceptableMoves.includes('Raise')) {
+            } else if (decision >= 0.8 && acceptableMoves.includes('Raise')) {
                 const raiseAmount = Math.floor(Math.random() * 100) + 1;
                 this.raise(raiseAmount);
-               
+            } else if (decision >= 0.8 && decision < 0.9 && acceptableMoves.includes('Check')) {
+                this.check();
             }
         }
-    }
-
-    emitSocketAction(action, amount = null) {
-        // Emit socket event for AI action
-        socket.emit('ai-action', { action, amount });
     }
 }
 

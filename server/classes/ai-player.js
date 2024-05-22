@@ -1,10 +1,44 @@
-const Player = require('../classes/player');
-const socket = require('../socket');
+const Player = require('./player');
+const io = require('socket.io-client');
+
+//method connect to game, disconnect from game- take in gameId
+//in addAi players(game-model) call join/leave function
+
+//create dumb makemove function and rewrite it in ai1
 
 class Ai extends Player {
     constructor(userId, socketId, username, chips, isAi, aiId) {
         super(userId, socketId, username, chips, isAi);
         this.aiId = aiId;
+        this.socket = io.connect('http://localhost:3000');
+
+        this.socket.on('connect', () => {
+            console.log('Successfully connected!');
+        })
+
+        this.socket.on('update-player', (messge) => { });
+
+        this.socket.on('your-turn', (data) => {
+                
+                // Do something with data.acceptableMoves
+
+                this.makemove();
+            });
+
+        this.socket.on('shown-cards', (data) => {
+            // Save data.cards to a variable
+        });
+
+        this,socket.on('update-round-data', (data) => {
+            // Save data.round to a variable
+        });
+    }
+    joinFunction(){
+        this.socket.join(gameId)
+    }
+
+    leaveFunction(){
+        this.socket.leave(gameId)
     }
 
     getCardToHand(card) {
