@@ -46,6 +46,7 @@ router.post('/create-user', async (req, res) => {
         console.error('Failed to create user:', error);
         return res.status(500).json({ message: 'Failed to create user', error: error.message });
     }
+    
 });
 
 //LOGIN LOGIC

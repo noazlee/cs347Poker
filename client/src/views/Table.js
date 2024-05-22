@@ -20,29 +20,39 @@ export default function Table({ props }) {
     const {gameId, userId} = useParams();
 
     useEffect(() => {
-
+        // Sent from Round.js file. Specificially, it is sent from both "start" and "updatePlayer" functions.
         socket.on('update-round-data', (data) => {
             setRoundData(data.round);
             setRoundOver(false);
         });
 
+        // Sent from inside the game-sockets.js file. Only used for showing notification for players when a player makes a move.
         socket.on('player-action', (data) => {
             toast(`Game updated! Player: ${data.username} Action: ${data.action}`);
         });
 
+        // Sent from round.js file. Specifically, it is sent from the "promptPlayerAction" function.
         socket.on('your-turn', (data) => {
             setPlayerOneCurrent(true);
             setMoves(data.acceptableMoves);
         });
 
+        // Sent from round.js file. Specifically, it is sent from the "start", "dealFlop", "dealTurn", "dealRiver" functions. Used to prompt the client to update the community cards.
         socket.on('shown-cards', (data) => {
             setCommunityCards(data.cards);
         });
 
+        // Sent from round.js file. Specifically, it is sent from the "endRound" function.
         socket.on('round-ended', (data)=>{
             console.log('game ended on client');
             setWinnerData(data);
             setRoundOver(true);
+            data.winner.forEach(winnerP=>{
+                if(socket.id===winnerP.socketId){ //ensures this is not sent twice
+                    console.log('Sending socket emit');
+                    socket.emit('round-end-client', {gameId: data.gameId, winner:winnerP, prevIndex: data.prevIndex, stillPlaying: data.stillPlaying});
+                }  
+            })
         });
 
         return () => {
