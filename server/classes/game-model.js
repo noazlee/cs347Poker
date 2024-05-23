@@ -1,5 +1,7 @@
 const Round = require('./round');
 const Player = require('./player');
+const Ai1 = require('./AI/ai1');
+
 
 const MAXNUMPLAYERS = 2;
 const POTAMOUNT = 10000;
@@ -38,6 +40,7 @@ class Game {
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
+        // this.addAiPlayers(hostId, hostSocketId, username, true);
     }
 
     addPlayer(userId, socketId, username, isAI){
@@ -79,16 +82,31 @@ class Game {
         }
     }
 
-    addAiPlayer() {
-        console.log("Add AI");
-        this.addPlayer(undefined, undefined, undefined, true)
-        // To be implemented: Add an AI player to the list of players
+    addAiPlayer(userId, socketId, username, isAI){
+        if (this.players.some(p => p.userId === userId)) {
+            console.log("Player already exists:", userId);
+            return false; 
+        }
+        let newPlayer = new Ai1(userId, socketId, username, POTAMOUNT,isAI);
+        this.players.push(newPlayer);
     }
 
     removeAiPlayer(playerId) {
-        console.log("Remove AI");
-        this.removePlayer(playerId, true);
-        // To be implemented: Remove an AI player from the list of players
+        let playerIndex = undefined;
+        for (let i = 0; i < this.players.length; i++) {
+            if (this.players[i].userId === playerId) {
+                playerIndex = i;
+            }
+        }
+        
+        if (playerIndex === undefined) {
+            console.error(`tried to remove player ${playerId}, but could not find it in game`);
+        } else {
+            this.players.splice(playerIndex, 1);
+            if (this.hostId === playerId) {
+                this.hostId = this.players[0].userId;
+            }
+        }
     }
 
     startGame() {

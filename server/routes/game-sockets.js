@@ -146,6 +146,7 @@ module.exports = function(io){
                 }
             }
         });
+        
     
         // Start the game
         socket.on('start-game', (data) => {

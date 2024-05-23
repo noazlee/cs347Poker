@@ -10,6 +10,7 @@ export default function BettingControls({ props }) {
     const [buttonRowOn, toggleButtonRow] = useState(true);
     const moves = props.moves;
 
+
     const handleRaise = () => {
         toggleDisplayPopup(true);
         toggleButtonRow(false);

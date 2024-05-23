@@ -42,7 +42,7 @@ export default function GameSettings({ props }) {
         if (props.players.length === props.maxPlayers) {
             alert("Not enough room to add another AI player.");
         } else {
-            // socket.emit('add-ai', {gameId}); UNCOMMENT WHEN READY TO TEST AI
+            socket.emit('add-ai', {gameId:props.gameId}); 
             props.setNumAiPlayers(props.numAiPlayers + 1);
         }
     }
