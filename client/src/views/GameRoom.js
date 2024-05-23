@@ -22,7 +22,7 @@ const GameRoom = () => {
     const [backgroundPosition, setBackgroundPosition] = useState(0);
 
     const subtractAi = (playerId) => {
-        // socket.emit('remove-ai', {gameId: gameId, playerId}); UNCOMMENT WHEN READY TO TEST AI
+        socket.emit('remove-ai', {gameId: gameId, playerId});
         setNumAiPlayers(numAiPlayers - 1);
     }
 
