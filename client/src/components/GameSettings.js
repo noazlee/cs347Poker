@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/GameSettings.css';
-import socket from '../socket';
+// import socket from '../socket';
 
 export default function GameSettings({ props }) {
 
