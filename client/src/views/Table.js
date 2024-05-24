@@ -22,6 +22,7 @@ export default function Table({ props }) {
     useEffect(() => {
         // Sent from Round.js file. Specificially, it is sent from both "start" and "updatePlayer" functions.
         socket.on('update-round-data', (data) => {
+            console.log('updating round data');
             setRoundData(data.round);
             setRoundOver(false);
         });
@@ -47,12 +48,6 @@ export default function Table({ props }) {
             console.log('game ended on client');
             setWinnerData(data);
             setRoundOver(true);
-            data.winner.forEach(winnerP=>{
-                if(socket.id===winnerP.socketId){ //ensures this is not sent twice
-                    console.log('Sending socket emit');
-                    socket.emit('round-end-client', {gameId: data.gameId, winner:winnerP, prevIndex: data.prevIndex, stillPlaying: data.stillPlaying});
-                }  
-            })
         });
 
         return () => {

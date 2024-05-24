@@ -5,6 +5,12 @@ import '../css/WinDisplay.css';
 export default function WinDisplay({ props }) {
     const startNewRound = () => {
         socket.emit('round-end-client', {gameId: props.data.gameId, winner: props.data.winner, prevIndex: props.data.prevIndex});
+        props.data.winner.forEach(winnerP=>{
+            if(socket.id===winnerP.socketId){ //ensures this is not sent twice
+                console.log('Sending socket emit');
+                socket.emit('round-end-client', {gameId: props.data.gameId, winner:winnerP, prevIndex: props.data.prevIndex, stillPlaying: props.data.stillPlaying});
+            }  
+        })
     }
 
     return (
