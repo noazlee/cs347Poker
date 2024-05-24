@@ -51,7 +51,7 @@ const GameHistory = () => {
         // Fetch the list of games for the dropdown
         const fetchGames = async () => {
             try {
-                const response = await axios.get(`/game/details/${selectedGameId}`);
+                const response = await axios.get(`/api/get-games/${userId}`);
                 setGames(response.data.games);
                 if (response.data.games.length > 0) {
                     setSelectedGameId(response.data.games[0].gameId);
