@@ -46,8 +46,12 @@ export default function Table({ props }) {
         // Sent from round.js file. Specifically, it is sent from the "endRound" function.
         socket.on('round-ended', (data)=>{
             console.log('game ended on client');
+            setPlayerOneCurrent(false);
             setWinnerData(data);
             setRoundOver(true);
+            // if(data.stillPlaying==false){ add end of game display here
+
+            // }
         });
 
         return () => {
