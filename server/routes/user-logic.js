@@ -104,34 +104,43 @@ router.get('/games', async (req, res) => {
 });
 
 // get specific game by ID
-router.get('/games/:gameId', async (req, res) => {
-    const { gameId } = req.params;
-    try {
-        const db = await connectDb();
-        const game = await db.collection('games').findOne({ gameId: gameId });
+// router.get('/games/:gameId', async (req, res) => {
+//     const { gameId } = req.params;
+//     try {
+//         const db = await connectDb();
+//         const game = await db.collection('games').findOne({ gameId: gameId });
 
-        if (game) {
-            return res.status(200).json(game);
-        } else {
-            return res.status(404).json({ message: 'Game not found' });
-        }
-    } catch (error) {
-        console.error('Failed to retrieve game:', error);
-        return res.status(500).json({ message: 'Failed to retrieve game' });
-    }
-});
+//         if (game) {
+//             return res.status(200).json(game);
+//         } else {
+//             return res.status(404).json({ message: 'Game not found' });
+//         }
+//     } catch (error) {
+//         console.error('Failed to retrieve game:', error);
+//         return res.status(500).json({ message: 'Failed to retrieve game' });
+//     }
+// });
 
 // get specific game by ID
 router.get('/games/:userId', async (req, res) => {
     const { userId } = req.params;
     try {
         const db = await connectDb();
-        const game = await db.collection('games').findOne({ userId: userId });
 
-        if (game) {
-            return res.status(200).json(game);
+        const games = await db.collection('games').find({ "players.userId": userId }).toArray();
+
+        games.forEach(game => {
+            if (game.rounds) {
+                game.rounds.forEach(round => {
+                    delete round.deck;
+                });
+            }
+        });
+
+        if (games) {
+            return res.status(200).json(games);
         } else {
-            return res.status(404).json({ message: 'Game not found' });
+            return res.status(404).json({ message: 'Game not found', game:games });
         }
     } catch (error) {
         console.error('Failed to retrieve game:', error);
