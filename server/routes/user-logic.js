@@ -91,5 +91,53 @@ router.get('/users/:userId', async (req, res) => {
     }
 });
 
+// get all games
+router.get('/games', async (req, res) => {
+    try {
+        const db = await connectDb();
+        const games = await db.collection('games').find({}).toArray();
+        return res.status(200).json(games);
+    } catch (error) {
+        console.error('Failed to retrieve games:', error);
+        return res.status(500).json({ message: 'Failed to retrieve games' });
+    }
+});
+
+// get specific game by ID
+router.get('/games/:gameId', async (req, res) => {
+    const { gameId } = req.params;
+    try {
+        const db = await connectDb();
+        const game = await db.collection('games').findOne({ gameId: gameId });
+
+        if (game) {
+            return res.status(200).json(game);
+        } else {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+    } catch (error) {
+        console.error('Failed to retrieve game:', error);
+        return res.status(500).json({ message: 'Failed to retrieve game' });
+    }
+});
+
+// get specific game by ID
+router.get('/games/:userId', async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const db = await connectDb();
+        const game = await db.collection('games').findOne({ userId: userId });
+
+        if (game) {
+            return res.status(200).json(game);
+        } else {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+    } catch (error) {
+        console.error('Failed to retrieve game:', error);
+        return res.status(500).json({ message: 'Failed to retrieve game' });
+    }
+});
+
 
 module.exports = router;

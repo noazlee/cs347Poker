@@ -51,7 +51,6 @@ export default function Table({ props }) {
         });
 
         return () => {
-            socket.off('player-action');
             socket.off('update-round-data');
             socket.off('your-turn');
             socket.off('round-ended');
