@@ -7,16 +7,16 @@ const io = require('socket.io-client');
 //create dumb makemove function and rewrite it in ai1
 
 class Ai {
-    constructor(userId, socketId, username, chips, isAi, aiId) {
-        this.username = username;
-        this.userId = this.generateRandomUserId;
+    constructor(socketId, chips, aiId) {
+        this.userId = this.generateRandomUserId();
+        this.username = `AI-${aiId}`;
         this.socketId = socketId;
         this.chips = chips;
         this.hand = [];
         this.isPlaying = true;
         this.isInRound = true;
         this.currentBet = 0;
-        this.isAi = isAi;
+        this.isAi = true; // Always true for AI players
         this.latestMove = "";
         this.aiId = aiId;
         this.socket = io.connect('http://localhost:3000');
@@ -30,9 +30,7 @@ class Ai {
         });
     }
 
-    joinFunction(gameId) {
-        this.socket.emit('join', { gameId, userId: this.userId });
-    generateRandomUserId(){
+    generateRandomUserId() {
         return `AI-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     }
 
@@ -44,14 +42,14 @@ class Ai {
         this.socket.emit('leave', { gameId, userId: this.userId });
     }
 
-    getCardToHand(card) {
+    addCardToHand(card) {
         this.hand.push(card);
     }
 
     fold() {
-        super.fold();
-        this.console.log('fold');
-        socket.emit('player-action', {
+        this.isInRound = false;
+        console.log('fold');
+        this.socket.emit('player-action', {
             userId: this.userId,
             action: 'fold',
             amount: 0
@@ -109,8 +107,12 @@ class Ai {
     }
 
     getPosition() {
-        return this.Position();
-        return this.Position();
+        return this.position;
+    }
+
+    makemove(acceptableMoves) {
+        // Dummy implementation, can be overridden in subclasses
+        console.log('AI making a move with acceptable moves:', acceptableMoves);
     }
 }
 
