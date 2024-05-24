@@ -1,4 +1,5 @@
 // const Player = require('./player');
+// const Player = require('./player');
 const io = require('socket.io-client');
 
 //method connect to game, disconnect from game- take in gameId
@@ -27,15 +28,24 @@ class Ai {
 
         // this.socket.on('update-player', (messge) => { 
         // });
+        // this.socket.on('update-player', (messge) => { 
+        // });
 
         this.socket.on('your-turn', (data) => {
+            this.makemove(data.acceptableMoves);
             this.makemove(data.acceptableMoves);
         });
 
         // this.socket.on('shown-cards', (data) => {
         //     // Save data.cards to a variable
         // });
+        // this.socket.on('shown-cards', (data) => {
+        //     // Save data.cards to a variable
+        // });
 
+        // this,socket.on('update-round-data', (data) => {
+        //     // Save data.round to a variable
+        // });
         // this,socket.on('update-round-data', (data) => {
         //     // Save data.round to a variable
         // });
@@ -46,8 +56,16 @@ class Ai {
 
     joinFunction(gameId) {
         this.socket.emit('join', { gameId, userId: this.userId });
+    generateRandomUserId(){
+        return `AI-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     }
 
+    joinFunction(gameId) {
+        this.socket.emit('join', { gameId, userId: this.userId });
+    }
+
+    leaveFunction(gameId) {
+        this.socket.emit('leave', { gameId, userId: this.userId });
     leaveFunction(gameId) {
         this.socket.emit('leave', { gameId, userId: this.userId });
     }
@@ -80,6 +98,17 @@ class Ai {
         this.currentBet += amountToCall;
         console.log('call');
         this.socket.emit('player-action', {
+        const amountToCall = amount - this.currentBet;
+        if (amountToCall <= 0) {
+            throw new Error('Player calls');
+        }
+        if (amountToCall > this.chips) {
+            throw new Error('Insufficient amount of chips');
+        }
+        this.chips -= amountToCall;
+        this.currentBet += amountToCall;
+        console.log('call');
+        this.socket.emit('player-action', {
             userId: this.userId,
             action: 'call',
             amount: amount
@@ -87,6 +116,14 @@ class Ai {
     }
 
     raise(amount) {
+        const amountToRaise = amount - this.currentBet;
+        if (amountToRaise > this.chips) {
+            throw new Error('Insufficient chips to raise');
+        }
+        this.chips -= amountToRaise;
+        this.currentBet = amount;
+        console.log('raise');
+        this.socket.emit('player-action', {
         const amountToRaise = amount - this.currentBet;
         if (amountToRaise > this.chips) {
             throw new Error('Insufficient chips to raise');
@@ -106,14 +143,22 @@ class Ai {
         this.chips = 0;
         console.log('all in');
         this.socket.emit('player-action', {
+        this.currentBet += this.chips;
+        this.chips = 0;
+        console.log('all in');
+        this.socket.emit('player-action', {
             userId: this.userId,
             action: 'allIn',
             amount: this.currentBet
+            amount: this.currentBet
         });
+        return this.currentBet;
         return this.currentBet;
     }
 
     check() {
+        console.log('check');
+        this.socket.emit('player-action', {
         console.log('check');
         this.socket.emit('player-action', {
             userId: this.userId,
@@ -126,9 +171,14 @@ class Ai {
         this.hand = [];
         this.currentBet = 0;
         this.isInRound = this.isPlaying;
+        this.hand = [];
+        this.currentBet = 0;
+        this.isInRound = this.isPlaying;
     }
 
     leaveGame() {
+        this.isPlaying = false;
+        this.isInRound = false;
         this.isPlaying = false;
         this.isInRound = false;
     }
@@ -138,6 +188,7 @@ class Ai {
     }
 
     getPosition() {
+        return this.Position();
         return this.Position();
     }
 }
