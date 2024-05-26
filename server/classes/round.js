@@ -146,6 +146,7 @@ class Round {
             if (player.isInRound) {
                 // Send signal to client. Received by Table.js
                 this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
+                    highestbet: this.highestBet,
                     acceptableMoves: acceptableMoves
                 });
                 return new Promise((resolve) => { 
@@ -401,6 +402,25 @@ class Round {
 
         if(this.roundEnded==false){
             this.io.to(this.gameId).emit('update-round-data', {
+                round: {
+                    gameId: this.gameId,
+                    index: this.index,
+                    players: this.players,
+                    deck: this.deck,
+                    smallBlindAmount: this.smallBlindAmount,
+                    currentBet: this.currentBet,
+                    pot: this.pot,
+                    communityCards: this.communityCards,
+                    hands: this.hands,
+                    stage: this.stage,
+                    startingPlayer: this.startingPlayer,
+                    currentPlayer: this.currentPlayer,
+                    currentSmallBlind: this.currentSmallBlind,
+                    playerResponses: this.playerResponses
+                }
+            });
+        }else{
+            this.io.to(this.gameId).emit('update-round-data-without-popup', {
                 round: {
                     gameId: this.gameId,
                     index: this.index,

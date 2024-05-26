@@ -124,9 +124,11 @@ module.exports = function(io){
             }else{
                 console.log('adding new game');
                 const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
+                game.updatePlayerChips();
                 console.log('game added');
                 console.log(newGame);
                 games[data.gameId]=null;
+                // send socket emit that sends people to home screen.
             }
         });
     
