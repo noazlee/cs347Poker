@@ -66,7 +66,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
                     )}
                     <p>Latest Move: {player.latestMove}</p>
-                    <button onClick={leaveGame}>Leave Game</button>
+                    {playerOne && <button onClick={leaveGame}>Leave Game</button>}
                 </div>
             </div>
         )
