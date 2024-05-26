@@ -422,6 +422,10 @@ class Round {
         
     }
 
+    updateHost(hostId) {
+        this.io.to(this.gameId).emit('update-host', {hostId});
+    }
+
     moveBetstoPot(){
         let totalBets = 0;
         console.log('moving bets to pot');

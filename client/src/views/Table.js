@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
 import '../css/Table.css'
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
 import { ToastContainer, toast } from "react-toastify";
@@ -10,7 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function Table({ props }) {
     const location = useLocation();
-    const hostId = location.state.hostId;
+    const navigate = useNavigate();
+    const [hostId, setHostId] = useState(location.state.hostId);
     const [roundData, setRoundData] = useState(undefined);
     const [playerOneCurrent, setPlayerOneCurrent] = useState(false);
     const [moves, setMoves] = useState([]);
@@ -49,16 +50,22 @@ export default function Table({ props }) {
             setPlayerOneCurrent(false);
             setWinnerData(data);
             setRoundOver(true);
-            // if(data.stillPlaying==false){ add end of game display here
-
-            // }
+            if (data.stillPlaying==false) {
+                navigate(`/win-screen/${userId}`, {state: {winData: data.winner}});
+            }
         });
+
+        // Sent from round.js file, specifically from the "updateHost" function.
+        socket.on('update-host', (data) => {
+            setHostId(data.hostId);
+        })
 
         return () => {
             socket.off('update-round-data');
             socket.off('your-turn');
             socket.off('round-ended');
             socket.off('shown-cards');
+            socket.off('update-host');
         };
     }, []);
 
@@ -105,7 +112,6 @@ export default function Table({ props }) {
                                 toggleCurrentPlayer: setPlayerOneCurrent
                             }}
                             gameId={gameId}
-                            userId={userId}
                             active={player.userId === currentPlayerId ? true : false}
                         />
                     </section>

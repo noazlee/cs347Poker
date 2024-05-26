@@ -134,7 +134,7 @@ module.exports = function(io){
         socket.on('leave-game', (data) => {
             const game = games[data.gameId];
             if (game) {
-                game.removePlayer(data.playerId, false);
+                game.removePlayer(data.playerId);
                 socket.leave(data.gameId);
 
                 if (game.players.length === 0) {
@@ -146,6 +146,21 @@ module.exports = function(io){
                 }
             }
         });
+
+        socket.on('leave-mid-game', (data) => {
+            const game = games[data.gameId];
+            if (game) {
+                game.removePlayerMidGame(data.userId)
+                socket.leave(data.gameId);
+            }
+
+            if (game.players.length === 0) {
+                delete games[data.gameId];
+                console.info(`Game ${data.gameId} ended as all players have left.`);
+            } else {
+                console.info(`${data.playerId} left game ${data.gameId}`);
+            }
+        })
         
     
         // Start the game

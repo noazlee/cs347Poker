@@ -2,11 +2,12 @@ import React from "react";
 import BettingControls from "./BettingControls";
 import Card from "./Card";
 import ChipsDisplay from "./ChipsDisplay";
+import socket from '../socket'
 import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId , userId, active}) {
+export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId, active}) {
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -31,6 +32,10 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
         } else {
             return null;
         }
+    }
+
+    const leaveGame = () => {
+        socket.emit('leave-mid-game', {gameId, userId: player.userId})
     }
 
     return (
@@ -61,6 +66,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
                     )}
                     <p>Latest Move: {player.latestMove}</p>
+                    <button onClick={leaveGame}>Leave Game</button>
                 </div>
             </div>
         )
