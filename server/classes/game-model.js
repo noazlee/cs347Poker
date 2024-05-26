@@ -1,6 +1,7 @@
 const Round = require('./round');
 const Player = require('./player');
 const Ai1 = require('./AI/ai1');
+const { connectDb } = require('../db');
 
 
 const MAXNUMPLAYERS = 2;
@@ -180,6 +181,39 @@ class Game {
         this.rounds.push(this.currentRound);
         this.currentRound.start();
     }
+
+    async updatePlayerChips(){ 
+        const db = await connectDb();
+        const users = db.collection('users');
+
+        for (const player of this.players) {
+            try{
+                const user = await users.findOne({ userId: player.userId });
+            
+                if (user) {
+                    const currentChips = parseInt(user.totalChips);
+                    console.log(user);
+                    console.log(player.chips);
+                    const updatedChips = currentChips + player.chips;
+
+                    await users.updateOne(
+                        { userId: player.userId },
+                        {
+                            $set: { totalChips: updatedChips },
+                            $currentDate: { lastUpdated: true }
+                        }
+                    );
+
+                    console.log(`Updated chips for player ${player.userId}: ${updatedChips}`);
+                } else {
+                    console.log(`User not found for player ${player.userId}`);
+                }
+            }catch (error) {
+                console.error(`Failed to update chips for player ${player.userId}:`, error);
+            }
+        };
+    }
+
 }
 
 module.exports = Game;

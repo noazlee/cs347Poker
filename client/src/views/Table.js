@@ -19,6 +19,7 @@ export default function Table({ props }) {
     const [roundOver, setRoundOver] = useState(false);
     const [winnerData, setWinnerData] = useState(undefined);
     const {gameId, userId} = useParams();
+    const [highestBet, setHighestBet] = useState(0);
 
     useEffect(() => {
         // Sent from Round.js file. Specificially, it is sent from both "start" and "updatePlayer" functions.
@@ -26,6 +27,11 @@ export default function Table({ props }) {
             console.log('updating round data');
             setRoundData(data.round);
             setRoundOver(false);
+        });
+
+        socket.on('update-round-data-without-popup', (data) => {
+            console.log('updating round data');
+            setRoundData(data.round);
         });
 
         // Sent from inside the game-sockets.js file. Only used for showing notification for players when a player makes a move.
@@ -37,6 +43,8 @@ export default function Table({ props }) {
         socket.on('your-turn', (data) => {
             setPlayerOneCurrent(true);
             setMoves(data.acceptableMoves);
+            console.log(data.highestbet);
+            setHighestBet(data.highestbet);
         });
 
         // Sent from round.js file. Specifically, it is sent from the "start", "dealFlop", "dealTurn", "dealRiver" functions. Used to prompt the client to update the community cards.
@@ -108,6 +116,7 @@ export default function Table({ props }) {
                             isCurrentPlayer={playerOneCurrent}
                             blind={blindStatus}
                             moves={moves}
+                            highestBet={highestBet}
                             props={{
                                 toggleCurrentPlayer: setPlayerOneCurrent
                             }}

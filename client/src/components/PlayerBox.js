@@ -7,7 +7,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId, active}) {
+export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -61,6 +61,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                             toggleCurrentPlayer: props.toggleCurrentPlayer,
                             gameId:gameId,
                             username:player.username,
+                            highestBet: highestBet
                         }}/>
                     ) : (
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>

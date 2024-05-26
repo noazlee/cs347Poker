@@ -24,6 +24,7 @@ class Round {
         this.playerResponses = new Map(); 
         this.winners = new Winner(players); // Initialize Winner object with the players array (sho)
         this.roundEnded = false;
+        this.roundPlaying=false;
     }
 
     async start() {
@@ -146,6 +147,7 @@ class Round {
             if (player.isInRound) {
                 // Send signal to client. Received by Table.js
                 this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
+                    highestbet: this.highestBet,
                     acceptableMoves: acceptableMoves
                 });
                 return new Promise((resolve) => { 
@@ -172,6 +174,7 @@ class Round {
         // Process the action
         console.log(`Action received from ${socket.id}: ${data.action}`);
         const player = this.players[this.currentPlayer];
+        this.roundPlaying=true;
         switch (data.action) {
             case 'check':
                 console.log(this.currentPlayer);
@@ -208,6 +211,10 @@ class Round {
                 player.isInRound = false;
 
                 const numPlayers = this.numPlayersInRound();
+
+                this.pot += player.currentBet;
+                player.currentBet = 0;
+
                 if(numPlayers>1){
                     this.advanceToNextPlayer();
                     this.updatePlayer();
@@ -297,6 +304,11 @@ class Round {
         let numPplPlaying = 0;
 
         this.roundEnded = true;
+
+        this.players.forEach(player=>{
+            this.pot+=player.currentBet;
+            player.currentBet=0;
+        })
 
         if(this.numPlayersInRound()>1){
             [winners, handRank] = this.determineWinner();
@@ -401,6 +413,25 @@ class Round {
 
         if(this.roundEnded==false){
             this.io.to(this.gameId).emit('update-round-data', {
+                round: {
+                    gameId: this.gameId,
+                    index: this.index,
+                    players: this.players,
+                    deck: this.deck,
+                    smallBlindAmount: this.smallBlindAmount,
+                    currentBet: this.currentBet,
+                    pot: this.pot,
+                    communityCards: this.communityCards,
+                    hands: this.hands,
+                    stage: this.stage,
+                    startingPlayer: this.startingPlayer,
+                    currentPlayer: this.currentPlayer,
+                    currentSmallBlind: this.currentSmallBlind,
+                    playerResponses: this.playerResponses
+                }
+            });
+        }else{
+            this.io.to(this.gameId).emit('update-round-data-without-popup', {
                 round: {
                     gameId: this.gameId,
                     index: this.index,

@@ -17,14 +17,21 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
         
         if (raiseValue > props.maxChips) { raiseValue = props.maxChips }
 
-        socket.emit('player-action', {
-            action: 'raise',
-            gameId: props.gameId,
-            value: raiseValue
-        });
-        togglePopup(false);
-        props.toggleCurrentPlayer(false);
-        props.toggleButtons(true);
+        console.log(props.highestBet);
+
+        if(raiseValue>=props.highestBet){
+            socket.emit('player-action', {
+                action: 'raise',
+                gameId: props.gameId,
+                value: raiseValue
+            });
+            togglePopup(false);
+            props.toggleCurrentPlayer(false);
+            props.toggleButtons(true);
+        }else{
+            alert("Need to bet at least the highest bet");
+        }
+        
     }
 
     const raise = (e) => {

@@ -116,7 +116,7 @@ module.exports = function(io){
             if(data.stillPlaying===true){
                 if (game) {
                     let curRound = game.rounds[game.rounds.length-1];
-                    if(curRound.communityCards.length>3){ // prevents calling twice
+                    if(curRound.roundPlaying===true){ // prevents calling twice
                         console.log('starting new round');
                         game.startNewRound(data.prevIndex);
                     }
@@ -124,9 +124,11 @@ module.exports = function(io){
             }else{
                 console.log('adding new game');
                 const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
+                game.updatePlayerChips();
                 console.log('game added');
                 console.log(newGame);
                 games[data.gameId]=null;
+                // send socket emit that sends people to home screen.
             }
         });
     
