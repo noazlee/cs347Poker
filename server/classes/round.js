@@ -24,6 +24,7 @@ class Round {
         this.playerResponses = new Map(); 
         this.winners = new Winner(players); // Initialize Winner object with the players array (sho)
         this.roundEnded = false;
+        this.roundPlaying=false;
     }
 
     async start() {
@@ -173,6 +174,7 @@ class Round {
         // Process the action
         console.log(`Action received from ${socket.id}: ${data.action}`);
         const player = this.players[this.currentPlayer];
+        this.roundPlaying=true;
         switch (data.action) {
             case 'check':
                 console.log(this.currentPlayer);
@@ -209,6 +211,10 @@ class Round {
                 player.isInRound = false;
 
                 const numPlayers = this.numPlayersInRound();
+
+                this.pot += player.currentBet;
+                player.currentBet = 0;
+
                 if(numPlayers>1){
                     this.advanceToNextPlayer();
                     this.updatePlayer();
@@ -298,6 +304,11 @@ class Round {
         let numPplPlaying = 0;
 
         this.roundEnded = true;
+
+        this.players.forEach(player=>{
+            this.pot+=player.currentBet;
+            player.currentBet=0;
+        })
 
         if(this.numPlayersInRound()>1){
             [winners, handRank] = this.determineWinner();

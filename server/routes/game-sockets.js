@@ -116,7 +116,7 @@ module.exports = function(io){
             if(data.stillPlaying===true){
                 if (game) {
                     let curRound = game.rounds[game.rounds.length-1];
-                    if(curRound.communityCards.length>3){ // prevents calling twice
+                    if(curRound.roundPlaying===true){ // prevents calling twice
                         console.log('starting new round');
                         game.startNewRound(data.prevIndex);
                     }
