@@ -292,7 +292,7 @@ class Round {
     }
 
     setBettingOrder(){
-        if (this.stage==0) { //if first stage
+        if (this.stage === 0) { //if first stage
             while (!this.players[this.currentSmallBlind].isPlaying) {
                 this.currentSmallBlind = (this.currentSmallBlind + 1) % this.players.length;
             }
@@ -303,13 +303,13 @@ class Round {
             }
 
             this.startingPlayer = (this.currentBigBlind + 1) % this.players.length;
+            while (!this.players[this.startingPlayer].isPlaying) {
+                this.startingPlayer = (this.startingPlayer + 1) % this.players.length;
+            } 
             this.currentPlayer = this.startingPlayer;
         } else {
             console.log('changing starting player');
             this.startingPlayer = this.currentSmallBlind;
-            while (this.players[this.startingPlayer].isPlaying) {
-                this.startingPlayer = (this.startingPlayer + 1) % this.players.length;
-            } 
             this.currentPlayer = this.startingPlayer;
         }
     }
