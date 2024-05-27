@@ -79,18 +79,28 @@ export default function Table({ props }) {
         });
 
         return () => {
+            socket.off('player-action');
             socket.off('update-round-data');
             socket.off('your-turn');
             socket.off('round-ended');
             socket.off('shown-cards');
         };
     }, []);
+    
+    const tableArrangements = {
+        2: [6, 2],
+        3: [6, 2, 4],
+        4: [6, 8, 2, 4],
+        5: [6, 7, 8, 2, 4],
+        6: [6, 7, 8, 1, 2, 4],
+        7: [6, 7, 8, 1, 2, 3, 4],
+        8: [6, 7, 8, 1, 2, 3, 4, 5]
+    }
 
     const generatePlayerBoxes = (data) => {
         const currentPlayerId = data.players[data.currentPlayer].userId;
         let smallBlindPlayerId;
         let bigBlindPlayerId;
-        let box = 1;
 
         console.log(`Now playing: Player ${data.currentPlayer}`);
 
@@ -101,6 +111,13 @@ export default function Table({ props }) {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }
 
+        let curPlayerIndex = 0;
+        data.players.forEach((player, index) => {
+            if (player.socketId === socket.id) {
+                curPlayerIndex = index;
+            }
+        });
+
         return (
             data.players.map((player, index) => {
                 let blindStatus = 0;
@@ -109,7 +126,6 @@ export default function Table({ props }) {
                 } else if (player.userId === bigBlindPlayerId) {
                     blindStatus = 2;
                 }
-
                 let isPlayerOne;
                 if (player.socketId === socket.id) {
                     isPlayerOne = true;
@@ -118,7 +134,7 @@ export default function Table({ props }) {
                 }
 
                 return (
-                    <section key={index} id={isPlayerOne ? 'Player1-Box' : `Box-${box++}`}>
+                    <section key={index} id={`Box-${tableArrangements[data.players.length][(index + data.players.length -curPlayerIndex) % data.players.length]}`}>
                         <PlayerBox
                             player={player} 
                             playerOne={isPlayerOne}

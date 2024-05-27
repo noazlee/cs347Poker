@@ -36,6 +36,18 @@ class Winner {
         } else if (this.isStraight(playerCards).isStraight) {
             console.log('is a straight');
             return { rank: 4, cards: playerCards, kicker: highestCardNum }; // Straight
+        } else if (this.isThreeOfAKind(playerCards)!= false) {
+            console.log('is a three of a kind');
+            const { threeOfAKind, kickers } = this.isThreeOfAKind(playerCards);
+            return { rank: 3, cards: playerCards, kicker: threeOfAKind }; // Three of a kind
+        } else if (this.isTwoPair(playerCards)!= false) {
+            const { pairs, kicker } = this.isTwoPair(playerCards);
+            console.log('is a two pair');
+            return { rank: 2, cards: playerCards, kicker: pairs }; // Two pair
+        } else if (this.isPair(playerCards)!=false) {
+            const { pair, kicker } = this.isPair(playerCards);
+            console.log('is a pair');
+            return { rank: 1, cards: playerCards, kicker: pair }; // Pair
         } else {
             const threeOfAKind = this.isThreeOfAKind(playerCards);
             if (threeOfAKind !== false) {
