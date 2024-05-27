@@ -7,6 +7,7 @@ import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { buildImgUrl } from '../utils/utils';
 
 export default function Table({ props }) {
     const location = useLocation();
@@ -19,6 +20,21 @@ export default function Table({ props }) {
     const [winnerData, setWinnerData] = useState(undefined);
     const {gameId, userId} = useParams();
     const [highestBet, setHighestBet] = useState(0);
+
+    const tableStyle = {
+        width: '100%',
+        height: '100vh',
+        backgroundColor: `dark green`,
+        backgroundImage: `url(${buildImgUrl('table.png')})`,
+        backgroundSize: 'cover',
+        border: '2px solid',
+        resize: 'both',
+        overflow: 'scroll',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gridTemplateRows: '1fr 1fr 1fr',
+        gap: '20px'
+    };
 
     useEffect(() => {
         // Sent from Round.js file. Specificially, it is sent from both "start" and "updatePlayer" functions.
@@ -126,7 +142,7 @@ export default function Table({ props }) {
         roundData === undefined ? (
             <p>Loading...</p>
         ) : (
-            <div className='table'>
+            <div className='table' style={tableStyle}>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
                     {roundOver === false ? (
