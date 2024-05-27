@@ -45,11 +45,24 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
         
     }
 
+    const raise = (e) => {
+        const raiseValue = e.target.value;
+        if (raiseValue <= props.currentBet) {
+            alert("You must raise to an amount greater than your current bet.");
+            changeRaiseAmount(props.currentBet + 1);
+        } else if (raiseValue > props.maxChips + props.currentBet) {
+            alert("You cannot raise more chips than you have available.");
+            changeRaiseAmount(props.maxChips + props.currentBet);
+        } else {
+            changeRaiseAmount(raiseValue);
+        }
+    }
+
     return isDisplayed === true ? (
         <div className='popup'>
             <div id='raiseForm'>
                 <h2>Select Amount to Raise</h2>
-                <input type='number' name='raiseAmount' id='raiseAmount' min="1" max={props.maxChips} value={raiseAmount} onChange={(e) => changeRaiseAmount(e.target.value)}/>
+                <input type='number' name='raiseAmount' id='raiseAmount' min={props.currentBet + 1} max={props.maxChips} value={raiseAmount} onChange={(e) => raise(e)}/>
                 <button onClick={goAllIn}>Go All In!</button>
                 <button onClick={() => {
                     togglePopup(false);

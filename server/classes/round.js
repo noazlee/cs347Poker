@@ -21,6 +21,7 @@ class Round {
         this.anchor = null; // used when someone raises
         this.currentPlayer = 0;
         this.currentSmallBlind = (prevIndex+1)%this.players.length;  // Index of the small blind in the players array
+        this.currentBigBlind = (this.currentSmallBlind + 1) % this.players.length;
         this.playerResponses = new Map(); 
         this.winners = new Winner(players); // Initialize Winner object with the players array (sho)
         this.roundEnded = false;
@@ -48,8 +49,9 @@ class Round {
 
         this.players[this.currentSmallBlind].currentBet = this.smallBlindAmount;
         this.players[this.currentSmallBlind].chips -= this.smallBlindAmount;
-        this.players[(this.currentSmallBlind+1)%this.players.length].currentBet = this.smallBlindAmount * 2; //big blind
-        this.players[(this.currentSmallBlind+1)%this.players.length].chips -= this.smallBlindAmount * 2;
+
+        this.players[this.currentBigBlind].currentBet = this.smallBlindAmount * 2; //big blind
+        this.players[this.currentBigBlind].chips -= this.smallBlindAmount * 2;
 
         this.players.forEach(player=>{
             console.info(player);
@@ -73,6 +75,7 @@ class Round {
                 startingPlayer: this.startingPlayer,
                 currentPlayer: this.currentPlayer,
                 currentSmallBlind: this.currentSmallBlind,
+                currentBigBlind: this.currentBigBlind,
                 playerResponses: this.playerResponses
             }
         });
@@ -288,13 +291,25 @@ class Round {
         }
     }
 
-    setBettingOrder(){    
-        if (this.stage==0) { //if first stage
-            this.startingPlayer = (this.currentSmallBlind + 2) % this.players.length; 
+    setBettingOrder(){
+        if (this.stage === 0) { //if first stage
+            while (!this.players[this.currentSmallBlind].isPlaying) {
+                this.currentSmallBlind = (this.currentSmallBlind + 1) % this.players.length;
+            }
+    
+            this.currentBigBlind = (this.currentSmallBlind + 1) % this.players.length;
+            while (!this.players[this.currentBigBlind].isPlaying) {
+                this.currentBigBlind = (this.currentBigBlind + 1) % this.players.length;
+            }
+
+            this.startingPlayer = (this.currentBigBlind + 1) % this.players.length;
+            while (!this.players[this.startingPlayer].isPlaying) {
+                this.startingPlayer = (this.startingPlayer + 1) % this.players.length;
+            } 
             this.currentPlayer = this.startingPlayer;
         } else {
             console.log('changing starting player');
-            this.startingPlayer = this.currentSmallBlind; 
+            this.startingPlayer = this.currentSmallBlind;
             this.currentPlayer = this.startingPlayer;
         }
     }
@@ -427,6 +442,7 @@ class Round {
                     startingPlayer: this.startingPlayer,
                     currentPlayer: this.currentPlayer,
                     currentSmallBlind: this.currentSmallBlind,
+                    currentBigBlind: this.currentBigBlind,
                     playerResponses: this.playerResponses
                 }
             });
@@ -446,11 +462,16 @@ class Round {
                     startingPlayer: this.startingPlayer,
                     currentPlayer: this.currentPlayer,
                     currentSmallBlind: this.currentSmallBlind,
+                    currentBigBlind: this.currentBigBlind,
                     playerResponses: this.playerResponses
                 }
             });
         }
         
+    }
+
+    updateHost(hostId) {
+        this.io.to(this.gameId).emit('update-host', {hostId});
     }
 
     moveBetstoPot(){

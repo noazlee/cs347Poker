@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
 import '../css/Table.css'
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
 import { ToastContainer, toast } from "react-toastify";
@@ -11,7 +11,8 @@ import { buildImgUrl } from '../utils/utils';
 
 export default function Table({ props }) {
     const location = useLocation();
-    const hostId = location.state.hostId;
+    const navigate = useNavigate();
+    const [hostId, setHostId] = useState(location.state.hostId);
     const [roundData, setRoundData] = useState(undefined);
     const [playerOneCurrent, setPlayerOneCurrent] = useState(false);
     const [moves, setMoves] = useState([]);
@@ -73,19 +74,26 @@ export default function Table({ props }) {
             setPlayerOneCurrent(false);
             setWinnerData(data);
             setRoundOver(true);
-            // if(data.stillPlaying==false){ add end of game display here
-
-            // }
+            if (data.stillPlaying === false) {
+                navigate(`/win-screen/${userId}`, {state: {winData: data.winner}});
+            }
         });
+
+        // Sent from round.js file, specifically from the "updateHost" function.
+        socket.on('update-host', (data) => {
+            setHostId(data.hostId);
+        })
 
         return () => {
             socket.off('player-action');
             socket.off('update-round-data');
+            socket.off('update-round-data-without-popup');
             socket.off('your-turn');
             socket.off('round-ended');
             socket.off('shown-cards');
+            socket.off('update-host');
         };
-    }, []);
+    }, [navigate, userId]);
     
     const tableArrangements = {
         2: [6, 2],
@@ -106,7 +114,7 @@ export default function Table({ props }) {
 
         if (data.players.length >= 2) {
             smallBlindPlayerId = data.players[data.currentSmallBlind].userId;
-            bigBlindPlayerId = data.players[(data.currentSmallBlind + 1) % data.players.length].userId;
+            bigBlindPlayerId = data.players[data.currentBigBlind].userId;
         } else {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }
@@ -128,6 +136,7 @@ export default function Table({ props }) {
         console.log("Table Global betting cap: ", globalBettingCap);
         return (
             data.players.map((player, index) => {
+                console.log(player);
                 let blindStatus = 0;
                 if (player.userId === smallBlindPlayerId) {
                     blindStatus = 1;
@@ -155,7 +164,6 @@ export default function Table({ props }) {
                                 toggleCurrentPlayer: setPlayerOneCurrent
                             }}
                             gameId={gameId}
-                            userId={userId}
                             active={player.userId === currentPlayerId ? true : false}
                         />
                     </section>
