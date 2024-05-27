@@ -8,6 +8,7 @@ import GameRoom from './views/GameRoom';
 import JoinRoom from './views/JoinRoom';
 import GameHistory from './views/GameHistory';
 import LeaderBoard from './views/LeaderBoard';
+import WinScreen from './views/WinScreen';
 
 const App = () => {
     return (
@@ -23,6 +24,7 @@ const App = () => {
                 <Route path="/join/:userId" element={<JoinRoom/>} />
                 <Route path="/leaderboard/:userId" element={<LeaderBoard/>} />
                 <Route path="/game-history/:userId" element={<GameHistory/>} />
+                <Route path="/win-screen/:userId" element={<WinScreen/>} />
                 {/* put all routes here */}
             </Routes>
         </Router>
