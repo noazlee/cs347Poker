@@ -2,11 +2,15 @@ import React from "react";
 import BettingControls from "./BettingControls";
 import Card from "./Card";
 import ChipsDisplay from "./ChipsDisplay";
+import socket from '../socket'
+import {useNavigate} from 'react-router-dom';
 import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], props, gameId , userId, active}) {
+export default function PlayerBox({ globalBettingCap, player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
+    const navigate = useNavigate();
+    
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -33,6 +37,12 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
         }
     }
 
+    const leaveGame = () => {
+        socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        navigate(`/home/${player.userId}`);
+    }
+    console.log("PlayerBox Global betting cap: ", globalBettingCap);
+
     return (
             <div className={"playerBox " + (active === true ? "active" : "inactive")}>
                 <div>
@@ -49,6 +59,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                 <div className="bettingTab">
                     {playerOne ? (
                         <BettingControls props={{
+                            globalBettingCap: globalBettingCap,
                             initialChips: player.chips,
                             currentBet: player.currentBet,
                             moves: moves,
@@ -56,11 +67,13 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                             toggleCurrentPlayer: props.toggleCurrentPlayer,
                             gameId:gameId,
                             username:player.username,
+                            highestBet: highestBet
                         }}/>
                     ) : (
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
                     )}
                     <p>Latest Move: {player.latestMove}</p>
+                    {playerOne && <button onClick={leaveGame}>Leave Game</button>}
                 </div>
             </div>
         )

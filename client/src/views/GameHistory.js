@@ -51,7 +51,7 @@ const GameHistory = () => {
         // Fetch the list of games for the dropdown
         const fetchGames = async () => {
             try {
-                const response = await axios.get(`/game/details/${selectedGameId}`);
+                const response = await axios.get(`/api/games/${userId}`);
                 setGames(response.data.games);
                 if (response.data.games.length > 0) {
                     setSelectedGameId(response.data.games[0].gameId);
@@ -69,7 +69,7 @@ const GameHistory = () => {
         if (selectedGameId) {
             const fetchGameDetails = async () => {
                 try {
-                    const response = await axios.get(`/api/game/details/${selectedGameId}`);
+                    const response = await axios.get(`/api/games/${userId}/${selectedGameId}`);
                     setRounds(response.data.rounds);
                 } catch (error) {
                     console.error('Failed to fetch game details', error);
@@ -77,7 +77,7 @@ const GameHistory = () => {
             };
             fetchGameDetails();
         }
-    }, [selectedGameId]);
+    }, [selectedGameId, userId]);
 
 
     return (

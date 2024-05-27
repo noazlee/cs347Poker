@@ -2,15 +2,17 @@ import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
 import '../css/Table.css'
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { buildImgUrl } from '../utils/utils';
 
 export default function Table({ props }) {
     const location = useLocation();
-    const hostId = location.state.hostId;
+    const navigate = useNavigate();
+    const [hostId, setHostId] = useState(location.state.hostId);
     const [roundData, setRoundData] = useState(undefined);
     const [playerOneCurrent, setPlayerOneCurrent] = useState(false);
     const [moves, setMoves] = useState([]);
@@ -18,12 +20,34 @@ export default function Table({ props }) {
     const [roundOver, setRoundOver] = useState(false);
     const [winnerData, setWinnerData] = useState(undefined);
     const {gameId, userId} = useParams();
+    const [highestBet, setHighestBet] = useState(0);
+
+    const tableStyle = {
+        width: '100%',
+        height: '100vh',
+        backgroundColor: `dark green`,
+        backgroundImage: `url(${buildImgUrl('table.png')})`,
+        backgroundSize: 'cover',
+        border: '2px solid',
+        resize: 'both',
+        overflow: 'scroll',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gridTemplateRows: '1fr 1fr 1fr',
+        gap: '20px'
+    };
 
     useEffect(() => {
         // Sent from Round.js file. Specificially, it is sent from both "start" and "updatePlayer" functions.
         socket.on('update-round-data', (data) => {
+            console.log('updating round data');
             setRoundData(data.round);
             setRoundOver(false);
+        });
+
+        socket.on('update-round-data-without-popup', (data) => {
+            console.log('updating round data');
+            setRoundData(data.round);
         });
 
         // Sent from inside the game-sockets.js file. Only used for showing notification for players when a player makes a move.
@@ -35,6 +59,8 @@ export default function Table({ props }) {
         socket.on('your-turn', (data) => {
             setPlayerOneCurrent(true);
             setMoves(data.acceptableMoves);
+            console.log(data.highestbet);
+            setHighestBet(data.highestbet);
         });
 
         // Sent from round.js file. Specifically, it is sent from the "start", "dealFlop", "dealTurn", "dealRiver" functions. Used to prompt the client to update the community cards.
@@ -45,48 +71,78 @@ export default function Table({ props }) {
         // Sent from round.js file. Specifically, it is sent from the "endRound" function.
         socket.on('round-ended', (data)=>{
             console.log('game ended on client');
+            setPlayerOneCurrent(false);
             setWinnerData(data);
             setRoundOver(true);
-            data.winner.forEach(winnerP=>{
-                if(socket.id===winnerP.socketId){ //ensures this is not sent twice
-                    console.log('Sending socket emit');
-                    socket.emit('round-end-client', {gameId: data.gameId, winner:winnerP, prevIndex: data.prevIndex, stillPlaying: data.stillPlaying});
-                }  
-            })
+            if (data.stillPlaying === false) {
+                navigate(`/win-screen/${userId}`, {state: {winData: data.winner}});
+            }
         });
 
+        // Sent from round.js file, specifically from the "updateHost" function.
+        socket.on('update-host', (data) => {
+            setHostId(data.hostId);
+        })
+
         return () => {
+            socket.off('player-action');
             socket.off('update-round-data');
+            socket.off('update-round-data-without-popup');
             socket.off('your-turn');
             socket.off('round-ended');
             socket.off('shown-cards');
+            socket.off('update-host');
         };
-    }, []);
+    }, [navigate, userId]);
+    
+    const tableArrangements = {
+        2: [6, 2],
+        3: [6, 2, 4],
+        4: [6, 8, 2, 4],
+        5: [6, 7, 8, 2, 4],
+        6: [6, 7, 8, 1, 2, 4],
+        7: [6, 7, 8, 1, 2, 3, 4],
+        8: [6, 7, 8, 1, 2, 3, 4, 5]
+    }
 
     const generatePlayerBoxes = (data) => {
         const currentPlayerId = data.players[data.currentPlayer].userId;
         let smallBlindPlayerId;
         let bigBlindPlayerId;
-        let box = 1;
 
         console.log(`Now playing: Player ${data.currentPlayer}`);
 
         if (data.players.length >= 2) {
             smallBlindPlayerId = data.players[data.currentSmallBlind].userId;
-            bigBlindPlayerId = data.players[(data.currentSmallBlind + 1) % data.players.length].userId;
+            bigBlindPlayerId = data.players[data.currentBigBlind].userId;
         } else {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }
 
+        let curPlayerIndex = 0;
+        data.players.forEach((player, index) => {
+            if (player.socketId === socket.id) {
+                curPlayerIndex = index;
+            }
+        });
+
+        let globalBettingCap = data.players.reduce((min, player) => {
+                let totalChips = player.currentBet + player.chips;
+                return min < totalChips ? min : totalChips;
+            },
+            data.players[0].currentBet + data.players[0].chips
+        );
+        
+        console.log("Table Global betting cap: ", globalBettingCap);
         return (
             data.players.map((player, index) => {
+                console.log(player);
                 let blindStatus = 0;
                 if (player.userId === smallBlindPlayerId) {
                     blindStatus = 1;
                 } else if (player.userId === bigBlindPlayerId) {
                     blindStatus = 2;
                 }
-
                 let isPlayerOne;
                 if (player.socketId === socket.id) {
                     isPlayerOne = true;
@@ -95,18 +151,19 @@ export default function Table({ props }) {
                 }
 
                 return (
-                    <section key={index} id={isPlayerOne ? 'Player1-Box' : `Box-${box++}`}>
+                    <section key={index} id={`Box-${tableArrangements[data.players.length][(index + data.players.length -curPlayerIndex) % data.players.length]}`}>
                         <PlayerBox
+                            globalBettingCap={globalBettingCap}
                             player={player} 
                             playerOne={isPlayerOne}
                             isCurrentPlayer={playerOneCurrent}
                             blind={blindStatus}
                             moves={moves}
+                            highestBet={highestBet}
                             props={{
                                 toggleCurrentPlayer: setPlayerOneCurrent
                             }}
                             gameId={gameId}
-                            userId={userId}
                             active={player.userId === currentPlayerId ? true : false}
                         />
                     </section>
@@ -118,7 +175,7 @@ export default function Table({ props }) {
         roundData === undefined ? (
             <p>Loading...</p>
         ) : (
-            <div className='table'>
+            <div className='table' style={tableStyle}>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
                     {roundOver === false ? (

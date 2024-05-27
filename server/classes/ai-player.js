@@ -6,6 +6,11 @@ const io = require('socket.io-client');
 
 //create dumb makemove function and rewrite it in ai1
 
+//round.js players = this.players error
+
+
+//round.js ggeck if player is makemove() then call make move()
+
 class Ai {
     static aiCounter = 0;
     
@@ -19,30 +24,12 @@ class Ai {
         this.isPlaying = true;
         this.isInRound = true;
         this.currentBet = 0;
-        this.isAi = isAi;
+        this.isAi = true; // Always true for AI players
         this.latestMove = "";
-        this.socket = io.connect('http://localhost:3000');
-
-        this.socket.on('connect', () => {
-            console.log('Successfully connected!');
-        })
-
-        // this.socket.on('update-player', (messge) => { 
-        // });
-
-        this.socket.on('your-turn', (data) => {
-            this.makemove(data.acceptableMoves);
-        });
-
-        // this.socket.on('shown-cards', (data) => {
-        //     // Save data.cards to a variable
-        // });
-
-        // this,socket.on('update-round-data', (data) => {
-        //     // Save data.round to a variable
-        // });
+        this.aiId = aiId;
     }
-    generateRandomUserId(){
+
+    generateRandomUserId() {
         return `AI-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     }
 
@@ -54,37 +41,17 @@ class Ai {
         this.socket.emit('leave', { gameId, userId: this.userId });
     }
 
-    getCardToHand(card) {
+    addCardToHand(card) {
         this.hand.push(card);
     }
 
-    // props.toggleCurrentPlayer(false);
-
     fold() {
-        super.fold();
-        this.console.log('fold');
-        socket.emit('player-action', {
+        this.isInRound = false;
+        console.log('fold');
+        this.socket.emit('player-action', {
             userId: this.userId,
             action: 'fold',
             amount: 0
-        });
-    }
-
-    call(amount) {
-        const amountToCall = amount - this.currentBet;
-        if (amountToCall <= 0) {
-            throw new Error('Player calls');
-        }
-        if (amountToCall > this.chips) {
-            throw new Error('Insufficient amount of chips');
-        }
-        this.chips -= amountToCall;
-        this.currentBet += amountToCall;
-        console.log('call');
-        this.socket.emit('player-action', {
-            userId: this.userId,
-            action: 'call',
-            amount: amount
         });
     }
 
@@ -112,7 +79,6 @@ class Ai {
             action: 'allIn',
             amount: this.currentBet
         });
-        return this.currentBet;
     }
 
     check() {
@@ -140,7 +106,12 @@ class Ai {
     }
 
     getPosition() {
-        return this.Position();
+        return this.position;
+    }
+
+    makemove(acceptableMoves) {
+        // Dummy implementation, can be overridden in subclasses
+        console.log('AI making a move with acceptable moves:', acceptableMoves);
     }
 }
 

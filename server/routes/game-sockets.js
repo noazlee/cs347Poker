@@ -116,7 +116,7 @@ module.exports = function(io){
             if(data.stillPlaying===true){
                 if (game) {
                     let curRound = game.rounds[game.rounds.length-1];
-                    if(curRound.communityCards.length>3){ // prevents calling twice
+                    if(curRound.roundPlaying===true){ // prevents calling twice
                         console.log('starting new round');
                         game.startNewRound(data.prevIndex);
                     }
@@ -124,9 +124,11 @@ module.exports = function(io){
             }else{
                 console.log('adding new game');
                 const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
+                game.updatePlayerChips();
                 console.log('game added');
                 console.log(newGame);
                 games[data.gameId]=null;
+                // send socket emit that sends people to home screen.
             }
         });
     
@@ -134,7 +136,7 @@ module.exports = function(io){
         socket.on('leave-game', (data) => {
             const game = games[data.gameId];
             if (game) {
-                game.removePlayer(data.playerId, false);
+                game.removePlayer(data.playerId);
                 socket.leave(data.gameId);
 
                 if (game.players.length === 0) {
@@ -146,6 +148,21 @@ module.exports = function(io){
                 }
             }
         });
+
+        socket.on('leave-mid-game', (data) => {
+            const game = games[data.gameId];
+            if (game) {
+                socket.leave(data.gameId);
+                game.removePlayerMidGame(data.userId)
+            }
+
+            if (game.players.length === 0) {
+                delete games[data.gameId];
+                console.info(`Game ${data.gameId} ended as all players have left.`);
+            } else {
+                console.info(`${data.playerId} left game ${data.gameId}`);
+            }
+        })
         
     
         // Start the game

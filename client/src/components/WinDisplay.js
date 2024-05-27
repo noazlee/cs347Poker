@@ -4,12 +4,20 @@ import '../css/WinDisplay.css';
 
 export default function WinDisplay({ props }) {
     const startNewRound = () => {
-        socket.emit('round-end-client', {gameId: props.data.gameId, winner: props.data.winner, prevIndex: props.data.prevIndex});
+        console.log(props.data);
+        if(props.isHost){ //ensures this is not sent twice
+            console.log('Sending socket emit');
+            socket.emit('round-end-client', {gameId: props.data.gameId, winner:props.data.winner, prevIndex: props.data.prevIndex, stillPlaying: props.data.stillPlaying});
+        }  
     }
 
     return (
         <div className='winDisplay'>
-            <h1>{props.data.winner.username} Wins!</h1>
+            <h1>Round Over</h1>
+            <h2>Winners:</h2>
+            {props.data.winner.map((winningPlayer, index) => {
+                return (<p key={index}>{winningPlayer.username}</p>)
+            })}
             {props.isHost === true ? ( //ensures the emit is not sent twice
                 <button onClick={startNewRound}>Start New Round</button>
             ) : (

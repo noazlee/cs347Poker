@@ -1,6 +1,7 @@
 const Round = require('./round');
 const Player = require('./player');
 const Ai1 = require('./AI/ai1');
+const { connectDb } = require('../db');
 
 
 const MAXNUMPLAYERS = 2;
@@ -59,7 +60,7 @@ class Game {
         this.players.push(newPlayer);
     }
 
-    removePlayer(playerId, isAi) {
+    removePlayer(playerId) {
         let playerIndex = undefined;
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].userId === playerId) {
@@ -68,16 +69,68 @@ class Game {
         }
         
         if (playerIndex === undefined) {
-            console.error(`tried to remove player ${playerId}, but could not find it in game`);
+            console.error(`Tried to remove player ${playerId}, but could not find it in game`);
         } else {
-            let playerToRemove = this.players.splice(playerIndex, 1);
-            // If AI, call method to remove AI socket from gameId (reference AI object using playerToRemove[0])
+            this.players.splice(playerIndex, 1);
             if (this.hostId === playerId) {
                 let newHostIndex = 0;
-                while (this.players[newHostIndex].isAi === true) {
+                while ((newHostIndex < this.players.length) && (this.players[newHostIndex].isAi === true)) {
                     newHostIndex++;
                 }
-                this.hostId = this.players[newHostIndex].userId;
+
+                if (newHostIndex === this.players.length) { // No more human players left to host
+                    this.players = []; // This will cause the game to be deleted
+                } else {
+                    this.hostId = this.players[newHostIndex].userId;
+                }
+            }
+        }
+    }
+
+    removePlayerMidGame(playerId) {
+        let playerIndex = undefined;
+        for (let i = 0; i < this.players.length; i++) {
+            if (this.players[i].userId === playerId) {
+                playerIndex = i;
+            }
+        }
+
+        if (playerIndex === undefined) {
+            console.error(`Tried to remove player ${playerId}, but could not find it in game`);
+        } else {
+            const playerLeft = this.players[playerIndex];
+            playerLeft.leaveGame();
+            playerLeft.latestMove = "Left Game";
+            if (this.hostId === playerId) {
+                let newHostIndex = 0;
+                while ((newHostIndex < this.players.length) && ((this.players[newHostIndex].isAi === true) || this.players[newHostIndex].isPlaying === false)) {
+                    newHostIndex++;
+                }
+
+                if (newHostIndex === this.players.length) { // No more human players left to host
+                    this.players = []; // This will cause the game to be deleted
+                } else {
+                    this.hostId = this.players[newHostIndex].userId;
+                    this.currentRound.updateHost(this.hostId);
+                    console.log(`New Host: ${this.hostId}`);
+                }
+            }
+
+            if (this.players.length > 0) { // if at least 1 human player remaining
+                let humanPlayersRemaining = 0;
+                for (let i = 0; i < this.players.length; i++) {
+                    if ((this.players[i].isAi === false) && (this.players[i].isPlaying === true)) {
+                        humanPlayersRemaining++;
+                    }
+                }
+                if (humanPlayersRemaining === 1) { // if only 1 human player remaining (and no AIs)
+                    this.currentRound.endRound();
+                } else {
+                    if (this.currentRound.currentPlayer === playerIndex) {
+                        this.currentRound.advanceToNextPlayer();
+                        this.currentRound.updatePlayer();
+                    }
+                }
             }
         }
     }
@@ -87,8 +140,11 @@ class Game {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Ai1(userId, socketId, username, POTAMOUNT,isAI);
+        let newPlayer = new Ai1(userId, socketId, username, this.startingChips, isAI);
         this.players.push(newPlayer);
+        the_socket = io.connect('http://localhost:3000');
+        // store socketid in the new ai player
+        //
     }
 
     removeAiPlayer(playerId) {
@@ -135,6 +191,39 @@ class Game {
         this.rounds.push(this.currentRound);
         this.currentRound.start();
     }
+
+    async updatePlayerChips(){ 
+        const db = await connectDb();
+        const users = db.collection('users');
+
+        for (const player of this.players) {
+            try{
+                const user = await users.findOne({ userId: player.userId });
+            
+                if (user) {
+                    const currentChips = parseInt(user.totalChips);
+                    console.log(user);
+                    console.log(player.chips);
+                    const updatedChips = currentChips + player.chips;
+
+                    await users.updateOne(
+                        { userId: player.userId },
+                        {
+                            $set: { totalChips: updatedChips },
+                            $currentDate: { lastUpdated: true }
+                        }
+                    );
+
+                    console.log(`Updated chips for player ${player.userId}: ${updatedChips}`);
+                } else {
+                    console.log(`User not found for player ${player.userId}`);
+                }
+            }catch (error) {
+                console.error(`Failed to update chips for player ${player.userId}:`, error);
+            }
+        };
+    }
+
 }
 
 module.exports = Game;
