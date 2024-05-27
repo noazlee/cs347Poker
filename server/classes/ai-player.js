@@ -7,8 +7,11 @@ const io = require('socket.io-client');
 //create dumb makemove function and rewrite it in ai1
 
 class Ai {
-    constructor(userId, socketId, username, chips, isAi) {
-        this.username = `AI-${aiId}`;
+    static aiCounter = 0;
+    
+    constructor(socketId, chips, aiId) {
+        this.userId = this.generateRandomUserId();
+        this.username = `AI-${++Ai.aiCounter}`; 
         this.userId = this.generateRandomUserId;
         this.socketId = socketId;
         this.chips = chips;
