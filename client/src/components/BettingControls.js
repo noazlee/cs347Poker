@@ -21,7 +21,8 @@ export default function BettingControls({ props }) {
         props.toggleCurrentPlayer(false);
         socket.emit('player-action', {
             action: 'check',
-            gameId:gameId
+            gameId:gameId,
+            username:props.username
         });
     }
 
@@ -30,7 +31,8 @@ export default function BettingControls({ props }) {
         props.toggleCurrentPlayer(false);
         socket.emit('player-action', {
             action: 'fold',
-            gameId:gameId
+            gameId:gameId,
+            username:props.username
         });
     }
 
@@ -46,7 +48,7 @@ export default function BettingControls({ props }) {
 
     return (
         <div className='bettingControls'>
-            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow, gameId: gameId, maxChips: props.initialChips, toggleCurrentPlayer: props.toggleCurrentPlayer, highestBet: props.highestBet, currentBet: props.currentBet}} />
+            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow, gameId: gameId, maxChips: props.initialChips, toggleCurrentPlayer: props.toggleCurrentPlayer, highestBet: props.highestBet, currentBet: props.currentBet, username: props.username}} />
             {(props.isTurn && buttonRowOn) ? (
                 <div className='buttonRow'>
                     {moves.includes('Check') && <button id='checkButton' onClick={handleCheck}>Check</button>}

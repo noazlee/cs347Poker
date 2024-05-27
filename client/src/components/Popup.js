@@ -26,7 +26,8 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
             socket.emit('player-action', {
                 action: 'raise',
                 gameId: props.gameId,
-                value: raiseValue
+                value: raiseValue,
+                username: props.username
             });
             togglePopup(false);
             props.toggleCurrentPlayer(false);
