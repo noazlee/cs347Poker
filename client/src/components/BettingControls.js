@@ -46,21 +46,11 @@ export default function BettingControls({ props }) {
         });
     }
 
+    console.log("Betting Control Global betting cap: ", props.globalBettingCap);
+
     return (
         <div className='bettingControls'>
-            <Popup
-                isDisplayed={popupDisplayed}
-                togglePopup={toggleDisplayPopup}
-                props={{
-                    toggleButtons: toggleButtonRow,
-                    gameId: gameId,
-                    maxChips: props.initialChips,
-                    toggleCurrentPlayer: props.toggleCurrentPlayer,
-                    highestBet: props.highestBet,
-                    currentBet: props.currentBet,
-                    username: props.username
-                }}
-            />
+            <Popup isDisplayed={popupDisplayed} togglePopup={toggleDisplayPopup} props={{toggleButtons: toggleButtonRow, gameId: gameId, maxChips: props.initialChips, toggleCurrentPlayer: props.toggleCurrentPlayer, highestBet: props.highestBet, currentBet: props.currentBet, username: props.username, globalBettingCap: props.globalBettingCap}} />
             {(props.isTurn && buttonRowOn) ? (
                 <div className='buttonRow'>
                     {moves.includes('Check') && <button id='checkButton' onClick={handleCheck}>Check</button>}

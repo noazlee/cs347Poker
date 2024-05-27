@@ -10,11 +10,18 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
         changeRaiseAmount(props.maxChips + props.currentBet);
     }
 
+    console.log("Popup Global betting cap: ", props.globalBettingCap);
+
     const handleSubmit = () => {
         let raiseValue = Number(document.getElementById('raiseAmount').value);
 
         if (raiseValue < 1) { raiseValue = 1 }
         
+        if (raiseValue > props.globalBettingCap) {
+            alert('You cannot raise more than the global betting cap');
+            return;
+        }
+
         if (raiseValue > props.maxChips + props.currentBet) { 
             alert('You do not have enough chips to raise this amount');
             return;

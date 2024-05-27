@@ -126,6 +126,14 @@ export default function Table({ props }) {
             }
         });
 
+        let globalBettingCap = data.players.reduce((min, player) => {
+                let totalChips = player.currentBet + player.chips;
+                return min < totalChips ? min : totalChips;
+            },
+            data.players[0].currentBet + data.players[0].chips
+        );
+        
+        console.log("Table Global betting cap: ", globalBettingCap);
         return (
             data.players.map((player, index) => {
                 console.log(player);
@@ -145,6 +153,7 @@ export default function Table({ props }) {
                 return (
                     <section key={index} id={`Box-${tableArrangements[data.players.length][(index + data.players.length -curPlayerIndex) % data.players.length]}`}>
                         <PlayerBox
+                            globalBettingCap={globalBettingCap}
                             player={player} 
                             playerOne={isPlayerOne}
                             isCurrentPlayer={playerOneCurrent}

@@ -8,7 +8,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
+export default function PlayerBox({ globalBettingCap, player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
     const navigate = useNavigate();
     
     const getBlindIcon = (blind) => {
@@ -41,6 +41,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
         socket.emit('leave-mid-game', {gameId, userId: player.userId});
         navigate(`/home/${player.userId}`);
     }
+    console.log("PlayerBox Global betting cap: ", globalBettingCap);
 
     return (
             <div className={"playerBox " + (active === true ? "active" : "inactive")}>
@@ -58,6 +59,7 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
                 <div className="bettingTab">
                     {playerOne ? (
                         <BettingControls props={{
+                            globalBettingCap: globalBettingCap,
                             initialChips: player.chips,
                             currentBet: player.currentBet,
                             moves: moves,
