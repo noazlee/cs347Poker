@@ -292,21 +292,24 @@ class Round {
     }
 
     setBettingOrder(){
-        while (!this.players[this.currentSmallBlind].isPlaying) {
-            this.currentSmallBlind = (this.currentSmallBlind + 1) % this.players.length;
-        }
-
-        this.currentBigBlind = (this.currentSmallBlind + 1) % this.players.length;
-        while (!this.players[this.currentBigBlind].isPlaying) {
-            this.currentBigBlind = (this.currentBigBlind + 1) % this.players.length;
-        }
-        
         if (this.stage==0) { //if first stage
+            while (!this.players[this.currentSmallBlind].isPlaying) {
+                this.currentSmallBlind = (this.currentSmallBlind + 1) % this.players.length;
+            }
+    
+            this.currentBigBlind = (this.currentSmallBlind + 1) % this.players.length;
+            while (!this.players[this.currentBigBlind].isPlaying) {
+                this.currentBigBlind = (this.currentBigBlind + 1) % this.players.length;
+            }
+
             this.startingPlayer = (this.currentBigBlind + 1) % this.players.length;
             this.currentPlayer = this.startingPlayer;
         } else {
             console.log('changing starting player');
-            this.startingPlayer = this.currentSmallBlind; 
+            this.startingPlayer = this.currentSmallBlind;
+            while (this.players[startingPlayer].isPlaying) {
+                this.startingPlayer = (this.startingPlayer + 1) % this.players.length;
+            } 
             this.currentPlayer = this.startingPlayer;
         }
     }
