@@ -6,6 +6,11 @@ const io = require('socket.io-client');
 
 //create dumb makemove function and rewrite it in ai1
 
+//round.js players = this.players error
+
+
+//round.js ggeck if player is makemove() then call make move()
+
 class Ai {
     constructor(socketId, chips, aiId) {
         this.userId = this.generateRandomUserId();
@@ -19,15 +24,6 @@ class Ai {
         this.isAi = true; // Always true for AI players
         this.latestMove = "";
         this.aiId = aiId;
-        this.socket = io.connect('http://localhost:3000');
-
-        this.socket.on('connect', () => {
-            console.log('Successfully connected!');
-        });
-
-        this.socket.on('your-turn', (data) => {
-            this.makemove(data.acceptableMoves);
-        });
     }
 
     generateRandomUserId() {

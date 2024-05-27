@@ -90,6 +90,9 @@ class Game {
         }
         let newPlayer = new Ai1(userId, socketId, username, POTAMOUNT,isAI);
         this.players.push(newPlayer);
+        the_socket = io.connect('http://localhost:3000');
+        // store socketid in the new ai player
+        //
     }
 
     removeAiPlayer(playerId) {

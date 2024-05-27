@@ -62,7 +62,7 @@ class Round {
             round: {
                 gameId: this.gameId,
                 index: this.index,
-                players: this.players,
+                players: this.players, // problem ... AI player inside player ... socket inside AI player
                 deck: this.deck,
                 smallBlindAmount: this.smallBlindAmount,
                 currentBet: this.currentBet,
@@ -150,6 +150,8 @@ class Round {
                     highestbet: this.highestBet,
                     acceptableMoves: acceptableMoves
                 });
+                // check if player is ai
+                // player.makeMove
                 return new Promise((resolve) => { 
                     this.playerResponses.set(player.socketId, resolve);
                 });
