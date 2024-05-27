@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
+import { buildImgUrl } from '../utils/utils';
 import '../App.css';
 
 export default function WinScreen() {

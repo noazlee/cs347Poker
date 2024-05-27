@@ -58,7 +58,7 @@ export default function Table({ props }) {
             setPlayerOneCurrent(false);
             setWinnerData(data);
             setRoundOver(true);
-            if (data.stillPlaying==false) {
+            if (data.stillPlaying === false) {
                 navigate(`/win-screen/${userId}`, {state: {winData: data.winner}});
             }
         });
@@ -75,7 +75,7 @@ export default function Table({ props }) {
             socket.off('shown-cards');
             socket.off('update-host');
         };
-    }, []);
+    }, [navigate, userId]);
 
     const generatePlayerBoxes = (data) => {
         const currentPlayerId = data.players[data.currentPlayer].userId;
@@ -87,13 +87,14 @@ export default function Table({ props }) {
 
         if (data.players.length >= 2) {
             smallBlindPlayerId = data.players[data.currentSmallBlind].userId;
-            bigBlindPlayerId = data.players[(data.currentSmallBlind + 1) % data.players.length].userId;
+            bigBlindPlayerId = data.players[data.currentBigBlind].userId;
         } else {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }
 
         return (
             data.players.map((player, index) => {
+                console.log(player);
                 let blindStatus = 0;
                 if (player.userId === smallBlindPlayerId) {
                     blindStatus = 1;

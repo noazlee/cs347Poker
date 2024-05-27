@@ -152,8 +152,8 @@ module.exports = function(io){
         socket.on('leave-mid-game', (data) => {
             const game = games[data.gameId];
             if (game) {
-                game.removePlayerMidGame(data.userId)
                 socket.leave(data.gameId);
+                game.removePlayerMidGame(data.userId)
             }
 
             if (game.players.length === 0) {

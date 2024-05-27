@@ -3,11 +3,14 @@ import BettingControls from "./BettingControls";
 import Card from "./Card";
 import ChipsDisplay from "./ChipsDisplay";
 import socket from '../socket'
+import {useNavigate} from 'react-router-dom';
 import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
 export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
+    const navigate = useNavigate();
+    
     const getBlindIcon = (blind) => {
         if (blind === 2) {
                 return (
@@ -35,7 +38,8 @@ export default function PlayerBox({ player, playerOne, isCurrentPlayer = false, 
     }
 
     const leaveGame = () => {
-        socket.emit('leave-mid-game', {gameId, userId: player.userId})
+        socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        navigate(`/home/${player.userId}`);
     }
 
     return (
