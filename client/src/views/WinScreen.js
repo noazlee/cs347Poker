@@ -41,6 +41,7 @@ export default function WinScreen() {
             <div className='home-container'>
                 {winData !== undefined ? (
                     <div>
+                        <h1>Game Ended</h1>
                         {playerIsWinner() === true ? (
                             <h1>You Win!</h1>
                         ) : (

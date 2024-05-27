@@ -13,7 +13,11 @@ export default function WinDisplay({ props }) {
 
     return (
         <div className='winDisplay'>
-            <h1>{props.data.winner.username} Wins!</h1>
+            <h1>Round Over</h1>
+            <h2>Winners:</h2>
+            {props.data.winner.map((winningPlayer, index) => {
+                return (<p key={index}>{winningPlayer}</p>)
+            })}
             {props.isHost === true ? ( //ensures the emit is not sent twice
                 <button onClick={startNewRound}>Start New Round</button>
             ) : (
