@@ -7,7 +7,7 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
     const [raiseAmount, changeRaiseAmount] = useState(1)
 
     const goAllIn = () => {
-        changeRaiseAmount(props.maxChips);
+        changeRaiseAmount(props.maxChips + props.currentBet);
     }
 
     const handleSubmit = () => {
@@ -15,7 +15,10 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
 
         if (raiseValue < 1) { raiseValue = 1 }
         
-        if (raiseValue > props.maxChips) { raiseValue = props.maxChips }
+        if (raiseValue > props.maxChips + props.currentBet) { 
+            alert('You do not have enough chips to raise this amount');
+            return;
+        }
 
         console.log(props.highestBet);
 
@@ -29,7 +32,7 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
             props.toggleCurrentPlayer(false);
             props.toggleButtons(true);
         }else{
-            alert("Need to bet at least the highest bet");
+            alert("Need to bet at least the highest bet"); //This does not allow user to all-in when they have less chips than the highest amount. Needs to fix this in the future.
         }
         
     }
