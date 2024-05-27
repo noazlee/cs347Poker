@@ -16,6 +16,7 @@ export default function WinDisplay({ props }) {
             <h1>Round Over</h1>
             <h2>Winners:</h2>
             {props.data.winner.map((winningPlayer, index) => {
+                console.log(`Winner: ${winningPlayer.username}`);
                 return (<p key={index}>{winningPlayer}</p>)
             })}
             {props.isHost === true ? ( //ensures the emit is not sent twice

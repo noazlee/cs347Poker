@@ -307,7 +307,7 @@ class Round {
         } else {
             console.log('changing starting player');
             this.startingPlayer = this.currentSmallBlind;
-            while (this.players[startingPlayer].isPlaying) {
+            while (this.players[this.startingPlayer].isPlaying) {
                 this.startingPlayer = (this.startingPlayer + 1) % this.players.length;
             } 
             this.currentPlayer = this.startingPlayer;

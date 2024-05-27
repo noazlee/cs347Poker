@@ -87,6 +87,7 @@ export default function Table({ props }) {
         return () => {
             socket.off('player-action');
             socket.off('update-round-data');
+            socket.off('update-round-data-without-popup');
             socket.off('your-turn');
             socket.off('round-ended');
             socket.off('shown-cards');
