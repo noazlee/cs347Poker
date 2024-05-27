@@ -4,7 +4,11 @@ import '../css/WinDisplay.css';
 
 export default function WinDisplay({ props }) {
     const startNewRound = () => {
-        socket.emit('round-end-client', {gameId: props.data.gameId, winner: props.data.winner, prevIndex: props.data.prevIndex});
+        console.log(props.data);
+        if(props.isHost){ //ensures this is not sent twice
+            console.log('Sending socket emit');
+            socket.emit('round-end-client', {gameId: props.data.gameId, winner:props.data.winner, prevIndex: props.data.prevIndex, stillPlaying: props.data.stillPlaying});
+        }  
     }
 
     return (
