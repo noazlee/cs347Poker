@@ -7,6 +7,7 @@ import socket from '../socket';
 import WinDisplay from '../components/WinDisplay';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { buildImgUrl } from '../utils/utils';
 
 export default function Table({ props }) {
     const location = useLocation();
@@ -20,6 +21,21 @@ export default function Table({ props }) {
     const [winnerData, setWinnerData] = useState(undefined);
     const {gameId, userId} = useParams();
     const [highestBet, setHighestBet] = useState(0);
+
+    const tableStyle = {
+        width: '100%',
+        height: '100vh',
+        backgroundColor: `dark green`,
+        backgroundImage: `url(${buildImgUrl('table.png')})`,
+        backgroundSize: 'cover',
+        border: '2px solid',
+        resize: 'both',
+        overflow: 'scroll',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gridTemplateRows: '1fr 1fr 1fr',
+        gap: '20px'
+    };
 
     useEffect(() => {
         // Sent from Round.js file. Specificially, it is sent from both "start" and "updatePlayer" functions.
@@ -77,12 +93,21 @@ export default function Table({ props }) {
             socket.off('update-host');
         };
     }, [navigate, userId]);
+    
+    const tableArrangements = {
+        2: [6, 2],
+        3: [6, 2, 4],
+        4: [6, 8, 2, 4],
+        5: [6, 7, 8, 2, 4],
+        6: [6, 7, 8, 1, 2, 4],
+        7: [6, 7, 8, 1, 2, 3, 4],
+        8: [6, 7, 8, 1, 2, 3, 4, 5]
+    }
 
     const generatePlayerBoxes = (data) => {
         const currentPlayerId = data.players[data.currentPlayer].userId;
         let smallBlindPlayerId;
         let bigBlindPlayerId;
-        let box = 1;
 
         console.log(`Now playing: Player ${data.currentPlayer}`);
 
@@ -93,6 +118,13 @@ export default function Table({ props }) {
             smallBlindPlayerId = bigBlindPlayerId = undefined;
         }
 
+        let curPlayerIndex = 0;
+        data.players.forEach((player, index) => {
+            if (player.socketId === socket.id) {
+                curPlayerIndex = index;
+            }
+        });
+
         return (
             data.players.map((player, index) => {
                 console.log(player);
@@ -102,7 +134,6 @@ export default function Table({ props }) {
                 } else if (player.userId === bigBlindPlayerId) {
                     blindStatus = 2;
                 }
-
                 let isPlayerOne;
                 if (player.socketId === socket.id) {
                     isPlayerOne = true;
@@ -111,7 +142,7 @@ export default function Table({ props }) {
                 }
 
                 return (
-                    <section key={index} id={isPlayerOne ? 'Player1-Box' : `Box-${box++}`}>
+                    <section key={index} id={`Box-${tableArrangements[data.players.length][(index + data.players.length -curPlayerIndex) % data.players.length]}`}>
                         <PlayerBox
                             player={player} 
                             playerOne={isPlayerOne}
@@ -134,7 +165,7 @@ export default function Table({ props }) {
         roundData === undefined ? (
             <p>Loading...</p>
         ) : (
-            <div className='table'>
+            <div className='table' style={tableStyle}>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
                     {roundOver === false ? (
