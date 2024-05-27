@@ -118,7 +118,7 @@ export default function Table({ props }) {
                 }
 
                 return (
-                    <section key={index} id={`Box-${tableArrangements[data.players.length][(index + 8 -curPlayerIndex) % 8]}`}>
+                    <section key={index} id={`Box-${tableArrangements[data.players.length][(index + 8 -curPlayerIndex) % data.players.length]}`}>
                         <PlayerBox
                             player={player} 
                             playerOne={isPlayerOne}
