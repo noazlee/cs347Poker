@@ -25,16 +25,15 @@ export default function Table({ props }) {
     const tableStyle = {
         width: '100%',
         height: '100vh',
-        backgroundColor: `dark green`,
         backgroundImage: `url(${buildImgUrl('table.png')})`,
         backgroundSize: 'cover',
-        border: '2px solid',
-        resize: 'both',
-        overflow: 'scroll',
+        backgroundPosition: 'center',
+        backgroundBlendMode: 'overlay', 
         display: 'grid',
         gridTemplateColumns: '1fr 1fr 1fr',
         gridTemplateRows: '1fr 1fr 1fr',
-        gap: '20px'
+        gap: '20px',
+        overflow: 'hidden'
     };
 
     useEffect(() => {
