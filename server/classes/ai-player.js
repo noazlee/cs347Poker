@@ -1,5 +1,5 @@
-// const Player = require('./player');
-const io = require('socket.io-client');
+const Player = require('./player');
+// const io = require('socket.io-client');
 
 //method connect to game, disconnect from game- take in gameId
 //in addAi players(game-model) call join/leave function
@@ -11,25 +11,17 @@ const io = require('socket.io-client');
 
 //round.js ggeck if player is makemove() then call make move()
 
-class Ai {
+class Ai extends Player {
     static aiCounter = 0;
-    
+
     constructor(socketId, chips, aiId) {
-        this.userId = this.generateRandomUserId();
-        this.username = `AI-${++Ai.aiCounter}`; 
-        this.userId = this.generateRandomUserId;
-        this.socketId = socketId;
-        this.chips = chips;
-        this.hand = [];
-        this.isPlaying = true;
-        this.isInRound = true;
-        this.currentBet = 0;
-        this.isAi = true; // Always true for AI players
-        this.latestMove = "";
+        const userId = Ai.generateRandomUserId();
+        const username = `AI-${++Ai.aiCounter}`;
+        super(userId, socketId, username, chips, true); // Calling the parent class constructor
         this.aiId = aiId;
     }
 
-    generateRandomUserId() {
+    static generateRandomUserId() {
         return `AI-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     }
 
@@ -41,77 +33,11 @@ class Ai {
         this.socket.emit('leave', { gameId, userId: this.userId });
     }
 
-    addCardToHand(card) {
-        this.hand.push(card);
-    }
-
-    fold() {
-        this.isInRound = false;
-        console.log('fold');
-        this.socket.emit('player-action', {
-            userId: this.userId,
-            action: 'fold',
-            amount: 0
-        });
-    }
-
-    raise(amount) {
-        const amountToRaise = amount - this.currentBet;
-        if (amountToRaise > this.chips) {
-            throw new Error('Insufficient chips to raise');
-        }
-        this.chips -= amountToRaise;
-        this.currentBet = amount;
-        console.log('raise');
-        this.socket.emit('player-action', {
-            userId: this.userId,
-            action: 'raise',
-            amount: amount
-        });
-    }
-
-    allIn() {
-        this.currentBet += this.chips;
-        this.chips = 0;
-        console.log('all in');
-        this.socket.emit('player-action', {
-            userId: this.userId,
-            action: 'allIn',
-            amount: this.currentBet
-        });
-    }
-
-    check() {
-        console.log('check');
-        this.socket.emit('player-action', {
-            userId: this.userId,
-            action: 'check',
-            amount: 0
-        });
-    }
-
-    resetForNewRound() {
-        this.hand = [];
-        this.currentBet = 0;
-        this.isInRound = this.isPlaying;
-    }
-
-    leaveGame() {
-        this.isPlaying = false;
-        this.isInRound = false;
-    }
-
-    getChips() {
-        return this.chips;
-    }
-
-    getPosition() {
-        return this.position;
-    }
-
     makemove(acceptableMoves) {
-        // Dummy implementation, can be overridden in subclasses
-        console.log('AI making a move with acceptable moves:', acceptableMoves);
+        // Example AI logic for making a move
+        const move = acceptableMoves[Math.floor(Math.random() * acceptableMoves.length)];
+        console.log(`AI Player ${this.username} making move:`, move);
+        return move;
     }
 }
 

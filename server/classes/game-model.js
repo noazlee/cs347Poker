@@ -54,6 +54,7 @@ class Game {
         if (!isAI) {
             newPlayer = new Player(userId, socketId, username, this.startingChips, isAI);
         } else {
+            newPlayer = new Ai1(userId, socketId, username, this.startingChips, isAI);
             // newPlayer = new AI
             // Call method to add AI socket to gameId
         }
@@ -142,7 +143,7 @@ class Game {
         }
         let newPlayer = new Ai1(userId, socketId, username, this.startingChips, isAI);
         this.players.push(newPlayer);
-        the_socket = io.connect('http://localhost:3000');
+        // the_socket = io.connect('http://localhost:3000');
         // store socketid in the new ai player
         //
     }

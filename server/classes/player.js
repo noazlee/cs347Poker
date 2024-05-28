@@ -70,6 +70,11 @@ class Player{
     getPosition(){
         return this.position;
     }
+    
+    makemove(acceptableMoves) {
+        // Dummy implementation, can be overridden in subclasses
+        console.log('AI making a move with acceptable moves:', acceptableMoves);
+    }
 
 
 }

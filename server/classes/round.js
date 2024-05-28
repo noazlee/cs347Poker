@@ -1,6 +1,7 @@
 const Deck = require('./deck');
 const pokerHandEvaluator = require('./poker-hand-evaluator');
 const Winner = require('./winner');
+const Ai1 = require('./AI/ai1');
 
 // round.js
 class Round {
@@ -148,6 +149,12 @@ class Round {
             //player.makemove(acceptableMoves);
     
             if (player.isInRound) {
+                if(player.isAi){
+                    const aiMove = player.makeMove(acceptableMoves);
+                    this.handlePlayerAction(player, aiMove);
+                    await this.advanceToNextPlayer();
+                }
+                else{
                 // Send signal to client. Received by Table.js
                 this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
                     highestbet: this.highestBet,
@@ -158,6 +165,7 @@ class Round {
                 return new Promise((resolve) => { 
                     this.playerResponses.set(player.socketId, resolve);
                 });
+            }
             } else {
                 await this.advanceToNextPlayer();  // Skip if the player is not active
             }
