@@ -149,6 +149,7 @@ body, html {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  overflow-y:scroll;
 }
 .home-container button:hover, .home-container-2 button:hover{
   background-color: #ae4c4c;

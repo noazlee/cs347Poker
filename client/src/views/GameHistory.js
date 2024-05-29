@@ -24,14 +24,16 @@ const GameHistory = () => {
 
     const backgroundStyle = {
         backgroundImage: `url(${buildImgUrl('poker-bg2.jpg')})`,
-        backgroundRepeat: 'no-repeat',
+        backgroundRepeat: 'repeat-y',
         backgroundPosition: `${backgroundPosition}% 0`,
         backgroundSize: '150% auto',
         height: '100vh',
         width: '100vw',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        overflow:'auto',
+        position:'relative',
     };
 
     useEffect(() => {
@@ -103,7 +105,7 @@ const GameHistory = () => {
                         <tbody>
                             {rounds.map((round, index) => (
                                 <tr key={index}>
-                                    <td>{round.index}</td>
+                                    <td>{index}</td>
                                     <td>
                                         <ul>
                                             {round.communityCards && round.communityCards.map((card, index) => (
