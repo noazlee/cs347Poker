@@ -74,6 +74,7 @@ export default function Table({ props }) {
             setWinnerData(data);
             setRoundOver(true);
             if (data.stillPlaying === false) {
+                socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner, prevIndex: data.prevIndex, stillPlaying: data.stillPlaying});
                 navigate(`/win-screen/${userId}`, {state: {winData: data.winner}});
             }
         });
@@ -164,6 +165,7 @@ export default function Table({ props }) {
                             }}
                             gameId={gameId}
                             active={player.userId === currentPlayerId ? true : false}
+                            roundOver={roundOver}
                         />
                     </section>
                 )

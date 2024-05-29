@@ -8,7 +8,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ globalBettingCap, player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
+export default function PlayerBox({ globalBettingCap, player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active, roundOver}) {
     const navigate = useNavigate();
     
     const getBlindIcon = (blind) => {
@@ -52,7 +52,7 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
                         {player.hand.map((card, index) => {
                             const cardSuit = card.suite;
                             const cardValue = card.value;
-                            return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
+                            return <Card key={index} isVisible={(playerOne || roundOver) && true} suit={cardSuit} value={cardValue} />
                         })}
                     </div>
                 </div>
