@@ -199,7 +199,14 @@ module.exports = function(io){
             } else {
                 console.info(`${data.playerId} left game ${data.gameId}`);
             }
-        })
+        });
+
+        socket.on('leave-socket', (data) => {
+            const game = games[data.gameId];
+            if (game) {
+                socket.leave(data.gameId);
+            }
+        });
         
     
         // Start the game

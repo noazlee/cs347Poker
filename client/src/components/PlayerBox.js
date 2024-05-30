@@ -38,8 +38,10 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
     }
 
     const leaveGame = () => {
-        if (player.isPlaying) { // Only send a socket emit if the player is still playing (i.e. hasn't been forced to leave)
+        if (player.isPlaying) { // If the player is playing, remove them from the socket and the game
             socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        } else { // If the player is spectating (already left game), just remove them from the socket
+            socket.emit('leave-socket', {gameId, userId: player.userId});
         }
         navigate(`/home/${player.userId}`);
     }
