@@ -27,6 +27,11 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
             return;
         }
 
+        if (raiseValue <= props.currentBet) {
+            alert('You must raise to an amount greater than your current bet');
+            return;
+        }
+
         console.log(props.highestBet);
 
         if(raiseValue>=props.highestBet){
@@ -41,21 +46,11 @@ export default function Popup ({ isDisplayed, togglePopup, props }) {
             props.toggleButtons(true);
         }else{
             alert("Need to bet at least the highest bet"); //This does not allow user to all-in when they have less chips than the highest amount. Needs to fix this in the future.
-        }
-        
+        }      
     }
 
     const raise = (e) => {
-        const raiseValue = e.target.value;
-        if (raiseValue <= props.currentBet) {
-            alert("You must raise to an amount greater than your current bet.");
-            changeRaiseAmount(props.currentBet + 1);
-        } else if (raiseValue > props.maxChips + props.currentBet) {
-            alert("You cannot raise more chips than you have available.");
-            changeRaiseAmount(props.maxChips + props.currentBet);
-        } else {
-            changeRaiseAmount(raiseValue);
-        }
+        changeRaiseAmount(e.target.value);
     }
 
     return isDisplayed === true ? (
