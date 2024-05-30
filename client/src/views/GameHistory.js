@@ -29,7 +29,7 @@ const GameHistory = () => {
         backgroundSize: '150% auto',
         height: '100vh',
         width: '100vw',
-        display: 'flex',
+        // display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         overflow:'auto',

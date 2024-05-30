@@ -26,7 +26,6 @@ const LeaderBoard = () => {
         backgroundSize: '150% auto',
         height: '100vh',
         width: '100vw',
-        display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'auto',
@@ -46,7 +45,7 @@ const LeaderBoard = () => {
     }, []);
 
     // Sort users by gamesWon in descending order
-    const sortedUsers = [...users].sort((a, b) => b.gamesWon - a.gamesWon);
+    const sortedUsers = [...users].sort((a, b) => b.gamesWon - a.gamesWon).slice(0,10);
 
     return (
         <div style={backgroundStyle}>
