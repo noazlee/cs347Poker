@@ -154,11 +154,9 @@ class Round {
             if (player.isInRound) {
                 if (player.isAi) {
                     console.log(acceptableMoves);
-                    const aiMove = player.makeMove(acceptableMoves);
-                    console.log(aiMove);
-
-                    const aiSocketId = Game.aiSocketIds.get(player.userId);
-                    this.handlePlayerAction(aiSocketId, aiMove);
+                    const aiMove = player.makeMove(acceptableMoves, this.highestBet);
+                    // const aiSocketId = Game.aiSocketIds.get(player.userId);
+                    await this.processPlayerActionAI(player, aiMove);
                 }else{
                 // Send signal to client. Received by Table.js
                 this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
@@ -188,6 +186,45 @@ class Round {
         }
     }
     
+    async processPlayerActionAI(player, aiMove) {
+        console.log(`Action received from ${player.userId}: ${aiMove}`);
+        this.roundPlaying=true;
+        switch(aiMove){
+            case 'check':
+                player.latestMove = "Check";
+                await this.advanceToNextPlayer();
+                await this.updatePlayer();
+            case 'call':
+                player.latestMove = "Call";
+                await this.advanceToNextPlayer();
+                await this.updatePlayer();
+                break;
+            case 'raise':
+                player.latestMove = "Raise";
+                this.highestBet = player.currentBet;
+                this.anchor = this.positionInQueue(player);
+                await this.advanceToNextPlayer();
+                await this.updatePlayer();
+                break;
+            case 'fold':
+                player.latestMove = "Fold";
+                player.isInRound = false;
+                const numPlayers = this.numPlayersInRound();
+                this.pot += player.currentBet;
+                player.currentBet = 0;
+
+                if(numPlayers>1){
+                    await this.advanceToNextPlayer();
+                    await this.updatePlayer();
+                }else{
+                    await this.endRound();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     processPlayerAction(socket, data) {
         // Process the action
         console.log(`Action received from ${socket.id}: ${data.action}`);
@@ -247,27 +284,30 @@ class Round {
 
     // Moves to the next player
     async advanceToNextPlayer() {
+        let movedToNextPlayer = false;
+    
         do {
-            console.log(this.currentPlayer);
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
-            console.log(this.currentPlayer);
-            console.log(this.anchor);
-            if(this.anchor!=null){
-                if(this.currentPlayer==this.anchor){
-                    console.log('betting round done, advancing stage');
-                    this.anchor=null;
-                    this.advanceStage();
-                }else{
-                    this.promptPlayerAction();
-                }
-            }else{
-                if(this.currentPlayer==this.startingPlayer){
-                    console.log('betting round done, advancing stage');
-                    this.advanceStage();
-                }
+            console.log(`Current player index after increment: ${this.currentPlayer}`);
+            movedToNextPlayer = this.players[this.currentPlayer].isInRound;
+    
+            // Check if we've returned to the anchor player
+            if (this.anchor !== null && this.currentPlayer === this.anchor) {
+                console.log('Betting round done, advancing stage');
+                this.anchor = null;
+                this.advanceStage();
+                return;
             }
-        } while (!this.players[this.currentPlayer].isInRound);
-
+    
+            // Check if we've returned to the starting player
+            if (this.anchor === null && this.currentPlayer === this.startingPlayer) {
+                console.log('Betting round done, advancing stage');
+                this.advanceStage();
+                return;
+            }
+    
+        } while (!movedToNextPlayer);
+    
         if (this.allPlayersActed()) {
             this.advanceStage();
         } else {
