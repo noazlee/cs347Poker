@@ -1,3 +1,5 @@
+// Created by Noah Lee - GameHistory page which takes data from the games DB for a specific user and puts it on a table.
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';

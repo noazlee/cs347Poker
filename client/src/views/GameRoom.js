@@ -1,3 +1,5 @@
+// Contributors: Noah Lee and Ashok Khare - GameRoom where players wait for a game to start.
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';

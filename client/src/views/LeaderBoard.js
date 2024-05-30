@@ -1,3 +1,6 @@
+// Leaderboard page for players with most wins and chips
+// Contributors: Carlos Flores, Sho Tanaka
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';

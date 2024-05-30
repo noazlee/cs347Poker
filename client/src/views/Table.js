@@ -1,3 +1,6 @@
+// Table for the game.
+// Contributors: Ashok Khare
+
 import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';

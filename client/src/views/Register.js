@@ -1,3 +1,6 @@
+// Register page that users will see if they dont have an account.
+// Contributors: Noah Lee
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';

@@ -1,3 +1,6 @@
+// Screen that shows when the game ends.
+// Contributors: Ashok Khare
+
 import React, {useState, useEffect} from 'react';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
 import { buildImgUrl } from '../utils/utils';

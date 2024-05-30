@@ -1,3 +1,5 @@
+// Created by Sho and Noah - Winner class which handles the logic of deciding the game winner - called in determineWinner in round.js
+
 const Card = require('./card');
 const Player = require('./player');
 

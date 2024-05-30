@@ -1,3 +1,6 @@
+// Created by Noah Lee - Round class which handles the logic for an entire round of a game of poker
+// Contributors: Batmend, Ashok, Wesley
+
 const Deck = require('./deck');
 const pokerHandEvaluator = require('./poker-hand-evaluator');
 const Winner = require('./winner');
