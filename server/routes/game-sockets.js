@@ -29,6 +29,40 @@ module.exports = function(io){
         return newGame;
     }
 
+    async function updatePlayerWinTotal(players, winner){ 
+        const db = await connectDb();
+        const users = db.collection('users');
+
+        for (const player of players) {
+            try{
+                const user = await users.findOne({ userId: player.userId });
+                console.log(player, 'player');
+                console.log(winner),'winner';
+                if (player.userId === winner.userId) {
+                    const currentWinTotal = parseInt(user.gamesWon);
+                    console.log(user);
+                    const updatedWins = currentWinTotal + 1;
+                    
+                    await users.updateOne(
+                        { userId: player.userId },
+                        {
+                            $set: { gamesWon: updatedWins },
+                            $currentDate: { lastUpdated: true }
+                        }
+                    );
+
+                    console.log(`Updated wins for player ${player.userId}: ${updatedWins}`);
+                } else {
+                    console.log(`User not found for player ${player.userId}`);
+                }
+            }catch (error) {
+                console.error(`Failed to update chips for player ${player.userId}:`, error);
+            }
+        };
+    }
+
+
+
     io.on('connection', (socket) => {
         console.info('New client connected:', socket.id);
     
@@ -126,6 +160,7 @@ module.exports = function(io){
                     console.log('adding new game');
                     const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
                     game.updatePlayerChips();
+                    updatePlayerWinTotal(game.players, data.winner[0]);
                     console.log('game added');
                     console.log(newGame);
                     games[data.gameId]=null;

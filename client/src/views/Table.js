@@ -176,6 +176,7 @@ export default function Table({ props }) {
         roundData === undefined ? (
             <p>Loading...</p>
         ) : (
+            <div className='tableDiv'>
             <div className='table' style={tableStyle}>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
@@ -186,6 +187,7 @@ export default function Table({ props }) {
                     )}
                 </section>
                 <ToastContainer />
+            </div>
             </div>
         )
     );

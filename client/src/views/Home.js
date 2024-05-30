@@ -26,14 +26,16 @@ const Home = () => {
 
     const backgroundStyle = {
         backgroundImage: `url(${buildImgUrl('poker-bg2.jpg')})`,
-        backgroundRepeat: 'no-repeat',
+        backgroundRepeat: 'repeat-y',
         backgroundPosition: `${backgroundPosition}% 0`,
         backgroundSize: '150% auto',
         height: '100vh',
         width: '100vw',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        overflow:'auto',
+        position:'relative',
     };
 
 
