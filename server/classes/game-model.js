@@ -87,7 +87,7 @@ class Game {
         }
     }
 
-    removePlayerMidGame(playerId) {
+    removePlayerMidGame(playerId, roundActive) {
         let playerIndex = undefined;
         for (let i = 0; i < this.players.length; i++) {
             if (this.players[i].userId === playerId) {
@@ -116,14 +116,19 @@ class Game {
                 }
             }
 
-            if (this.players.length > 0) { // if at least 1 human player remaining
+            if ((roundActive === true) && (this.players.length > 0)){ // if at least 1 human player remaining and the round is currently active
                 let humanPlayersRemaining = 0;
+                let aiPlayersRemaining = 0;
                 for (let i = 0; i < this.players.length; i++) {
-                    if ((this.players[i].isAi === false) && (this.players[i].isPlaying === true)) {
-                        humanPlayersRemaining++;
+                    if (this.players[i].isAi === false) {
+                        if (this.players[i].isPlaying === true) {
+                            humanPlayersRemaining++;
+                        }
+                    } else {
+                        aiPlayersRemaining++;
                     }
                 }
-                if (humanPlayersRemaining === 1) { // if only 1 human player remaining (and no AIs)
+                if ((humanPlayersRemaining === 1) && (aiPlayersRemaining === 0)) { // if only 1 human player remaining (and no AIs)
                     this.currentRound.endRound();
                 } else {
                     if (this.currentRound.currentPlayer === playerIndex) {
@@ -187,6 +192,12 @@ class Game {
     }
 
     startNewRound(prevIndex){
+        // In between rounds, remove players who can no longer match the big blind
+        this.players.forEach((player) => {
+            if (player.chips + player.currentBet < this.smallBlindAmount * 2) {
+                this.removePlayerMidGame(player.userId, false);
+            }
+        });
         this.currentRound = new Round(this.io, this.gameId, prevIndex, this.players, this.smallBlindAmount);
         this.rounds.push(this.currentRound);
         this.currentRound.start();

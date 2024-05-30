@@ -190,7 +190,7 @@ module.exports = function(io){
             const game = games[data.gameId];
             if (game) {
                 socket.leave(data.gameId);
-                game.removePlayerMidGame(data.userId)
+                game.removePlayerMidGame(data.userId, true)
             }
 
             if (game.players.length === 0) {
