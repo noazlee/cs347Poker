@@ -33,11 +33,11 @@ class Ai extends Player {
         this.socket.emit('leave', { gameId, userId: this.userId });
     }
 
-    makemove(acceptableMoves) {
-        // Example AI logic for making a move
-        const move = acceptableMoves[Math.floor(Math.random() * acceptableMoves.length)];
-        console.log(`AI Player ${this.username} making move:`, move);
-        return move;
+    makeMove(acceptableMoves) {
+        // Logic for AI decision making
+        // Should return an object like { action: 'raise', value: 1000 } or { action: 'call' }
+        const decision = someAiLogic(acceptableMoves);
+        return decision;
     }
 }
 

@@ -2,6 +2,7 @@ const Deck = require('./deck');
 const pokerHandEvaluator = require('./poker-hand-evaluator');
 const Winner = require('./winner');
 const Ai1 = require('./AI/ai1');
+const Game = require('./game-model');
 
 // round.js
 class Round {
@@ -27,6 +28,8 @@ class Round {
         this.winners = new Winner(players); // Initialize Winner object with the players array (sho)
         this.roundEnded = false;
         this.roundPlaying=false;
+
+        this.aiSocketIds = new Map();
     }
 
     async start() {
@@ -149,12 +152,14 @@ class Round {
             //player.makemove(acceptableMoves);
     
             if (player.isInRound) {
-                if(player.isAi){
+                if (player.isAi) {
+                    console.log(acceptableMoves);
                     const aiMove = player.makeMove(acceptableMoves);
-                    this.handlePlayerAction(player, aiMove);
-                    await this.advanceToNextPlayer();
-                }
-                else{
+                    console.log(aiMove);
+
+                    const aiSocketId = Game.aiSocketIds.get(player.userId);
+                    this.handlePlayerAction(aiSocketId, aiMove);
+                }else{
                 // Send signal to client. Received by Table.js
                 this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
                     highestbet: this.highestBet,
@@ -182,7 +187,7 @@ class Round {
             this.processPlayerAction(socket, data);
         }
     }
-
+    
     processPlayerAction(socket, data) {
         // Process the action
         console.log(`Action received from ${socket.id}: ${data.action}`);

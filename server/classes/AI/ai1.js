@@ -18,26 +18,42 @@ const Ai = require('../ai-player');
 
 class Ai1 extends Ai {
     constructor(userId, socketId, chips, aiId) {
-        super(userId, socketId, `AI-${aiId}`, chips, true, aiId);
+        super(userId, socketId, `AI-${aiId}`, chips, aiId);
         this.identifier = parseInt(aiId.toString()[0]);
     }
 
-    makemove(acceptableMoves) {
+    makeMove(acceptableMoves) {
         if (this.identifier >= 1 && this.identifier <= 9) {
             const decision = Math.random();
 
-            if (decision < 0.2 && acceptableMoves.includes('Fold')) {
-                this.fold();
-            } else if (decision < 0.4 && acceptableMoves.includes('Call')) {
-                this.call();
-            } else if (decision < 0.6 && acceptableMoves.includes('AllIn')) {
-                this.allIn();
-            } else if (decision >= 0.8 && acceptableMoves.includes('Raise')) {
-                const raiseAmount = Math.floor(Math.random() * 100) + 1;
-                this.raise(raiseAmount);
-            } else if (decision >= 0.8 && decision < 0.9 && acceptableMoves.includes('Check')) {
+            if (decision < 0.9 && acceptableMoves.includes('Check')) {
                 this.check();
+                return 'Check';
             }
+            else{
+                this.fold();
+                return 'Fold';
+            }
+
+
+            // if (decision < 0.2 && acceptableMoves.includes('Fold')) {
+            //     this.fold();
+            //     return 'Fold';
+            // } else if (decision < 0.4 && acceptableMoves.includes('Call')) {
+            //     this.call();
+            //     return 'Call';
+            // } else if (decision < 0.6 && acceptableMoves.includes('AllIn')) {
+            //     this.allIn();
+            //     return 'All In';
+            // } else if (decision >= 0.8 && acceptableMoves.includes('Raise')) {
+            //     const raiseAmount = Math.floor(Math.random() * 100) + 1;
+            //     this.raise(raiseAmount);
+            //     return 'Raise';
+            // } else if (decision >= 0.8 && decision < 0.9 && acceptableMoves.includes('Check')) {
+            //     this.check();
+            //     return 'Check';
+            // }
+            return 'No move';
         }
     }
 }

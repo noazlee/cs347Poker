@@ -38,6 +38,8 @@ class Game {
         this.smallBlindAmount = SMALLBLINDAMOUNT;
         this.rounds = [];
         this.status = 'waiting';
+
+        this.aiSocketIds = new Map();
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
@@ -136,13 +138,14 @@ class Game {
         }
     }
 
-    addAiPlayer(userId, socketId, username, isAI){
+    addAiPlayer(userId, socketId, username){
         if (this.players.some(p => p.userId === userId)) {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Ai1(userId, socketId, username, this.startingChips, isAI);
+        let newPlayer = new Ai1(userId, socketId, username, this.startingChips, true);
         this.players.push(newPlayer);
+        this.aiSocketIds.set(userId, socketId);
         // the_socket = io.connect('http://localhost:3000');
         // store socketid in the new ai player
         //
