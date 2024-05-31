@@ -1,5 +1,5 @@
 // Page where users enter a game code to join the game
-// Contributors: Noah Lee
+// Contributors: Noah Lee, Batmend Batsaikhan
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';

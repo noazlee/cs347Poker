@@ -1,5 +1,5 @@
 // Table for the game.
-// Contributors: Ashok Khare
+// Contributors: Ashok Khare, Batmend Batsaikhan
 
 import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
