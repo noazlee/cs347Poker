@@ -1,5 +1,5 @@
 // Table for the game.
-// Contributors: Ashok Khare
+// Contributors: Ashok Khare, Batmend Batsaikhan
 
 import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
@@ -129,17 +129,13 @@ export default function Table({ props }) {
             }
         });
 
-        let globalBettingCap = data.players.reduce((min, player) => {
-                let totalChips;
-                if (player.isPlaying) {
-                    totalChips = player.currentBet + player.chips;
-                } else {
-                    totalChips = -1; // if the player is not playing, disregard their total chips
-                }
-                return (min < totalChips || totalChips === -1) ? min : totalChips;
-            },
-            data.players[0].currentBet + data.players[0].chips
-        );
+        let bettingCaps = [];
+        data.players.forEach((player) => {
+            if (player.isPlaying) {
+                bettingCaps.push(player.chips + player.currentBet)
+            }
+        });
+        let globalBettingCap = Math.min(...bettingCaps);
         
         console.log("Table Global betting cap: ", globalBettingCap);
         return (
