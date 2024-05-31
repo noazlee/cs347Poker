@@ -130,8 +130,13 @@ export default function Table({ props }) {
         });
 
         let globalBettingCap = data.players.reduce((min, player) => {
-                let totalChips = player.currentBet + player.chips;
-                return min < totalChips ? min : totalChips;
+                let totalChips;
+                if (player.isPlaying) {
+                    totalChips = player.currentBet + player.chips;
+                } else {
+                    totalChips = -1; // if the player is not playing, disregard their total chips
+                }
+                return (min < totalChips || totalChips === -1) ? min : totalChips;
             },
             data.players[0].currentBet + data.players[0].chips
         );

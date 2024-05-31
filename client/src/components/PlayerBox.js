@@ -38,7 +38,11 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
     }
 
     const leaveGame = () => {
-        socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        if (player.isPlaying) { // If the player is playing, remove them from the socket and the game
+            socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        } else { // If the player is spectating (already left game), just remove them from the socket
+            socket.emit('leave-socket', {gameId, userId: player.userId});
+        }
         navigate(`/home/${player.userId}`);
     }
     console.log("PlayerBox Global betting cap: ", globalBettingCap);
@@ -73,7 +77,7 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
                     )}
                     <p>Latest Move: {player.latestMove}</p>
-                    {playerOne && <button onClick={leaveGame}>Leave Game</button>}
+                    {(playerOne === true && roundOver === false) && <button onClick={leaveGame}>Leave Game</button>}
                 </div>
             </div>
         )

@@ -190,7 +190,7 @@ module.exports = function(io){
             const game = games[data.gameId];
             if (game) {
                 socket.leave(data.gameId);
-                game.removePlayerMidGame(data.userId)
+                game.removePlayerMidGame(data.userId, true)
             }
 
             if (game.players.length === 0) {
@@ -199,7 +199,14 @@ module.exports = function(io){
             } else {
                 console.info(`${data.playerId} left game ${data.gameId}`);
             }
-        })
+        });
+
+        socket.on('leave-socket', (data) => {
+            const game = games[data.gameId];
+            if (game) {
+                socket.leave(data.gameId);
+            }
+        });
         
     
         // Start the game

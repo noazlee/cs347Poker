@@ -1,3 +1,6 @@
+body {
+    display: block;
+}
 
 .tableDiv{
     background-color:bisque;
