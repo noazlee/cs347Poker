@@ -38,6 +38,7 @@ class Game {
         this.smallBlindAmount = SMALLBLINDAMOUNT;
         this.rounds = [];
         this.status = 'waiting';
+        this.isActive = true;
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
@@ -79,7 +80,7 @@ class Game {
                 }
 
                 if (newHostIndex === this.players.length) { // No more human players left to host
-                    this.players = []; // This will cause the game to be deleted
+                    this.isActive = false; // This will cause the game to be deleted
                 } else {
                     this.hostId = this.players[newHostIndex].userId;
                 }
@@ -108,7 +109,7 @@ class Game {
                 }
 
                 if (newHostIndex === this.players.length) { // No more human players left to host
-                    this.players = []; // This will cause the game to be deleted
+                    this.isActive = false; // This will cause the game to be deleted
                 } else {
                     this.hostId = this.players[newHostIndex].userId;
                     this.currentRound.updateHost(this.hostId);
@@ -116,7 +117,7 @@ class Game {
                 }
             }
 
-            if ((roundActive === true) && (this.players.length > 0)){ // if at least 1 human player remaining and the round is currently active
+            if ((roundActive === true) && (this.isActive === true)){ // if at least 1 human player remaining and the round is currently active
                 let humanPlayersRemaining = 0;
                 let aiPlayersRemaining = 0;
                 for (let i = 0; i < this.players.length; i++) {
@@ -195,9 +196,11 @@ class Game {
         // In between rounds, remove players who can no longer match the big blind
         this.players.forEach((player) => {
             if (player.chips + player.currentBet < this.smallBlindAmount * 2) {
-                this.removePlayerMidGame(player.userId, false);
+                this.removePlayerMidGame(player.userId, false); // if the last human player goes out, the next round started will immediately end the game
             }
         });
+
+        if (this.isActive === false) { this.players = [] }
         this.currentRound = new Round(this.io, this.gameId, prevIndex, this.players, this.smallBlindAmount);
         this.rounds.push(this.currentRound);
         this.currentRound.start();

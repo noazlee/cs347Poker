@@ -120,7 +120,7 @@ module.exports = function(io){
             if (game) {
                 game.removeAiPlayer(data.playerId);
 
-                if (game.players.length === 0) {
+                if (game.isActive === false) {
                     delete games[data.gameId];
                     console.info(`Game ${data.gameId} ended as all players have left.`);
                 } else {
@@ -176,7 +176,7 @@ module.exports = function(io){
                 game.removePlayer(data.playerId);
                 socket.leave(data.gameId);
 
-                if (game.players.length === 0) {
+                if (game.isActive === false) {
                     delete games[data.gameId];
                     console.info(`Game ${data.gameId} ended as all players have left.`);
                 } else {
@@ -193,7 +193,7 @@ module.exports = function(io){
                 game.removePlayerMidGame(data.userId, true)
             }
 
-            if (game.players.length === 0) {
+            if (game.isActive === false) {
                 delete games[data.gameId];
                 console.info(`Game ${data.gameId} ended as all players have left.`);
             } else {

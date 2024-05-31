@@ -51,7 +51,7 @@ export default function GameSettings({ props }) {
         <div className='gameSettings'>
             <h3>Game Settings</h3>
             <section className='setting'>
-                <h4>Maximum Players</h4>
+                <h4>Number of Players</h4>
                 <button id='lowerMaxPlayers' onClick={reduceMaxPlayers}>&lt;</button>
                 <p>{props.maxPlayers}</p>
                 <button id='raiseMaxPlayers' onClick={raiseMaxPlayers}>&gt;</button>
