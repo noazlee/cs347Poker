@@ -11,13 +11,22 @@ export default function WinDisplay({ props }) {
         }  
     }
 
+    const winnerUsernames = [];
+    const communalCards = [];
+
+    props.data.winner.forEach(winningPlayer => {
+        winnerUsernames.push(winningPlayer.username);
+    });
+
+    props.communityCards.forEach(card => {
+        communalCards.push(`${card.value} of ${card.suite}`);
+    });
+
     return (
         <div className='winDisplay'>
             <h1>Round Over</h1>
-            <h2>Winners:</h2>
-            {props.data.winner.map((winningPlayer, index) => {
-                return (<p key={index}>{winningPlayer.username}</p>)
-            })}
+            {winnerUsernames.length > 0 && <p>Winners: {winnerUsernames.join(', ')}</p>}
+            {communalCards.length > 0 && <p>Community Cards: {communalCards.join(', ')}</p>}
             {props.isHost === true ? ( //ensures the emit is not sent twice
                 <button onClick={startNewRound}>Start New Round</button>
             ) : (
