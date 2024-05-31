@@ -187,7 +187,7 @@ export default function Table({ props }) {
                     {roundOver === false ? (
                         <Deck props={{communityCards: communityCards, pot: roundData.pot}}/>
                     ) : (
-                        <WinDisplay props={{isHost: (hostId === userId ? true : false), data: winnerData}} />
+                        <WinDisplay props={{isHost: (hostId === userId ? true : false), data: winnerData, communityCards}} />
                     )}
                 </section>
                 <ToastContainer />
