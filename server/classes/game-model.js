@@ -1,3 +1,5 @@
+// Created by Noah Lee - Game class which handles the logic for an entire game of poker.
+
 const Round = require('./round');
 const Player = require('./player');
 const Ai1 = require('./AI/ai1');
