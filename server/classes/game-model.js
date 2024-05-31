@@ -39,7 +39,7 @@ class Game {
         this.rounds = [];
         this.status = 'waiting';
 
-        this.aiSocketIds = new Map();
+        // this.aiSocketIds = new Map();
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
@@ -144,8 +144,9 @@ class Game {
             return false; 
         }
         let newPlayer = new Ai1(userId, socketId, username, this.startingChips, true);
+        console.log("Adding AI Player:", newPlayer); 
         this.players.push(newPlayer);
-        this.aiSocketIds.set(userId, socketId);
+        // this.aiSocketIds.set(userId, socketId);
         // the_socket = io.connect('http://localhost:3000');
         // store socketid in the new ai player
         //
