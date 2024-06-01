@@ -9,9 +9,11 @@ followed by: docker compose up
 
 The application should now be running on your local device.
 
-Team Agreement: https://docs.google.com/document/d/1AP9mlET7MxQbqPdoJ10EmB-fCuxxBRmGgbX9t6ZO7cU/edit
-Planning slides: https://docs.google.com/presentation/d/1SALGtjrwbJJ-kLWbSkRuYY_1Gmg2yPrAszVYIfPdKmk/edit?usp=sharing
+Team Agreement: https://docs.google.com/document/d/1AP9mlET7MxQbqPdoJ10EmB-fCuxxBRmGgbX9t6ZO7cU/edit <br />
+Planning slides: https://docs.google.com/presentation/d/1SALGtjrwbJJ-kLWbSkRuYY_1Gmg2yPrAszVYIfPdKmk/edit?usp=sharing <br />
+Project Log: https://docs.google.com/document/d/11E76UkFGQZ_2gm35Ad9MUgOuUgT4LxQ9EmvUOkagFBE/edit?usp=sharing <br />
 
 Image Credits:
-Table Image, Blinds and Chip Icons - Aiden Johnson '27
-Poker stock images - https://www.freepik.com/free-photo/overhead-view-red-dices-casino-chip-green-poker-table_2887007.htm#query=poker%20background&position=3&from_view=keyword&track=ais&uuid=b07ca1ea-2a07-4e0f-afe6-ce1e71cefc4a 
+Table Image, Blinds and Chip Icons - Aiden Johnson '27 <br />
+Poker stock images - https://www.freepik.com/free-photo/overhead-view-red-dices-casino-chip-green-poker- table_2887007.htm#query=poker%20background&position=3&from_view=keyword&track=ais&uuid=b07ca1ea-2a07-4e0f-afe6-ce1e71cefc4a <br />
+Font: CardFont
