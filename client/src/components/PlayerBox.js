@@ -8,7 +8,7 @@ import '../css/playerBoxCards.css';
 import '../css/PlayerBox.css';
 import { buildImgUrl } from "../utils/utils";
 
-export default function PlayerBox({ globalBettingCap, player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active}) {
+export default function PlayerBox({ globalBettingCap, player, playerOne, isCurrentPlayer = false, blind, moves = [], highestBet, props, gameId, active, roundOver}) {
     const navigate = useNavigate();
     
     const getBlindIcon = (blind) => {
@@ -38,7 +38,11 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
     }
 
     const leaveGame = () => {
-        socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        if (player.isPlaying) { // If the player is playing, remove them from the socket and the game
+            socket.emit('leave-mid-game', {gameId, userId: player.userId});
+        } else { // If the player is spectating (already left game), just remove them from the socket
+            socket.emit('leave-socket', {gameId, userId: player.userId});
+        }
         navigate(`/home/${player.userId}`);
     }
     console.log("PlayerBox Global betting cap: ", globalBettingCap);
@@ -52,7 +56,7 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
                         {player.hand.map((card, index) => {
                             const cardSuit = card.suite;
                             const cardValue = card.value;
-                            return <Card key={index} isVisible={playerOne && true} suit={cardSuit} value={cardValue} />
+                            return <Card key={index} isVisible={(playerOne || roundOver) && true} suit={cardSuit} value={cardValue} />
                         })}
                     </div>
                 </div>
@@ -73,7 +77,7 @@ export default function PlayerBox({ globalBettingCap, player, playerOne, isCurre
                         <ChipsDisplay props={{ initialChips: player.chips, currentBet: player.currentBet }}/>
                     )}
                     <p>Latest Move: {player.latestMove}</p>
-                    {playerOne && <button onClick={leaveGame}>Leave Game</button>}
+                    {(playerOne === true && roundOver === false) && <button onClick={leaveGame}>Leave Game</button>}
                 </div>
             </div>
         )

@@ -1,3 +1,6 @@
+// Screen that shows when the game ends.
+// Contributors: Ashok Khare
+
 import React, {useState, useEffect} from 'react';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
 import { buildImgUrl } from '../utils/utils';
@@ -47,10 +50,14 @@ export default function WinScreen() {
                         ) : (
                             <h1>You Lose...</h1>
                         )}
-                        <h2>Winners:</h2>
-                        {winData.map((winner) => {
-                            return <p>{winner.username}</p>
-                        })}
+                        {winData.length > 0 && (
+                            <div>
+                                <h2>Winners:</h2>
+                                {winData.map((winner) => {
+                                    return <p>{winner.username}</p>
+                                })}
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <h1>No Game Data Found</h1>

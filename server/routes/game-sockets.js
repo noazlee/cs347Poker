@@ -29,6 +29,40 @@ module.exports = function(io){
         return newGame;
     }
 
+    async function updatePlayerWinTotal(players, winner){ 
+        const db = await connectDb();
+        const users = db.collection('users');
+
+        for (const player of players) {
+            try{
+                const user = await users.findOne({ userId: player.userId });
+                console.log(player, 'player');
+                console.log(winner),'winner';
+                if (player.userId === winner.userId) {
+                    const currentWinTotal = parseInt(user.gamesWon);
+                    console.log(user);
+                    const updatedWins = currentWinTotal + 1;
+                    
+                    await users.updateOne(
+                        { userId: player.userId },
+                        {
+                            $set: { gamesWon: updatedWins },
+                            $currentDate: { lastUpdated: true }
+                        }
+                    );
+
+                    console.log(`Updated wins for player ${player.userId}: ${updatedWins}`);
+                } else {
+                    console.log(`User not found for player ${player.userId}`);
+                }
+            }catch (error) {
+                console.error(`Failed to update chips for player ${player.userId}:`, error);
+            }
+        };
+    }
+
+
+
     io.on('connection', (socket) => {
         console.info('New client connected:', socket.id);
     
@@ -86,7 +120,7 @@ module.exports = function(io){
             if (game) {
                 game.removeAiPlayer(data.playerId);
 
-                if (game.players.length === 0) {
+                if (game.isActive === false) {
                     delete games[data.gameId];
                     console.info(`Game ${data.gameId} ended as all players have left.`);
                 } else {
@@ -122,13 +156,16 @@ module.exports = function(io){
                     }
                 }
             }else{
-                console.log('adding new game');
-                const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
-                game.updatePlayerChips();
-                console.log('game added');
-                console.log(newGame);
-                games[data.gameId]=null;
-                // send socket emit that sends people to home screen.
+                if(game){
+                    console.log('adding new game');
+                    const newGame = addGame(game.date, game.gameId, game.players, data.winner.chips , data.winner, game.rounds); // gameId, players, chipsWon, winner, rounds
+                    game.updatePlayerChips();
+                    updatePlayerWinTotal(game.players, data.winner[0]);
+                    console.log('game added');
+                    console.log(newGame);
+                    games[data.gameId]=null;
+                    // send socket emit that sends people to home screen.
+                }
             }
         });
     
@@ -139,7 +176,7 @@ module.exports = function(io){
                 game.removePlayer(data.playerId);
                 socket.leave(data.gameId);
 
-                if (game.players.length === 0) {
+                if (game.isActive === false) {
                     delete games[data.gameId];
                     console.info(`Game ${data.gameId} ended as all players have left.`);
                 } else {
@@ -153,16 +190,23 @@ module.exports = function(io){
             const game = games[data.gameId];
             if (game) {
                 socket.leave(data.gameId);
-                game.removePlayerMidGame(data.userId)
+                game.removePlayerMidGame(data.userId, true)
             }
 
-            if (game.players.length === 0) {
+            if (game.isActive === false) {
                 delete games[data.gameId];
                 console.info(`Game ${data.gameId} ended as all players have left.`);
             } else {
                 console.info(`${data.playerId} left game ${data.gameId}`);
             }
-        })
+        });
+
+        socket.on('leave-socket', (data) => {
+            const game = games[data.gameId];
+            if (game) {
+                socket.leave(data.gameId);
+            }
+        });
         
     
         // Start the game

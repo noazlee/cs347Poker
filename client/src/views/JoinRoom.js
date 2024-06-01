@@ -1,3 +1,6 @@
+// Page where users enter a game code to join the game
+// Contributors: Noah Lee, Batmend Batsaikhan
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '../App.css';
@@ -23,14 +26,16 @@ useEffect(() => {
 
 const backgroundStyle = {
     backgroundImage: `url(${buildImgUrl('poker-bg2.jpg')})`,
-    backgroundRepeat: 'no-repeat',
+    backgroundRepeat: 'repeat-y',
     backgroundPosition: `${backgroundPosition}% 0`,
     backgroundSize: '150% auto',
     height: '100vh',
     width: '100vw',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow:'auto',
+    position:'relative',
 };
 
 useEffect(() => {

@@ -1,3 +1,6 @@
+// Table for the game.
+// Contributors: Ashok Khare, Batmend Batsaikhan
+
 import React, {useState, useEffect} from 'react';
 import PlayerBox from '../components/PlayerBox'
 import Deck from '../components/Deck';
@@ -25,16 +28,15 @@ export default function Table({ props }) {
     const tableStyle = {
         width: '100%',
         height: '100vh',
-        backgroundColor: `dark green`,
         backgroundImage: `url(${buildImgUrl('table.png')})`,
         backgroundSize: 'cover',
-        border: '2px solid',
-        resize: 'both',
-        overflow: 'scroll',
+        backgroundPosition: 'center',
+        backgroundBlendMode: 'overlay', 
         display: 'grid',
         gridTemplateColumns: '1fr 1fr 1fr',
         gridTemplateRows: '1fr 1fr 1fr',
-        gap: '20px'
+        gap: '20px',
+        overflow: 'hidden'
     };
 
     useEffect(() => {
@@ -75,6 +77,7 @@ export default function Table({ props }) {
             setWinnerData(data);
             setRoundOver(true);
             if (data.stillPlaying === false) {
+                socket.emit('round-end-client', {gameId: data.gameId, winner:data.winner, prevIndex: data.prevIndex, stillPlaying: data.stillPlaying});
                 navigate(`/win-screen/${userId}`, {state: {winData: data.winner}});
             }
         });
@@ -126,12 +129,13 @@ export default function Table({ props }) {
             }
         });
 
-        let globalBettingCap = data.players.reduce((min, player) => {
-                let totalChips = player.currentBet + player.chips;
-                return min < totalChips ? min : totalChips;
-            },
-            data.players[0].currentBet + data.players[0].chips
-        );
+        let bettingCaps = [];
+        data.players.forEach((player) => {
+            if (player.isPlaying) {
+                bettingCaps.push(player.chips + player.currentBet)
+            }
+        });
+        let globalBettingCap = Math.min(...bettingCaps);
         
         console.log("Table Global betting cap: ", globalBettingCap);
         return (
@@ -165,6 +169,7 @@ export default function Table({ props }) {
                             }}
                             gameId={gameId}
                             active={player.userId === currentPlayerId ? true : false}
+                            roundOver={roundOver}
                         />
                     </section>
                 )
@@ -175,16 +180,18 @@ export default function Table({ props }) {
         roundData === undefined ? (
             <p>Loading...</p>
         ) : (
+            <div className='tableDiv'>
             <div className='table' style={tableStyle}>
                 {generatePlayerBoxes(roundData)}
                 <section id='deck'>
                     {roundOver === false ? (
                         <Deck props={{communityCards: communityCards, pot: roundData.pot}}/>
                     ) : (
-                        <WinDisplay props={{isHost: (hostId === userId ? true : false), data: winnerData}} />
+                        <WinDisplay props={{isHost: (hostId === userId ? true : false), data: winnerData, communityCards}} />
                     )}
                 </section>
                 <ToastContainer />
+            </div>
             </div>
         )
     );

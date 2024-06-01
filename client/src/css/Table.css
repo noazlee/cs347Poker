@@ -1,4 +1,10 @@
+body {
+    display: block;
+}
 
+.tableDiv{
+    background-color:bisque;
+}
 
 #Box-1 {
     grid-column: 1;

@@ -1,3 +1,6 @@
+// Starting page that users will see when they initially open the application to login.
+// Contributors: Noah Lee
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';

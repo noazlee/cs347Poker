@@ -1,3 +1,6 @@
+// Created by Noah Lee - Round class which handles the logic for an entire round of a game of poker
+// Contributors: Batmend, Ashok, Wesley
+
 const Deck = require('./deck');
 const pokerHandEvaluator = require('./poker-hand-evaluator');
 const Winner = require('./winner');
@@ -33,58 +36,75 @@ class Round {
     }
 
     async start() {
-        this.players.forEach(player => {
-            if (player.isPlaying) {
-                player.resetForNewRound();
+        if (this.players.length === 0) { // If players array is empty (no active human player), skip straight to end game
+            this.endRound();
+        } else {
+            let humanPlayersRemaining = 0;
+            let aiPlayersRemaining = 0;
+            this.players.forEach(player => {
+                if (player.isPlaying) {
+                    player.resetForNewRound();
+                    if (player.isAi) {
+                        aiPlayersRemaining++;
+                    } else {
+                        humanPlayersRemaining++;
+                    }
+                }
+            });
+
+            if ((humanPlayersRemaining === 1) && (aiPlayersRemaining === 0)) { // if only 1 human player left, end round early
+                this.endRound();
+            } else {
+
+                console.log(this.currentSmallBlind);
+
+
+                this.deck.shuffle();
+                this.players.filter(player => player.isInRound).forEach(player => {
+                    player.addCardToHand(this.deck.dealOneCard());
+                    player.addCardToHand(this.deck.dealOneCard());
+                });
+
+                this.pot = 0;
+                
+                await this.setBettingOrder();
+
+                this.players[this.currentSmallBlind].currentBet = this.smallBlindAmount;
+                this.players[this.currentSmallBlind].chips -= this.smallBlindAmount;
+
+                this.players[this.currentBigBlind].currentBet = this.smallBlindAmount * 2; //big blind
+                this.players[this.currentBigBlind].chips -= this.smallBlindAmount * 2;
+
+                this.players.forEach(player=>{
+                    console.info(player);
+                })
+
+                this.io.to(this.gameId).emit('shown-cards', {
+                    cards: []
+                });
+                this.io.to(this.gameId).emit('update-round-data', {
+                    round: {
+                        gameId: this.gameId,
+                        index: this.index,
+                        players: this.players, // problem ... AI player inside player ... socket inside AI player
+                        deck: this.deck,
+                        smallBlindAmount: this.smallBlindAmount,
+                        currentBet: this.currentBet,
+                        pot: this.pot,
+                        communityCards: this.communityCards,
+                        hands: this.hands,
+                        stage: this.stage,
+                        startingPlayer: this.startingPlayer,
+                        currentPlayer: this.currentPlayer,
+                        currentSmallBlind: this.currentSmallBlind,
+                        currentBigBlind: this.currentBigBlind,
+                        playerResponses: this.playerResponses
+                    }
+                });
+
+                await this.promptPlayerAction();
             }
-        });
-
-        // console.log(this.currentSmallBlind);
-
-        this.deck.shuffle();
-        this.players.filter(player => player.isInRound).forEach(player => {
-            player.addCardToHand(this.deck.dealOneCard());
-            player.addCardToHand(this.deck.dealOneCard());
-        });
-
-        this.pot = 0;
-        
-        await this.setBettingOrder();
-
-        this.players[this.currentSmallBlind].currentBet = this.smallBlindAmount;
-        this.players[this.currentSmallBlind].chips -= this.smallBlindAmount;
-
-        this.players[this.currentBigBlind].currentBet = this.smallBlindAmount * 2; //big blind
-        this.players[this.currentBigBlind].chips -= this.smallBlindAmount * 2;
-
-        this.players.forEach(player=>{
-            console.info(player);
-        })
-
-        this.io.to(this.gameId).emit('shown-cards', {
-            cards: []
-        });
-        this.io.to(this.gameId).emit('update-round-data', {
-            round: {
-                gameId: this.gameId,
-                index: this.index,
-                players: this.players, // problem ... AI player inside player ... socket inside AI player
-                deck: this.deck,
-                smallBlindAmount: this.smallBlindAmount,
-                currentBet: this.currentBet,
-                pot: this.pot,
-                communityCards: this.communityCards,
-                hands: this.hands,
-                stage: this.stage,
-                startingPlayer: this.startingPlayer,
-                currentPlayer: this.currentPlayer,
-                currentSmallBlind: this.currentSmallBlind,
-                currentBigBlind: this.currentBigBlind,
-                playerResponses: this.playerResponses
-            }
-        });
-
-        await this.promptPlayerAction();
+        }
     }
 
     dealFlop(){
@@ -374,41 +394,45 @@ class Round {
 
         this.roundEnded = true;
 
-        this.players.forEach(player=>{
-            this.pot+=player.currentBet;
-            player.currentBet=0;
-        })
+        if (this.players.length > 0) {
+            this.players.forEach(player=>{
+                this.pot+=player.currentBet;
+                player.currentBet=0;
+            })
 
-        if(this.numPlayersInRound()>1){
-            [winners, handRank] = this.determineWinner();
-            this.winners = winners; 
-            console.log('rank: ', handRank);
-        }else{
-            winners = [this.lastPlayerInRound()];
-            this.winners = winners;
-        }
+            if(this.numPlayersInRound()>1){
+                [winners, handRank] = this.determineWinner();
+                this.winners = winners; 
+                console.log('rank: ', handRank);
+            }else{
+                winners = [this.lastPlayerInRound()];
+                this.winners = winners;
+            }
 
-        winners.forEach(winner => console.log('winner: ', winner.username, handRank));
+            winners.forEach(winner => console.log('winner: ', winner.username, handRank));
 
-        if (winners.length > 1) {
-            const potShare = Math.floor(this.pot / winners.length);
-            winners.forEach(winner => {
-                winner.chips += potShare;
+            if (winners.length > 1) {
+                const potShare = Math.floor(this.pot / winners.length);
+                winners.forEach(winner => {
+                    winner.chips += potShare;
+                });
+            } else {
+                const winner = winners[0];
+                winner.chips += this.pot;
+            }
+
+            this.players.forEach(player => {
+                if(player.isPlaying){
+                    if(player.chips<=0){
+                        player.isPlaying = false;
+                    }else{
+                        numPplPlaying += 1;
+                    }
+                }
             });
         } else {
-            const winner = winners[0];
-            winner.chips += this.pot;
+            winners = [];
         }
-
-        this.players.forEach(player => {
-            if(player.isPlaying){
-                if(player.chips<=0){
-                    player.isPlaying = false;
-                }else{
-                    numPplPlaying += 1;
-                }
-            }
-        });
 
         if(numPplPlaying>1){
             await this.io.to(this.gameId).emit('round-ended', { gameId:this.gameId, winner: winners, prevIndex: this.currentSmallBlind, cards: [], stillPlaying: true });

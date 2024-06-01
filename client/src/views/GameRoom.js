@@ -1,3 +1,5 @@
+// Contributors: Noah Lee and Ashok Khare - GameRoom where players wait for a game to start.
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -35,14 +37,16 @@ const GameRoom = () => {
 
     const backgroundStyle = {
         backgroundImage: `url(${buildImgUrl('poker-bg2.jpg')})`,
-        backgroundRepeat: 'no-repeat',
+        backgroundRepeat: 'repeat-y',
         backgroundPosition: `${backgroundPosition}% 0`,
         backgroundSize: '150% auto',
         height: '100vh',
         width: '100vw',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        overflow:'auto',
+        position:'relative',
     };
 
     // Fetching the current user's username
