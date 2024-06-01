@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/GameSettings.css';
-import socket from '../socket';
+// import socket from '../socket';
 
 export default function GameSettings({ props }) {
 
@@ -38,14 +38,14 @@ export default function GameSettings({ props }) {
         }
     }
 
-    const addAi = () => {
-        if (props.players.length === props.maxPlayers) {
-            alert("Not enough room to add another AI player.");
-        } else {
-            socket.emit('add-ai', {gameId:props.gameId}); 
-            props.setNumAiPlayers(props.numAiPlayers + 1);
-        }
-    }
+    // const addAi = () => {
+    //     if (props.players.length === props.maxPlayers) {
+    //         alert("Not enough room to add another AI player.");
+    //     } else {
+    //         socket.emit('add-ai', {gameId:props.gameId}); 
+    //         props.setNumAiPlayers(props.numAiPlayers + 1);
+    //     }
+    // }
 
     return (
         <div className='gameSettings'>
@@ -78,11 +78,11 @@ export default function GameSettings({ props }) {
                     onChange={(e) => changeStartingChips(e)}
                 />
             </section>
-            <section className='setting'>
+            {/* <section className='setting'>
                 <h4>AI Players</h4>
                 <p>{props.numAiPlayers}</p>
                 <button id='addAi' onClick={addAi}>Add AI</button>
-            </section>
+            </section> */}
         </div>
     )
 }
