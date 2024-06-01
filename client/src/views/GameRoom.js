@@ -23,10 +23,10 @@ const GameRoom = () => {
 
     const [backgroundPosition, setBackgroundPosition] = useState(0);
 
-    const subtractAi = (playerId) => {
-        socket.emit('remove-ai', {gameId: gameId, playerId});
-        setNumAiPlayers(numAiPlayers - 1);
-    }
+    // const subtractAi = (playerId) => {
+    //     socket.emit('remove-ai', {gameId: gameId, playerId});
+    //     setNumAiPlayers(numAiPlayers - 1);
+    // }
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -140,9 +140,9 @@ const GameRoom = () => {
                     return (
                         <div>
                             <li key={index}>{player.username}</li>
-                            {(userId === hostId && player.isAi) && (
+                            {/* {(userId === hostId && player.isAi) && (
                                 <button id='subtractAi' onClick={() => subtractAi(player.userId)}>Remove AI</button>
-                            )}
+                            )} */}
                         </div>
                     );
                 })}

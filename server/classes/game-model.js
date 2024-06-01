@@ -41,6 +41,12 @@ class Game {
         this.rounds = [];
         this.status = 'waiting';
         this.isActive = true;
+        this.io.on('connection', (socket) => {
+            // Listen for 'remove-ai' event from the frontend
+            socket.on('remove-ai', (data) => {
+                this.removeAiPlayer(data.gameId);
+            });
+        });
         
 
         this.addPlayer(hostId, hostSocketId, username, false);
@@ -158,21 +164,16 @@ class Game {
         //
     }
 
-    removeAiPlayer(playerId) {
-        let playerIndex = undefined;
-        for (let i = 0; i < this.players.length; i++) {
-            if (this.players[i].userId === playerId) {
-                playerIndex = i;
-            }
-        }
-        
-        if (playerIndex === undefined) {
-            console.error(`tried to remove player ${playerId}, but could not find it in game`);
+    removeAiPlayer(gameId) {
+        // Find and remove an AI player from the game
+        const aiPlayerIndex = this.players.findIndex(player => player.isAi);
+        if (aiPlayerIndex !== -1) {
+            const removedAiPlayer = this.players.splice(aiPlayerIndex, 1)[0];
+            console.log(`Removed AI player: ${removedAiPlayer.username}`);
+            // Emit an event to inform clients about the removed AI player
+            this.io.to(gameId).emit('ai-player-removed', { playerId: removedAiPlayer.userId });
         } else {
-            this.players.splice(playerIndex, 1);
-            if (this.hostId === playerId) {
-                this.hostId = this.players[0].userId;
-            }
+            console.log("No AI players to remove.");
         }
     }
 
