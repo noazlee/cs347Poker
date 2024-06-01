@@ -71,7 +71,7 @@ const LeaderBoard = () => {
                                 <tr key={index}>
                                     <td>{user.username}</td>
                                     <td>{user.gamesWon}</td>
-                                    <td>{user.totalchips}</td>
+                                    <td>{user.totalChips}</td>
                                 </tr>
                             ))}
                         </tbody>
