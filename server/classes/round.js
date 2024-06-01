@@ -153,7 +153,7 @@ class Round {
     
             if (player.isInRound) {
                 if (player.isAi) {
-                    // console.log(acceptableMoves);
+                    console.log(acceptableMoves);
                     const aiMove = player.makeMove(acceptableMoves, this.highestBet);
                     // const aiSocketId = Game.aiSocketIds.get(player.userId);
                     await this.processPlayerActionAI(player, aiMove);
@@ -192,6 +192,7 @@ class Round {
                 player.latestMove = "Check";
                 await this.advanceToNextPlayer();
                 await this.updatePlayer();
+                break;
             case 'call':
                 player.latestMove = "Call";
                 await this.advanceToNextPlayer();
