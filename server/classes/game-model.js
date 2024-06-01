@@ -57,6 +57,7 @@ class Game {
         if (!isAI) {
             newPlayer = new Player(userId, socketId, username, this.startingChips, isAI);
         } else {
+            newPlayer = new Ai1(userId, socketId, username, this.startingChips, isAI);
             // newPlayer = new AI
             // Call method to add AI socket to gameId
         }
@@ -143,14 +144,16 @@ class Game {
         }
     }
 
-    addAiPlayer(userId, socketId, username, isAI){
+    addAiPlayer(userId, socketId, username){
         if (this.players.some(p => p.userId === userId)) {
             console.log("Player already exists:", userId);
             return false; 
         }
-        let newPlayer = new Ai1(userId, socketId, username, this.startingChips, isAI);
+        let newPlayer = new Ai1(userId, socketId, username, this.startingChips, true);
+        console.log("Adding AI Player:", newPlayer); 
         this.players.push(newPlayer);
-        the_socket = io.connect('http://localhost:3000');
+        // this.aiSocketIds.set(userId, socketId);
+        // the_socket = io.connect('http://localhost:3000');
         // store socketid in the new ai player
         //
     }
