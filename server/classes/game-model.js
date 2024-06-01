@@ -1,4 +1,5 @@
 // Created by Noah Lee - Game class which handles the logic for an entire game of poker.
+// Contributors: Sho Tanaka, Wesley Yang
 
 const Round = require('./round');
 const Player = require('./player');
@@ -158,10 +159,6 @@ class Game {
         let newPlayer = new Ai1(userId, socketId, username, this.startingChips, true);
         console.log("Adding AI Player:", newPlayer); 
         this.players.push(newPlayer);
-        // this.aiSocketIds.set(userId, socketId);
-        // the_socket = io.connect('http://localhost:3000');
-        // store socketid in the new ai player
-        //
     }
 
     removeAiPlayer(gameId) {

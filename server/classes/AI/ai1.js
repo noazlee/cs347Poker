@@ -1,16 +1,5 @@
-//use socket to send signals to server
-//check if its your turn
-//make make move have the same websocket message as when the player clicks
-//establiish socket with backend
-
-//control p
-//gameroom.js - logic for players creating and joining game rooms
-//bettingcontrols.js - where the clients talk to the server
-//prompt player action(round.js) - logic behind players options
-
-//gamesocket.js add ai player
-
-//adding ai player to game-model.js add ai players
+// Created by Wesley Yang - Handles logic of when Ai makes a move
+// Contributors: Noah Lee, Sho Tanaka
 
 const Ai = require('../ai-player');
 

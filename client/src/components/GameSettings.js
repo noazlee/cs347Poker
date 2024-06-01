@@ -1,3 +1,6 @@
+// Created by Ashok 
+// Contributor: Wesley, Sho
+
 import React from 'react';
 import '../css/GameSettings.css';
 import socket from '../socket';

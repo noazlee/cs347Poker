@@ -1,3 +1,5 @@
+// Created by Sho Tanaka and Noah Lee - handles the ranking of different combinations of cards
+
 const CARD_RANKS = "23456789TJQKA";
 const HAND_RANKS = {
     "High Card": 1,

@@ -1,3 +1,5 @@
+// Created by Wesley Yang - Initializes the deck and its methods
+
 const Card = require('./card');
 
 class Deck{

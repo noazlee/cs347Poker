@@ -1,4 +1,4 @@
-// Leaderboard page for players with most wins and chips
+// Created by Sho Tanaka - Leaderboard page for players with most wins and chips
 // Contributors: Carlos Flores, Sho Tanaka
 
 import React, { useState, useEffect } from 'react';

@@ -1,15 +1,6 @@
+//Created by Wesley Yang - Initializes the moves for Ai
+
 const Player = require('./player');
-// const io = require('socket.io-client');
-
-//method connect to game, disconnect from game- take in gameId
-//in addAi players(game-model) call join/leave function
-
-//create dumb makemove function and rewrite it in ai1
-
-//round.js players = this.players error
-
-
-//round.js ggeck if player is makemove() then call make move()
 
 class Ai extends Player {
     static aiCounter = 0;

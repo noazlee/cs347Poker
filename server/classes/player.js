@@ -1,3 +1,6 @@
+// Created by Wesley Yang: Players moves and options
+// Contributor: Sho Tanaka
+
 class Player{
     constructor(userId, socketId, username, chips, isAi){
         this.username = username;
@@ -81,13 +84,4 @@ class Player{
 
 module.exports = Player;
 
-//players two cards
-//position
-//chips
-// is ai
-//user id
-//is still playing
-
-//methods:
-// fold, raise, check, call, leave game, all in?
 
