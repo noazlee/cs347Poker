@@ -4,6 +4,8 @@
 const Deck = require('./deck');
 const pokerHandEvaluator = require('./poker-hand-evaluator');
 const Winner = require('./winner');
+const Ai1 = require('./AI/ai1');
+const Game = require('./game-model');
 
 // round.js
 class Round {
@@ -29,6 +31,8 @@ class Round {
         this.winners = new Winner(players); // Initialize Winner object with the players array (sho)
         this.roundEnded = false;
         this.roundPlaying=false;
+
+        this.aiSocketIds = new Map();
     }
 
     async start() {
@@ -53,6 +57,7 @@ class Round {
             } else {
 
                 console.log(this.currentSmallBlind);
+
 
                 this.deck.shuffle();
                 this.players.filter(player => player.isInRound).forEach(player => {
@@ -147,8 +152,8 @@ class Round {
             const player = this.players[this.currentPlayer];
             console.log(player.userId, "turn"); 
             var acceptableMoves;
-            console.log(player.currentBet);
-            console.log(this.highestBet);
+            // console.log(player.currentBet);
+            // console.log(this.highestBet);
             if(player.currentBet<this.highestBet){
                 if(player.chips==0){
                     acceptableMoves = ['Fold', 'Check'];
@@ -167,16 +172,21 @@ class Round {
             //player.makemove(acceptableMoves);
     
             if (player.isInRound) {
+                if (player.isAi) {
+                    console.log(acceptableMoves);
+                    const aiMove = player.makeMove(acceptableMoves, this.highestBet);
+                    // const aiSocketId = Game.aiSocketIds.get(player.userId);
+                    await this.processPlayerActionAI(player, aiMove);
+                }else{
                 // Send signal to client. Received by Table.js
                 this.io.to(player.socketId).emit('your-turn', { // Waits for signal from client and calls function game sockets.
                     highestbet: this.highestBet,
                     acceptableMoves: acceptableMoves
                 });
-                // check if player is ai
-                // player.makeMove
                 return new Promise((resolve) => { 
                     this.playerResponses.set(player.socketId, resolve);
                 });
+            }
             } else {
                 await this.advanceToNextPlayer();  // Skip if the player is not active
             }
@@ -191,6 +201,46 @@ class Round {
             resolve();
             this.playerResponses.delete(socket.id);
             this.processPlayerAction(socket, data);
+        }
+    }
+    
+    async processPlayerActionAI(player, aiMove) {
+        console.log(`Action received from ${player.userId}: ${aiMove}`);
+        this.roundPlaying=true;
+        switch(aiMove){
+            case 'check':
+                player.latestMove = "Check";
+                await this.advanceToNextPlayer();
+                await this.updatePlayer();
+                break;
+            case 'call':
+                player.latestMove = "Call";
+                await this.advanceToNextPlayer();
+                await this.updatePlayer();
+                break;
+            case 'raise':
+                player.latestMove = "Raise";
+                this.highestBet = player.currentBet;
+                this.anchor = this.positionInQueue(player);
+                await this.advanceToNextPlayer();
+                await this.updatePlayer();
+                break;
+            case 'fold':
+                player.latestMove = "Fold";
+                player.isInRound = false;
+                const numPlayers = this.numPlayersInRound();
+                this.pot += player.currentBet;
+                player.currentBet = 0;
+
+                if(numPlayers>1){
+                    await this.advanceToNextPlayer();
+                    await this.updatePlayer();
+                }else{
+                    await this.endRound();
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -253,27 +303,30 @@ class Round {
 
     // Moves to the next player
     async advanceToNextPlayer() {
+        let movedToNextPlayer = false;
+    
         do {
-            console.log(this.currentPlayer);
             this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
-            console.log(this.currentPlayer);
-            console.log(this.anchor);
-            if(this.anchor!=null){
-                if(this.currentPlayer==this.anchor){
-                    console.log('betting round done, advancing stage');
-                    this.anchor=null;
-                    this.advanceStage();
-                }else{
-                    this.promptPlayerAction();
-                }
-            }else{
-                if(this.currentPlayer==this.startingPlayer){
-                    console.log('betting round done, advancing stage');
-                    this.advanceStage();
-                }
+            console.log(`Current player index after increment: ${this.currentPlayer}`);
+            movedToNextPlayer = this.players[this.currentPlayer].isInRound;
+    
+            // Check if we've returned to the anchor player
+            if (this.anchor !== null && this.currentPlayer === this.anchor) {
+                console.log('Betting round done, advancing stage');
+                this.anchor = null;
+                this.advanceStage();
+                return;
             }
-        } while (!this.players[this.currentPlayer].isInRound);
-
+    
+            // Check if we've returned to the starting player
+            if (this.anchor === null && this.currentPlayer === this.startingPlayer) {
+                console.log('Betting round done, advancing stage');
+                this.advanceStage();
+                return;
+            }
+    
+        } while (!movedToNextPlayer);
+    
         if (this.allPlayersActed()) {
             this.advanceStage();
         } else {
@@ -501,15 +554,15 @@ class Round {
 
     moveBetstoPot(){
         let totalBets = 0;
-        console.log('moving bets to pot');
+        // console.log('moving bets to pot');
         this.players.forEach(player => {
             if (player.isPlaying) {
-                console.log(`Moving ${player.currentBet} from ${player.userId} to pot`);
+                // console.log(`Moving ${player.currentBet} from ${player.userId} to pot`);
                 this.pot += parseInt(player.currentBet);
                 player.currentBet = 0;
             }
         });
-        console.log(`Total pot after moving bets: ${this.pot}`);
+        // console.log(`Total pot after moving bets: ${this.pot}`);
     }
 
     // go loop through each player
@@ -525,7 +578,7 @@ class Round {
 
             if (player.isInRound) {
                 const playerCards = [...player.hand, ...this.communityCards];
-                console.log(player.userId, playerCards);
+                // console.log(player.userId, playerCards);
                 const playerHand = this.winners.evaluateHand(playerCards);
     
                 if (playerHand.rank > bestHand.rank || 
