@@ -120,6 +120,7 @@ module.exports = function(io){
             if (game) {
                 game.removeAiPlayer(data.playerId);
 
+
                 if (game.isActive === false) {
                     delete games[data.gameId];
                     console.info(`Game ${data.gameId} ended as all players have left.`);

@@ -43,9 +43,14 @@ export default function GameSettings({ props }) {
             alert("Not enough room to add another AI player.");
         } else {
             socket.emit('add-ai', {gameId:props.gameId}); 
-            props.setNumAiPlayers(props.numAiPlayers + 1);
+            // props.setNumAiPlayers(props.numAiPlayers + 1);
         }
     }
+    const removeAi = () => {
+        socket.emit('remove-ai', { gameId: props.gameId });
+        // props.setNumAiPlayers(props.numAiPlayers - 1);
+    }
+
 
     return (
         <div className='gameSettings'>
@@ -80,8 +85,9 @@ export default function GameSettings({ props }) {
             </section>
             <section className='setting'>
                 <h4>AI Players</h4>
-                <p>{props.numAiPlayers}</p>
+                {/* <p>{props.numAiPlayers}</p> */}
                 <button id='addAi' onClick={addAi}>Add AI</button>
+                <button id='removeAi' onClick={removeAi}>Remove AI</button>
             </section>
         </div>
     )
