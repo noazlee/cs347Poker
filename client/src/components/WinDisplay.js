@@ -1,3 +1,6 @@
+// A small display that appears on round end, showing the winner and community cards.
+// Contributors: Ashok Khare
+
 import React from 'react';
 import socket from '../socket';
 import '../css/WinDisplay.css';

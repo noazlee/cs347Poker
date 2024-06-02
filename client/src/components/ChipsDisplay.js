@@ -1,3 +1,6 @@
+// Displays a player's chips.
+// Contributors: Ashok Khare, Carlos Flores
+
 import React from 'react';
 import { buildImgUrl } from '../utils/utils';
 import '../css/ChipsDisplay.css';

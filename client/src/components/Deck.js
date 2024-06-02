@@ -1,3 +1,6 @@
+// Displays the community cards for a round, and the pot.
+// Contributors: Ashok Khare, Carlos Flores
+
 import React from 'react';
 import Card from './Card';
 import '../css/Deck.css';

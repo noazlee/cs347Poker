@@ -1,3 +1,6 @@
+// Contains the buttons for player actions, and the player's chips.
+// Contributors: Ashok Khare
+
 import React, { useState } from 'react';
 import ChipsDisplay from './ChipsDisplay';
 import Popup from './Popup';

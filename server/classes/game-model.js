@@ -1,5 +1,5 @@
 // Created by Noah Lee - Game class which handles the logic for an entire game of poker.
-// Contributors: Sho Tanaka, Wesley Yang
+// Contributors: Sho Tanaka, Wesley Yang, Ashok Khare
 
 const Round = require('./round');
 const Player = require('./player');

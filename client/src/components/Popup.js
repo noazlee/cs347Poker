@@ -1,3 +1,6 @@
+// A popup box that allows the user to specify an amount to raise on their turn.
+// Contributors: Ashok Khare
+
 import React, { useState } from 'react';
 import '../css/Popup.css';
 import socket from '../socket';

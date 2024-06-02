@@ -1,3 +1,6 @@
+// Displays a card back, or the front given a suit and value.
+// Contributors: Ashok Khare, Carlos Flores
+
 import React, { useState } from 'react';
 import { cardMap, buildImgUrl } from '../utils/utils';
 import '../css/Card.css';

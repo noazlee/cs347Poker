@@ -1,3 +1,4 @@
+// User interface to change a game's initial settings.
 // Created by Ashok 
 // Contributor: Wesley, Sho
 

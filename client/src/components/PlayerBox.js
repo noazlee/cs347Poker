@@ -1,3 +1,6 @@
+// Displays a player's information in game. Includes buttons for the player to make a move or leave the game.
+// Contributors: Ashok Khare, Carlos Flores
+
 import React from "react";
 import BettingControls from "./BettingControls";
 import Card from "./Card";
